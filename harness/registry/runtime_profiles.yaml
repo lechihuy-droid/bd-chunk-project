@@ -1,0 +1,11 @@
+profiles:
+  read_only:
+    mode: read
+  registry_writer:
+    mode: write_index
+  source_parser:
+    mode: write_outputs
+  validator:
+    mode: write_exceptions
+  bd_writer:
+    mode: write_bd_outputs
