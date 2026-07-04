@@ -1,0 +1,9 @@
+rules:
+  business_rule: business_rule
+  validation_rule: validation
+  exception_rule: exception
+  state_transition: status_transition
+  screen_behavior: screen_spec
+  api_behavior: api_spec
+  batch_process: batch
+  data_item: database
