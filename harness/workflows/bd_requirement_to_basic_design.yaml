@@ -1,0 +1,69 @@
+id: bd_requirement_to_basic_design
+name: BD Requirement to Basic Design
+version: 0.1.0
+
+stages:
+  - id: register_files
+    owner: file_registry_agent
+    outputs:
+      - data/index/file_registry.jsonl
+
+  - id: parse_sources
+    owner: source_parser_agent
+    inputs:
+      - data/index/file_registry.jsonl
+    outputs:
+      - data/outputs/source_units.jsonl
+
+  - id: validate_source_units
+    owner: traceability_validator_agent
+    inputs:
+      - data/outputs/source_units.jsonl
+    outputs:
+      - data/outputs/exceptions.jsonl
+
+  - id: build_traceable_chunks
+    owner: chunk_builder_agent
+    inputs:
+      - data/outputs/source_units.jsonl
+    outputs:
+      - data/outputs/traceable_chunks.jsonl
+
+  - id: label_ontology
+    owner: ontology_labeler_agent
+    inputs:
+      - data/outputs/traceable_chunks.jsonl
+      - ontology/
+    outputs:
+      - data/outputs/rkb_candidates.jsonl
+
+  - id: review_rkb
+    owner: rkb_reviewer_agent
+    inputs:
+      - data/outputs/rkb_candidates.jsonl
+    outputs:
+      - data/outputs/rkb_items.jsonl
+
+  - id: map_bd
+    owner: bd_mapper_agent
+    inputs:
+      - data/outputs/rkb_items.jsonl
+      - ontology/mapping_rules.yaml
+    outputs:
+      - data/outputs/bd_mapping.jsonl
+
+  - id: generate_bd_patch
+    owner: bd_patch_writer_agent
+    inputs:
+      - data/outputs/rkb_items.jsonl
+      - data/outputs/bd_mapping.jsonl
+    outputs:
+      - data/outputs/bd_patch_ja.md
+
+gates:
+  - id: provenance_required
+    rule: every_source_unit_must_have_source_locator
+  - id: pending_blocked
+    rule: pending_or_conflict_items_must_not_generate_bd_patch
+  - id: mapping_controlled
+    rule: bd_frame_must_exist_in_ontology
