@@ -1,3 +1,3 @@
 # Deprecated
-# This legacy registry file was cleared during the Harness restructure.
-# Use harness/registry/tool_profiles.yaml instead.
+# This legacy file was cleared during the Harness restructure.
+# Use harness/registry/runtime_profiles.yaml instead.
