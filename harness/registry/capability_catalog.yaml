@@ -1,0 +1,10 @@
+capabilities:
+  - register_files
+  - parse_excel
+  - build_chunks
+  - validate_chunks
+  - label_ontology
+  - promote_rkb
+  - build_bm25
+  - map_bd
+  - generate_bd_patch
