@@ -1,0 +1,36 @@
+agents:
+  - id: orchestrator
+    stage: orchestration
+    role: route_jobs_and_check_gates
+
+  - id: file_registry
+    stage: ingest
+    role: hash_files_and_create_registry_records
+
+  - id: source_parser
+    stage: ingest
+    role: parse_sources_into_source_units
+
+  - id: traceability_validator
+    stage: validation
+    role: validate_source_locations_and_raw_text
+
+  - id: chunk_builder
+    stage: chunking
+    role: create_traceable_chunks
+
+  - id: ontology_labeler
+    stage: rkb
+    role: apply_controlled_labels
+
+  - id: rkb_reviewer
+    stage: review
+    role: promote_ready_items_only
+
+  - id: bd_mapper
+    stage: bd_mapping
+    role: map_rkb_items_to_bd_frames
+
+  - id: bd_patch_writer
+    stage: bd_generation
+    role: write_japanese_bd_patch_with_citations
