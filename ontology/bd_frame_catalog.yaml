@@ -1,0 +1,10 @@
+frames:
+  - screen_spec
+  - api_spec
+  - business_rule
+  - validation
+  - exception
+  - status_transition
+  - batch
+  - external_interface
+  - database
