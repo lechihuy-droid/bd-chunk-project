@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.env
+.DS_Store
+
+data/raw/*
+data/outputs/*
+data/index/*
+!data/raw/.gitkeep
+!data/outputs/.gitkeep
+!data/index/.gitkeep
