@@ -373,7 +373,153 @@ The primary output is not a conversation. The primary output is a reviewable BD 
 
 ---
 
-## 10. Definition of Done for This One-Week UI Rebuild
+## 10. UI Pattern Extractor Core
+
+The UI rebuild should use `github.com/JCodesMore/ai-website-cloner-template` as the core engine for UI reverse engineering.
+
+This repository should not be used as a direct cloning engine for the BD Harness UI. Its role is to provide the capture, analysis, and generation foundation for a higher-level **UI Pattern Extractor**.
+
+### Reframed Purpose
+
+Do not ask:
+
+```text
+How do we clone DeerFlow?
+```
+
+Ask instead:
+
+```text
+Which UI patterns from DeerFlow are worth adopting into Harness?
+Where do those patterns fit in the BD Harness workflow?
+Should they become part of our reusable UI Pattern Library?
+```
+
+### Target Pipeline
+
+```text
+URL / Screenshot / Public Repo
+        ↓
+AI Website Cloner Core
+        ↓
+DOM / Screenshot / Component Guess / Layout Guess
+        ↓
+UI Pattern Extractor
+        ↓
+Pattern Candidate
+        ↓
+Pattern Library
+        ↓
+UX Decision Record
+        ↓
+Harness UI Spec
+        ↓
+Storybook / Frontend Implementation
+```
+
+### Core Responsibilities
+
+The cloner core should handle:
+
+- Website capture
+- Screenshot ingestion
+- DOM extraction when available
+- Layout reconstruction
+- Initial component guess
+- Visual hierarchy analysis
+- HTML / React prototype generation when useful
+
+The Harness-specific extractor layer should handle:
+
+- Pattern naming
+- Pattern classification
+- Applicability scoring
+- Fit-to-Harness analysis
+- Comparison with existing patterns
+- UX decision record generation
+- Pattern library update
+- Screen-spec update
+
+### Pattern Extraction Output
+
+Each cloned or analyzed product should produce a structured output:
+
+```yaml
+product: DeerFlow
+source_type: website_or_repo_or_screenshot
+analyzed_area: Planner UI
+
+patterns:
+  - name: Execution Timeline
+    category: agent_execution
+    evidence:
+      - screenshot
+      - dom_notes
+      - interaction_notes
+    strengths:
+      - Shows task progress clearly
+      - Makes long-running agent work understandable
+    weaknesses:
+      - May become noisy for simple tasks
+    harness_fit:
+      target_screen:
+        - Agent Run
+        - Planner
+        - BD Mapping Review
+      priority: high
+      confidence: 0.85
+    decision:
+      action: adopt_with_modification
+      reason: Useful for transparent BD generation and human review gates
+```
+
+### Pattern Library Update Rule
+
+Every analyzed product should update one of these locations:
+
+```text
+docs/ui/patterns/
+docs/ui/references/
+docs/ui/decisions/
+docs/ui/components/
+docs/ui/screens/
+```
+
+The extractor should not generate final UI code directly unless the pattern has already been accepted into the library.
+
+### Decision Matrix
+
+For each pattern family, compare candidates from multiple products before adopting.
+
+| Pattern Family | Candidate Products | Preferred Source | Reason |
+|---|---|---|---|
+| Sidebar | Linear, VS Code, Cursor | Linear + VS Code | Fast navigation with project/file hierarchy |
+| Workspace | Cursor, VS Code, ChatGPT Canvas | Cursor | Strong multi-panel AI workbench model |
+| Planner | DeerFlow, OpenHands, LangGraph Studio | DeerFlow + LangGraph Studio | Human-readable plan plus dependency-aware execution |
+| Workflow Graph | LangGraph Studio, n8n, Flowise | LangGraph Studio | Clear graph semantics for agent flow |
+| Inspector | Figma, Cursor, VS Code | Figma | Contextual properties panel is mature and scalable |
+| Artifact Viewer | ChatGPT, VS Code, GitHub | VS Code + ChatGPT | Preview plus conversational handoff |
+| Review Gate | GitHub PR, Azure DevOps, Linear | GitHub PR | Familiar approval and diff review workflow |
+| Command Palette | VS Code, Cursor, Linear | VS Code | De facto keyboard-first interaction model |
+
+### Definition of Done for the Extractor Layer
+
+The cloner is successfully adapted when it can produce:
+
+- Product analysis notes
+- Pattern candidates
+- Pattern fit score
+- Evidence references
+- Suggested Harness screen mapping
+- UX decision record draft
+- Component candidates
+- Implementation notes for Storybook
+
+The output should improve the Harness UI Design System over time. The goal is to build an original Harness design language from 10-20 analyzed products, not to create a copy of any single product.
+
+---
+
+## 11. Definition of Done for This One-Week UI Rebuild
 
 The rebuild is done when the repository contains:
 
@@ -385,12 +531,13 @@ The rebuild is done when the repository contains:
 - Component inventory
 - Initial implementation backlog
 - Clear decision records for layout, planner, artifact viewer, and review gate
+- Initial UI Pattern Extractor plan using `JCodesMore/ai-website-cloner-template` as the core engine
 
 The week is not done if the output is only visual mockups without implementation-ready structure.
 
 ---
 
-## 11. Next Implementation Step
+## 12. Next Implementation Step
 
 After this documentation sprint, the recommended next step is:
 
@@ -408,5 +555,6 @@ Priority:
 6. BD Mapping screen
 7. Artifact Review screen
 8. ExecutionTimeline
+9. UI Pattern Extractor wrapper around the website cloner core
 
 This keeps the UI independent from backend/runtime decisions while still making the product visible and testable early.
