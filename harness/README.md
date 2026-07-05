@@ -1,11 +1,11 @@
-# Harness Layer
+# Harness Design Notes
 
-This folder contains the declarative control layer for the BD Harness.
+This folder stores declarative design references for the BD Harness.
 
 Folders:
 
-- registry: catalogs for agents, skills, and runtime profiles.
-- workflows: workflow definitions and stage gates.
-- policies: governance and guardrail rules.
+- `registry/`: agent, capability, and runtime profile drafts.
+- `workflows/`: workflow definitions and stage-gate drafts.
+- `policies/`: future governance and guardrail notes.
 
-The Harness defines stage order, allowed responsibilities, and validation gates. Deterministic implementation lives under `src/bd_chunk/`.
+These files are planning artifacts. Runtime implementation should be created in a separate build repository when needed.
