@@ -1,7 +1,2 @@
-import typer
-
-app = typer.Typer()
-
-@app.command()
-def health():
-    typer.echo("bdchunk ok")
+# Documentation-only repository.
+# Runtime CLI code is not maintained in this repo.
