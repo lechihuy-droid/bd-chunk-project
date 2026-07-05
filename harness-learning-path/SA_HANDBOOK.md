@@ -1,7 +1,120 @@
 # SA Handbook — Agent System Architecture for BD Harness
 
-Version: v0.1  
+Version: v0.2  
 Purpose: Central knowledge base for the BD Chunk / Super Agent Harness architecture.
+
+> **SA Handbook không phải là nơi lưu mọi kiến thức. Đây là nơi chuẩn hóa kiến trúc đã được chấp nhận của dự án.**
+
+---
+
+# 0. Operating Definition
+
+## 0.1 Mission
+
+SA Handbook là **Single Source of Truth** cho kiến trúc của dự án BD Harness.
+
+Nó không thay thế research note, course note, repo review hay raw learning log. Những nội dung đó nằm ở research/reading layer. SA Handbook chỉ lưu phần tri thức đã được **lọc, chuẩn hóa và chấp nhận** để dùng cho thiết kế hệ thống.
+
+## 0.2 What Belongs Here
+
+SA Handbook chỉ nên lưu:
+
+- Canonical architecture của Harness
+- Core concepts đã được định nghĩa rõ
+- Architecture principles
+- Reusable design patterns
+- Framework mapping
+- Architecture Decision Records (ADR)
+- BD Harness methodology
+- Governance rules
+- Glossary chuẩn của dự án
+
+## 0.3 What Does Not Belong Here
+
+Không đưa trực tiếp các nội dung sau vào SA Handbook:
+
+- Raw paper summary
+- Raw course note
+- Repo review dài
+- Prompt nháp
+- Tool experiment log
+- Ý tưởng chưa được kiểm chứng
+- Chi tiết implementation tạm thời
+
+Những nội dung trên có thể nằm ở `reading/`, `research/`, hoặc learning log. Chỉ khi đã rút ra pattern, principle hoặc decision thì mới đưa vào handbook.
+
+## 0.4 MVP Structure
+
+SA Handbook MVP chỉ cần giữ 10 nhóm nội dung:
+
+```text
+1. Purpose
+2. Canonical Architecture
+3. Core Concepts
+4. Architecture Principles
+5. Pattern Library
+6. Framework Mapping
+7. Architecture Decision Records
+8. Glossary
+9. References
+10. Learning Log
+```
+
+## 0.5 Learning-to-Handbook Workflow
+
+Khi đọc một repo, course, paper hoặc framework mới, không copy trực tiếp vào handbook. Luôn đi qua workflow sau:
+
+```text
+Research / Course / Repo
+  ↓
+Extract Pattern
+  ↓
+Compare with Canonical Architecture
+  ↓
+Update SA Handbook
+  ↓
+Create ADR if needed
+  ↓
+Apply to BD Harness
+```
+
+## 0.6 Five Questions Before Updating Handbook
+
+Mỗi lần cập nhật handbook, phải trả lời 5 câu hỏi:
+
+1. Học được pattern gì?
+2. Pattern này thuộc chapter nào trong SA Handbook?
+3. Có cần tạo ADR mới không?
+4. Có thay đổi Canonical Architecture không?
+5. Có áp dụng được cho BD Harness ở đâu?
+
+Nếu không trả lời được ít nhất một câu rõ ràng, nội dung đó chưa nên đưa vào handbook.
+
+## 0.7 Design Principles
+
+### Framework Independent
+
+Thiết kế kiến trúc trước, chọn framework sau. LangGraph, Claude Code, OpenAI Agents SDK và Microsoft Agent Framework chỉ là implementation options.
+
+### Artifact First
+
+Tri thức quan trọng và deliverable nên tồn tại dưới dạng artifact có thể review, diff và version bằng Git.
+
+### Traceability First
+
+Mọi output quan trọng phải truy vết được về requirement/source.
+
+### Human Review
+
+Không tự động hóa quyết định thiết kế cuối cùng nếu output là tài liệu BD hoặc artifact có ảnh hưởng đến khách hàng.
+
+### Schema First
+
+Ưu tiên giao tiếp giữa agent bằng schema rõ ràng thay vì prompt tự do.
+
+### Small Context
+
+Mỗi agent chỉ nhận lượng context tối thiểu cần thiết cho task của nó.
 
 ---
 
