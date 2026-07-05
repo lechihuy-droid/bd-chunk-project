@@ -1,25 +1,27 @@
-# Architecture
+# Architecture Notes
 
-The project is structured as a file-based Harness MVP.
+This document describes the target architecture for a future BD Harness. It is a planning artifact, not an implementation guide for this repository.
+
+## Target concept
 
 ```text
-User / CLI Job
+User request or project task
   -> Harness Orchestrator
-  -> Specialist Skills
-  -> Deterministic Python Pipeline
-  -> Validation Gates
-  -> Reviewable BD Output
+  -> Specialist roles
+  -> Deterministic parsing service
+  -> Validation gates
+  -> Reviewable BD output
 ```
 
-## Layers
+## Conceptual layers
 
 1. Orchestration layer: routes jobs and enforces stage order.
-2. Registry layer: defines agents, skills, and tool profiles.
+2. Registry layer: defines agents, capabilities, and runtime profiles.
 3. Data layer: stores raw input, normalized output, and indexes.
 4. Ontology layer: controls source labels, requirement types, BD frames, and mapping rules.
-5. Runtime layer: executes deterministic parsing, chunking, validation, indexing, and BD generation.
+5. Runtime layer: should be built in a separate implementation repository.
 6. Review layer: blocks unresolved items before client-facing output.
 
 ## Runtime boundary
 
-The sandbox runtime should not access production databases directly. It should use approved connectors, exported files, controlled API endpoints, or cloud sandbox data mirrors.
+A future sandbox runtime should not access production databases directly. It should use approved connectors, exported files, controlled API endpoints, or cloud sandbox data mirrors.
