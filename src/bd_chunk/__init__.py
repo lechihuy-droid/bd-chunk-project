@@ -1,1 +1,2 @@
-__version__ = "0.1.0"
+# Documentation-only repository.
+# Source package placeholders are retained only to avoid broken historical links.
