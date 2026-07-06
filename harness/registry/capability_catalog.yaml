@@ -8,3 +8,25 @@ capabilities:
   - build_bm25
   - map_bd
   - generate_bd_patch
+
+useful_external_tools:
+  - name: codebase-memory-mcp
+    category: code_memory_engine
+    role_in_harness: Persistent code knowledge graph for AI coding agents.
+    useful_for:
+      - Symbol, function, class, dependency, and call graph lookup.
+      - Impact analysis from code changes or git diff.
+      - Cross-service and cross-repository architecture reasoning.
+      - Reducing token usage when agents need codebase context.
+    recommended_position: Code Memory layer, connected through MCP.
+    fit_for_bd_harness: High value after the project moves from BD planning to runtime/code implementation.
+
+  - name: CodeGraph
+    category: lightweight_code_graph
+    role_in_harness: Local codebase graph/index for faster AI code navigation.
+    useful_for:
+      - Finding symbol usage and caller/callee relationships.
+      - Helping Claude Code, Cursor, Codex, or similar agents avoid repeated grep/read cycles.
+      - Lightweight repository onboarding and code exploration.
+    recommended_position: Developer-side Code Navigation layer or lightweight Code Memory layer.
+    fit_for_bd_harness: Useful as a simpler option before adopting a heavier persistent graph engine.
