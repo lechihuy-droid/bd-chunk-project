@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This folder stores implementation-oriented research for the BD Harness Context Layer.
+This folder stores implementation-oriented research for the BD Harness Context Layer and adjacent Harness implementation layers.
 
 The goal is to separate general reading material from project-specific technical evaluation, benchmarks, architecture decisions, and adoption notes.
 
@@ -34,7 +34,7 @@ Use two repositories for two different types of knowledge:
 
 ## Current Research Scope
 
-The initial scope of this folder is the Harness Context Layer:
+The initial scope of this folder is the Harness Context Layer plus adjacent implementation layers needed for BD Harness:
 
 - codebase-memory-mcp
 - Microsoft GraphRAG
@@ -46,6 +46,8 @@ The initial scope of this folder is the Harness Context Layer:
 - OpenWiki
 - CodeGraph
 - Context Orchestrator design
+- Langfuse for L6 AgentOps / Observability
+- OpenHands for L2 Runtime Architecture
 
 ## Planned Files
 
@@ -55,6 +57,8 @@ The initial scope of this folder is the Harness Context Layer:
 - `openwiki.md`
 - `codegraph.md`
 - `context-harness-architecture.md`
+- `langfuse.md`
+- `openhands.md`
 - `adr-context-layer-classification.md`
 
 ## Operating Rule
