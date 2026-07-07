@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This folder stores implementation-oriented research for the BD Harness Context Layer and adjacent Harness implementation layers.
+This folder stores implementation-oriented research for the BD Harness Context Layer.
 
 The goal is to separate general reading material from project-specific technical evaluation, benchmarks, architecture decisions, and adoption notes.
 
@@ -34,7 +34,7 @@ Use two repositories for two different types of knowledge:
 
 ## Current Research Scope
 
-The initial scope of this folder is the Harness Context Layer plus adjacent implementation layers needed for BD Harness:
+The initial scope of this folder is the Harness Context Layer:
 
 - codebase-memory-mcp
 - Microsoft GraphRAG
@@ -46,8 +46,6 @@ The initial scope of this folder is the Harness Context Layer plus adjacent impl
 - OpenWiki
 - CodeGraph
 - Context Orchestrator design
-- Langfuse for L6 AgentOps / Observability
-- OpenHands for L2 Runtime Architecture
 
 ## Planned Files
 
@@ -57,14 +55,19 @@ The initial scope of this folder is the Harness Context Layer plus adjacent impl
 - `openwiki.md`
 - `codegraph.md`
 - `context-harness-architecture.md`
-- `langfuse.md`
-- `openhands.md`
 - `adr-context-layer-classification.md`
+
+## Related Harness Implementation Layers
+
+Adjacent implementation notes are stored outside this folder:
+
+- L2 Runtime / Orchestration: `docs/research/runtime-layer/`
+- L6 AgentOps / Observability: `docs/research/agentops-layer/`
 
 ## Operating Rule
 
 When a new repo, article, or framework is reviewed:
 
 - If it is mainly learning material, add it to the Opus reading list.
-- If it affects BD Harness implementation, add a research note here.
-- If it is both, create both records: a short reading-list entry in Opus and a detailed implementation note in this folder.
+- If it affects BD Harness implementation, add a research note in the correct Harness layer folder.
+- If it is both, create both records: a short reading-list entry in Opus and a detailed implementation note in BD Chunk.
