@@ -55,6 +55,38 @@ capabilities:
       itself in L5. L5 should only contain the control mechanisms that select,
       enforce, evaluate, or block a skill during execution.
 
+  - id: office_document_engine
+    layer: L4_capability
+    type: tool_adapter
+    source: https://github.com/iOfficeAI/OfficeCLI
+    role: agent_first_office_document_automation_for_word_excel_and_powerpoint
+    expose_as:
+      - office.read
+      - office.query
+      - office.create
+      - office.update
+      - office.replace
+      - office.insert_table
+      - office.insert_chart
+      - office.insert_image
+      - office.render
+      - office.preview
+      - office.dump
+      - office.validate
+      - office.batch
+    adoption_note: >-
+      Treat OfficeCLI as an implementation behind an Office Capability API, not as
+      direct prompt-level CLI commands. The BD Harness should call stable capabilities
+      such as render_preview, dump_structure, update_sheet, insert_table, and validate_layout,
+      while the adapter maps those calls to OfficeCLI. This keeps workflows portable if
+      the implementation is later replaced by Microsoft Graph, LibreOffice, or custom SDKs.
+    use_for_bd_harness: >-
+      Use for generating, updating, rendering, reviewing, and validating client-facing
+      Word, Excel, and PowerPoint artifacts. Especially useful for a closed feedback loop:
+      edit document, render to HTML or PNG, review the visual result, fix layout/content,
+      then produce a reviewable delivery pack.
+    not_for: high_volume_excel_etl_or_dataframe_processing
+
 reference_sources:
   - id: superpowers
     name: Superpowers
@@ -66,3 +98,18 @@ reference_sources:
       analyze_rd, build_traceable_chunks, validate_rcd, map_bd_frame,
       review_basic_design, and generate_client_ready_patch.
     not_for: runtime_orchestration_agentops_or_observability
+
+  - id: officecli
+    name: OfficeCLI
+    repository: https://github.com/iOfficeAI/OfficeCLI
+    releases: https://github.com/iOfficeAI/OfficeCLI/releases
+    layer: L4_capability
+    category: office_document_tool_adapter
+    use_for_bd_harness: >-
+      Add as a notable harness tool for Office artifact automation. It is useful when
+      the agent must create or modify Office documents and then render/review the result
+      before final delivery.
+    integration_rule: >-
+      Do not expose raw OfficeCLI commands directly to application agents. Wrap them in
+      the Office Capability API and keep command syntax inside the adapter layer.
+    not_for: direct_replacement_of_all_excel_batch_processing_or_project_governance
