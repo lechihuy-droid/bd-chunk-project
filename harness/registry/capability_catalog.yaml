@@ -1,10 +1,68 @@
 capabilities:
-  - register_files
-  - parse_excel
-  - build_chunks
-  - validate_chunks
-  - label_ontology
-  - promote_rkb
-  - build_bm25
-  - map_bd
-  - generate_bd_patch
+  - id: register_files
+    layer: L4_capability
+    type: deterministic_tool
+    role: register_raw_project_files_and_create_file_records
+
+  - id: parse_excel
+    layer: L4_capability
+    type: deterministic_tool
+    role: parse_excel_workbooks_with_sheet_row_cell_traceability
+
+  - id: build_chunks
+    layer: L4_capability
+    type: deterministic_tool
+    role: build_traceable_chunks_from_source_units
+
+  - id: validate_chunks
+    layer: L4_capability
+    type: validator
+    role: validate_chunk_provenance_boundaries_and_required_fields
+
+  - id: label_ontology
+    layer: L4_capability
+    type: controlled_labeling_skill
+    role: apply_requirement_type_source_type_and_bd_frame_labels
+
+  - id: promote_rkb
+    layer: L4_capability
+    type: workflow_skill
+    role: promote_validated_chunks_into_requirement_knowledge_base_items
+
+  - id: build_bm25
+    layer: L4_capability
+    type: retrieval_tool
+    role: build_keyword_index_for_traceable_requirement_lookup
+
+  - id: map_bd
+    layer: L4_capability
+    type: mapping_skill
+    role: map_requirement_knowledge_base_items_to_basic_design_frames
+
+  - id: generate_bd_patch
+    layer: L4_capability
+    type: generation_skill
+    role: generate_reviewable_japanese_basic_design_patch_with_citations
+
+  - id: methodology_skill_library
+    layer: L4_capability
+    type: skill_library_pattern
+    source: https://github.com/obra/Superpowers
+    role: reusable_methodology_skills_for_planning_review_execution_and_delivery
+    adoption_note: >-
+      Treat Superpowers-style skills as capability assets in L4, together with tools,
+      templates, prompts, commands, and knowledge packs. Do not keep the skill asset
+      itself in L5. L5 should only contain the control mechanisms that select,
+      enforce, evaluate, or block a skill during execution.
+
+reference_sources:
+  - id: superpowers
+    name: Superpowers
+    repository: https://github.com/obra/Superpowers
+    layer: L4_capability
+    category: methodology_as_code_skill_library
+    use_for_bd_harness: >-
+      Adapt the small reusable skill pattern into BD-specific skills such as
+      analyze_rd, build_traceable_chunks, validate_rcd, map_bd_frame,
+      review_basic_design, and generate_client_ready_patch.
+    not_for: runtime_orchestration_agentops_or_observability
