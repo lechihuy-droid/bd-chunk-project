@@ -13,12 +13,13 @@ docs/research/
 ├── tool-research-backlog.md
 └── code-memory/
     ├── codebase-memory-mcp.md
-    └── codegraph.md
+    ├── codegraph.md
+    └── cocoindex.md
 ```
 
 ## Categories
 
-- `code-memory/`: tools that help agents understand source code structure, symbols, call paths, dependencies, blast radius, routes, and cross-repo relationships.
+- `code-memory/`: tools that help agents understand source code structure, symbols, call paths, dependencies, blast radius, routes, cross-repo relationships, or keep code/context indexes fresh.
 - `workflow/`: agent workflow tools and CLI coding workflows.
 - `uiux/`: UI/UX tools useful for Harness frontend or developer experience.
 - `papers/`: academic or preprint research that influences architecture decisions.
