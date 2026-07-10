@@ -9,6 +9,42 @@ capabilities:
     type: deterministic_tool
     role: parse_excel_workbooks_with_sheet_row_cell_traceability
 
+  - id: parse_pdf
+    layer: L4_capability
+    type: tool_adapter
+    implementation: opendataloader_pdf
+    source: https://github.com/opendataloader-project/opendataloader-pdf
+    role: parse_pdf_documents_into_structured_source_units_with_page_and_layout_traceability
+    expose_as:
+      - pdf.parse
+      - pdf.extract_structure
+      - pdf.extract_tables
+      - pdf.extract_images
+      - pdf.render_page
+      - pdf.validate_output
+    required_outputs:
+      - document_id
+      - page_number
+      - element_type
+      - reading_order
+      - text
+      - bounding_box
+      - source_hash
+    adoption_note: >-
+      Use OpenDataLoader PDF behind a stable PDF Capability API. Preserve page numbers,
+      element types, reading order, bounding boxes, and source hashes before chunk creation.
+      The adapter may emit Markdown or structured JSON, but downstream BD workflows must
+      consume normalized source units rather than vendor-specific output directly.
+    use_for_bd_harness: >-
+      Use for RD, specification, QA, meeting-material, legacy-reference, and scanned PDF
+      ingestion when layout-aware extraction is required. Feed validated source units into
+      build_chunks so every chunk can retain document, page, element, and coordinate provenance.
+    integration_rule: >-
+      Do not allow parser output to bypass file registration, provenance locking, schema
+      normalization, or extraction validation. OCR-derived text must be marked with extraction
+      method and confidence when those fields are available.
+    not_for: excel_cell_level_parsing_or_direct_llm_generation_from_raw_pdf
+
   - id: build_chunks
     layer: L4_capability
     type: deterministic_tool
@@ -98,6 +134,23 @@ reference_sources:
       analyze_rd, build_traceable_chunks, validate_rcd, map_bd_frame,
       review_basic_design, and generate_client_ready_patch.
     not_for: runtime_orchestration_agentops_or_observability
+
+  - id: opendataloader_pdf
+    name: OpenDataLoader PDF
+    repository: https://github.com/opendataloader-project/opendataloader-pdf
+    layer: L4_capability
+    category: layout_aware_pdf_ingestion_adapter
+    install_priority: core_candidate
+    use_for_bd_harness: >-
+      Add as the preferred candidate for layout-aware PDF ingestion before traceable
+      chunk construction. Evaluate it on Japanese digital PDFs, scanned documents,
+      complex tables, multi-column layouts, and hidden-text cases using the project's
+      golden document set before making it the production default.
+    integration_rule: >-
+      Wrap it behind pdf.parse and normalize its output into the project source-unit
+      schema. Persist document hash, page number, reading order, element type, and
+      bounding box whenever available so provenance remains independent of the parser.
+    not_for: replacing_excel_parser_chunk_validator_or_bd_mapping_logic
 
   - id: officecli
     name: OfficeCLI
