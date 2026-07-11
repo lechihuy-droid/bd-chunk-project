@@ -91,6 +91,41 @@ capabilities:
       itself in L5. L5 should only contain the control mechanisms that select,
       enforce, evaluate, or block a skill during execution.
 
+  - id: external_skill_tool_library
+    layer: L4_capability
+    type: selective_reference_library
+    implementation: ecc
+    source: https://github.com/affaan-m/ECC
+    former_name: Everything Claude Code
+    role: cross_harness_source_for_reusable_skills_tools_hooks_rules_agents_and_mcp_patterns
+    adoption_mode: selective_extract_review_and_adapt
+    install_required: false
+    runtime_dependency: false
+    recommended_for:
+      - skill_registry_and_discovery
+      - selective_installation_manifests
+      - verification_and_grader_loops
+      - planner_reviewer_separation
+      - session_handoff_and_decision_ledgers
+      - cross_harness_adapter_design
+      - continuous_learning_with_promotion_gate
+      - security_review_of_skills_hooks_and_mcp
+    adoption_note: >-
+      Treat ECC as an external capability library and reference implementation, not as a
+      monolithic dependency. Import only relevant assets after relevance review, security
+      review, BD-domain rewriting, contract definition, evaluation, and human approval.
+    integration_rule: >-
+      Registered ECC-derived skills and tools must use BD-specific input and output contracts,
+      preserve provenance, remain versioned, and stay subject to the same governance gates as
+      native capabilities. Hooks and MCP profiles must be allowlisted and reviewed before use.
+    restrictions:
+      - do_not_bulk_install_all_skills
+      - do_not_enable_hooks_without_security_review
+      - do_not_use_agent_memory_as_requirement_source_of_truth
+      - do_not_allow_external_assets_to_bypass_bd_governance
+      - add_bd_specific_evaluations_before_adoption
+    risk_level: medium_high_if_bulk_installed
+
   - id: office_document_engine
     layer: L4_capability
     type: tool_adapter
@@ -134,6 +169,29 @@ reference_sources:
       analyze_rd, build_traceable_chunks, validate_rcd, map_bd_frame,
       review_basic_design, and generate_client_ready_patch.
     not_for: runtime_orchestration_agentops_or_observability
+
+  - id: ecc
+    name: ECC
+    former_name: Everything Claude Code
+    repository: https://github.com/affaan-m/ECC
+    layer: L4_capability
+    category: cross_harness_skill_and_tool_pattern_library
+    install_priority: optional_selective
+    install_required: false
+    runtime_dependency: false
+    use_for_bd_harness: >-
+      Use as a source for selectively adapting skill registry, discovery, installer manifest,
+      verification loop, session handoff, decision ledger, cross-harness adapter, continuous
+      learning, security review, hook, rule, agent, tool, and MCP patterns into BD-specific assets.
+    adoption_process: >-
+      Review relevance, inspect security-sensitive scripts and permissions, rewrite for BD,
+      define stable contracts, add provenance and evaluation requirements, obtain human approval,
+      then register the adopted asset in this catalog with an explicit owner and version.
+    integration_rule: >-
+      Do not vendor or activate the full distribution by default. All imported assets must be
+      allowlisted, version-pinned, testable, and prevented from bypassing source registration,
+      traceability validation, ontology control, human review, or delivery governance.
+    not_for: monolithic_runtime_dependency_or_unreviewed_bulk_installation
 
   - id: opendataloader_pdf
     name: OpenDataLoader PDF
