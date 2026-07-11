@@ -91,6 +91,34 @@ capabilities:
       itself in L5. L5 should only contain the control mechanisms that select,
       enforce, evaluate, or block a skill during execution.
 
+  - id: official_claude_skill_pattern_library
+    layer: L4_capability
+    type: small_skill_pattern_library
+    implementation: claude_cookbooks
+    source: https://github.com/anthropics/claude-cookbooks
+    role: official_anthropic_source_for_small_reusable_agent_tool_and_evaluation_patterns
+    adoption_mode: extract_review_and_adapt
+    install_required: false
+    runtime_dependency: false
+    recommended_for:
+      - tool_use_patterns
+      - human_in_the_loop_skill
+      - outcome_grader_skill
+      - prompt_versioning_skill
+      - memory_handling_pattern
+      - multi_agent_coordination_pattern
+      - plan_big_execute_small_pattern
+      - agent_evaluation_pattern
+    adoption_note: >-
+      Treat each cookbook recipe as a small capability or skill pattern that may be adapted
+      into a BD-specific SKILL.md, validator, evaluator, or workflow step. Do not treat the
+      repository as a separate architecture layer, monolithic framework, or runtime dependency.
+    integration_rule: >-
+      Prefer Anthropic's official behavior and API patterns when they conflict with community
+      examples, but rewrite every adopted recipe for BD contracts, provenance, traceability,
+      versioning, evaluation, and human review before registration.
+    not_for: direct_notebook_copy_into_production_or_top_level_harness_architecture
+
   - id: external_skill_tool_library
     layer: L4_capability
     type: selective_reference_library
@@ -169,6 +197,28 @@ reference_sources:
       analyze_rd, build_traceable_chunks, validate_rcd, map_bd_frame,
       review_basic_design, and generate_client_ready_patch.
     not_for: runtime_orchestration_agentops_or_observability
+
+  - id: claude_cookbooks
+    name: Claude Cookbooks
+    repository: https://github.com/anthropics/claude-cookbooks
+    layer: L4_capability
+    category: official_small_skill_and_agent_pattern_library
+    priority: official_reference
+    install_required: false
+    runtime_dependency: false
+    use_for_bd_harness: >-
+      Use individual cookbook recipes as official Anthropic references for small reusable
+      skills and capability patterns such as tool use, human approval, graders, prompt
+      versioning, memory handling, multi-agent coordination, and evaluation loops.
+    adoption_process: >-
+      Select one recipe, rewrite it for a narrow BD use case, define its input and output
+      contract, add provenance and evaluation requirements, test it, obtain human approval,
+      and then register it as a versioned BD capability.
+    integration_rule: >-
+      Keep cookbook-derived assets inside L4 as small skills, validators, evaluators, or
+      workflow steps. Do not elevate the repository into a separate Harness layer and do not
+      copy notebooks directly into production code.
+    not_for: monolithic_runtime_dependency_or_top_level_architecture_layer
 
   - id: ecc
     name: ECC
