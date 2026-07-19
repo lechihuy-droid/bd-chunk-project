@@ -274,3 +274,26 @@ reference_sources:
       Do not expose raw OfficeCLI commands directly to application agents. Wrap them in
       the Office Capability API and keep command syntax inside the adapter layer.
     not_for: direct_replacement_of_all_excel_batch_processing_or_project_governance
+
+  - id: learn_claude_code
+    name: Learn Claude Code
+    repository: https://github.com/shareAI-lab/learn-claude-code
+    layer: L4_capability
+    category: harness_engineering_learning_reference
+    install_priority: learning_reference
+    install_required: false
+    runtime_dependency: false
+    use_for_bd_harness: >-
+      Use as a progressive learning and architecture reference for building agent harness
+      mechanisms: agent loop, tool dispatch, permission gates, hooks, planning, subagents,
+      on-demand skill loading, context compaction, memory, error recovery, task DAGs,
+      background execution, agent teams, worktree isolation, and MCP integration.
+    adoption_process: >-
+      Study the canonical root-level s01-s20 track, extract one mechanism at a time,
+      rewrite it against BD-specific contracts, add deterministic validation, provenance,
+      observability, security controls, tests, and human approval before adoption.
+    integration_rule: >-
+      Treat the repository as teaching code and an architectural reference, not as Claude Code
+      source code or a production-ready runtime. Reuse concepts selectively behind stable BD
+      capability APIs and governed workflow boundaries; do not copy s20 directly into production.
+    not_for: production_runtime_security_sandbox_or_unreviewed_drop_in_framework
