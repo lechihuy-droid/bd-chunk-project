@@ -1,3 +1,5 @@
+fastapi
+uvicorn
 pytest
 openai  # NVIDIA integrate.api.nvidia.com OpenAI-compatible chat streaming
 pyyaml

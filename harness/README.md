@@ -1,6 +1,55 @@
 # Opus Agent Harness
 
 Local harness for workspace health, agent-task evaluation, and trace-grounded repair.
+## Cài đặt và chạy
+
+Yêu cầu: **Python 3.11+**. Dashboard Hub cần thêm **Node.js 20+** và `pnpm` (qua Corepack). Docker và Inspect AI là tùy chọn.
+
+```powershell
+git clone https://github.com/lechihuy-droid/bd-chunk-project.git
+cd bd-chunk-project
+py -3.11 -m venv .ih
+.\.ih\Scripts\python.exe -m pip install --upgrade pip
+.\.ih\Scripts\python.exe -m pip install -r .\harness\hub\requirements-hub.txt
+```
+
+Nếu không có `py -3.11`, thay bằng đường dẫn tới Python 3.11+ trên máy. Core harness không cần API key.
+
+Chạy kiểm tra cơ bản từ thư mục gốc repository:
+
+```powershell
+.\.ih\Scripts\python.exe .\harness\run_harness.py --suite workspace-smoke
+.\.ih\Scripts\python.exe .\harness\run_harness.py --suite boundary-compliance
+.\harness\ci-harness.ps1 -SkipInspect
+```
+
+### Harness Hub
+
+Chạy backend trong một cửa sổ PowerShell:
+
+```powershell
+.\.ih\Scripts\python.exe .\harness\hub\server.py
+```
+
+Chạy UI development trong cửa sổ khác:
+
+```powershell
+cd .\harness\hub\web-v3
+corepack enable
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+Mở `http://127.0.0.1:5173`; Vite sẽ proxy API đến backend ở `http://127.0.0.1:8799`.
+
+Để chạy kiểu production cục bộ, dùng `pnpm build` trong `harness\hub\web-v3`, rồi khởi động backend và mở `http://127.0.0.1:8799`. Backend sẽ phục vụ thư mục `dist` khi build tồn tại.
+
+### Tùy chọn
+
+- Claude, Codex, Gemini: cài và đăng nhập CLI tương ứng trên máy.
+- NVIDIA API: đặt `NVIDIA_API_KEY` trong biến môi trường hoặc file `.env` ở gốc repo (không commit file này).
+- Inspect AI: chạy `.\harness\install-inspect.ps1` trước khi dùng `.\harness\run-inspect.ps1`.
+- Docker: cài Docker Desktop trước khi chạy `run-docker-harness.ps1`.
 
 This is intentionally lightweight:
 
@@ -19,34 +68,34 @@ The design borrows the useful parts from the local agent-harness paper pack:
 
 ## Quick Start
 
-From `C:\Users\HUY\workspace\ai-project-opus`:
+From the repository root:
 
 ```powershell
-C:\Users\HUY\AppData\Local\Programs\Python\Python311\python.exe harness\run_harness.py --suite workspace-smoke
+.\.ih\Scripts\python.exe .\harness\run_harness.py --suite workspace-smoke
 ```
 
 List available suites:
 
 ```powershell
-C:\Users\HUY\AppData\Local\Programs\Python\Python311\python.exe harness\run_harness.py --list
+.\.ih\Scripts\python.exe .\harness\run_harness.py --list
 ```
 
 Run one check:
 
 ```powershell
-C:\Users\HUY\AppData\Local\Programs\Python\Python311\python.exe harness\run_harness.py --suite workspace-smoke --check recall-tests
+.\.ih\Scripts\python.exe .\harness\run_harness.py --suite workspace-smoke --check recall-tests
 ```
 
 Run boundary compliance probes:
 
 ```powershell
-C:\Users\HUY\AppData\Local\Programs\Python\Python311\python.exe harness\run_harness.py --suite boundary-compliance
+.\.ih\Scripts\python.exe .\harness\run_harness.py --suite boundary-compliance
 ```
 
 Run the local CI loop:
 
 ```powershell
-.\harness\ci-harness.ps1
+.\harness\ci-harness.ps1 -SkipInspect
 ```
 
 Artifacts are written to:
