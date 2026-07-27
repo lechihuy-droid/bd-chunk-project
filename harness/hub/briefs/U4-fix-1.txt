@@ -1,0 +1,17 @@
+STEP U4-fix-1 — one fix. FRONTEND ONLY. Model: gpt-5.6-luna. No Python, no build, no commit.
+File: harness/hub/web-v3/src/pages/UsagePage.tsx only.
+
+MED — UsagePage loads cockpit + rollup + tools + suites + inspect in a single Promise.all(...).catch(...).
+Promise.all fails fast, so a 404/error on ANY secondary endpoint (/api/tools, /api/suites, /api/inspect/logs)
+prevents the PRIMARY cockpit/rollup state from ever being set — blanking "Quota hôm nay" + "Rollup" behind one
+error. Brief requires the secondary sections to fail independently without blocking the page.
+
+FIX: make each fetch settle independently. Either:
+- Promise.allSettled over the 5 calls, setting each piece of state only from its own fulfilled result
+  (leave a section empty / show its own small error on rejection), OR
+- separate `.then/.catch` per call (cockpit, rollup, tools, suites, inspect each set their own state + own error).
+Primary quota/rollup must render even when tools/suites/inspect all fail. Keep the existing render/empty states.
+Do not change other pages.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b (if EPERM on .tsbuildinfo, no-emit check + say so).
+DONE = changed hunk + tsc result line.

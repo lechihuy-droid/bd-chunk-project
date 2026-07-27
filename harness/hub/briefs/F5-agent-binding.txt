@@ -1,0 +1,76 @@
+STEP F5 — Gắn Agent vào từng pane chat (SD-chat-control-plane.md §4). Model: gpt-5.6-luna.
+BACKEND + FRONTEND. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH — review ChatGPT §5.1 đòi chuẩn hoá Provider → Model → Agent → Profile.
+Hiện pane chat chỉ có provider + model. Agent đã tồn tại đầy đủ ở backend nhưng chat KHÔNG dùng được.
+
+SỰ THẬT ĐÃ KIỂM:
+- `agents/*.agent.yaml` có sẵn: `id`, `provider`, `model`, `system_prompt`, `skills`, `permission`,
+  `budget`, `risk_tier`. Ví dụ `reviewer.agent.yaml` provider claude, permission read_only.
+- `GET /api/agents` đã trả danh sách này (services/runtime_agents.py).
+- `POST /api/chat` hiện chỉ nhận: provider, model, messages, session_id.
+- **`/api/chat` TỪ CHỐI role `system`** — server.py:112 `role not in {"user", "assistant"}` -> 400.
+  Đây chính là thứ chặn agent và skill vào chat.
+
+════ A. BACKEND ════
+
+A1. `/api/chat` nhận thêm `agent_id` (tuỳ chọn, chuỗi).
+    - Có `agent_id` -> nạp agent qua `runtime_agents` (dùng hàm có sẵn, đừng tự đọc file yaml).
+      Agent không tồn tại -> 400 kèm tên agent sai.
+    - Agent quyết định `provider` và `model` khi nó có khai báo; giá trị người dùng gửi kèm chỉ dùng để
+      lấp chỗ agent để trống (`model: null`). Nói rõ thứ tự ưu tiên này trong DONE.
+    - `system_prompt` của agent phải tới được model. CHỌN CÁCH THEO TỪNG PROVIDER:
+      * nvidia: services/chat.py đã có `_messages_with_reasoning_system` chèn message role system —
+        dùng lại cơ chế đó.
+      * claude / codex / gemini chạy qua CLI: **TỰ KIỂM TRA CLI CÓ CỜ NÀO NHẬN SYSTEM PROMPT KHÔNG**
+        (chạy `--help` thật rồi đọc, đừng đoán tên cờ). Có thì dùng cờ đó trong `_build_cmd`.
+        Không có thì fallback: ghép `system_prompt` vào ĐẦU prompt của lượt ĐẦU TIÊN trong session,
+        có nhãn rõ ràng; các lượt sau resume theo session thì KHÔNG ghép lại.
+      Ghi rõ trong DONE mỗi provider đã chọn cách nào và dựa trên bằng chứng gì.
+    - KHÔNG nới lỏng kiểm tra role ở `_chat_messages` để frontend nhét system message tuỳ ý.
+      Prompt hệ thống phải đến từ định nghĩa agent phía server, không phải từ trình duyệt.
+
+A2. Test trong harness/hub/tests/:
+    1. `agent_id` không tồn tại -> 400.
+    2. Agent có `provider`/`model` -> ghi đè giá trị client gửi; agent để `model: null` -> dùng model client.
+    3. `system_prompt` thực sự tới được lệnh/messages gửi đi (giả lập, đừng gọi CLI thật).
+    4. REGRESSION: request KHÔNG có `agent_id` chạy y như cũ.
+    5. REGRESSION: role `system` do client gửi vẫn bị từ chối 400.
+
+════ B. FRONTEND — src/pages/ChatPage.tsx ════
+
+B1. Mỗi pane thêm ô chọn Agent (nạp từ `GET /api/agents`), có lựa chọn "không dùng agent" (mặc định).
+    Chọn agent -> gửi kèm `agent_id`; provider/model của pane hiện theo agent và KHOÁ lại các ô mà agent
+    đã quy định (đừng để người dùng sửa rồi tưởng có tác dụng).
+
+B2. Header pane hiện đủ tầng, đúng ý review §5.1:
+        claude / theo CLI
+        Agent: reviewer · Quyền: read_only
+    `permission` và `risk_tier` lấy từ agent. Đây cũng là lúc badge `READ-ONLY` của F1 có nghĩa thật —
+    khi có agent, hiện quyền của AGENT; không có agent thì giữ nguyên cách giải thích của F1.
+
+B3. Đổi agent giữa chừng -> bỏ `cliSessionId` của pane đó (session cũ mang system prompt cũ, resume tiếp
+    là trộn hai nhân cách). Báo cho người dùng biết là hội thoại sẽ bắt đầu phiên mới.
+
+B4. SỬA KÈM (F4-fix-1) — dấu vân tay shared context bị ghi cả khi lượt gọi HỎNG.
+    ĐO TRÊN MÁY THẬT: gửi cùng một prompt tới 4 pane, rồi gửi lượt thứ hai.
+      - claude, codex: lượt 2 chỉ có "lan hai" -> KHÔNG chèn lại. ĐÚNG.
+      - nvidia (chưa cấu hình, hỏng ngay): lượt 2 VẪN kèm nguyên khối bối cảnh.
+      - claude cũng hỏng (hết hạn OAuth) NHƯNG vẫn ghi dấu vân tay.
+    Hai provider cùng hỏng mà hành xử khác nhau -> logic đang bám vào giai đoạn hỏng, không bám vào
+    kết quả. Ghi dấu vân tay khi lượt hỏng là SAI: model chưa hề nhận được bối cảnh, nhưng pane đã bị
+    đánh dấu là "đã gửi rồi" -> lượt sau mất bối cảnh vĩnh viễn.
+    SỬA: chỉ ghi dấu vân tay khi lượt gọi THÀNH CÔNG (đường `done`). Lượt kết thúc bằng sự kiện `error`,
+    bằng exception, hoặc bị người dùng bấm Dừng -> KHÔNG ghi, để lượt sau chèn lại.
+    Áp dụng thống nhất cho mọi provider.
+
+RÀNG BUỘC: không đụng `send()` (chỉ thêm trường vào body và chỗ ghi dấu vân tay ở mục B4), parseSse,
+`patchMessage`, lược đồ localStorage
+`hub-v3-chat` (nếu cần nhớ agent thì thêm trường vào Pane — Pane được phép, Message thì KHÔNG),
+giới hạn 4 pane, panel artifact, F1/F2/F3/F4. Nhãn tiếng Việt, không thêm dep.
+
+KIỂM TRA: cd /c/Users/HUY/workspace/ai-project-opus && .ih/Scripts/python.exe -m pytest harness/hub/tests -q
+          cd harness/hub/web-v3 && pnpm exec tsc -b
+DONE = file sửa, cách đưa system_prompt vào từng provider + bằng chứng, thứ tự ưu tiên provider/model,
+       dòng pytest, kết quả tsc.

@@ -1,0 +1,19 @@
+{
+  "run_id": "run-c",
+  "suite": "suite-y",
+  "suite_name": "Suite Y",
+  "started_at": "2026-06-27T10:02:00+00:00",
+  "finished_at": "2026-06-27T10:02:01+00:00",
+  "status": "pass",
+  "passed": 1,
+  "failed": 0,
+  "total": 1,
+  "results": [
+    {
+      "id": "check-one",
+      "type": "path_exists",
+      "status": "pass",
+      "message": "ok"
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+STEP C4 — Canvas workflow editor (Hub v2 Phase C, size L). Depends on C2
+(workflow.py + workflow_exec.py) AND C3 (#/workflows list + run view page in
+app.js) being landed and stable. Spec: harness/hub/BD-hub-v2-phaseC.md Step
+C4. Read it first.
+
+*** MANDATORY PRECONDITION CHECK — DO THIS BEFORE WRITING ANY CODE ***
+As of this brief being written, C3 (harness/hub/briefs/C3-run-view-ui.txt)
+has NOT landed in this repo: `grep -i workflow harness/hub/web/app.js` and
+`grep -i workflow harness/hub/web/index.html` currently return zero matches.
+There is no `renderWorkflows`, no `#/workflows` branch in `route()`, no
+"Workflows" nav link, and no workflow section in web/DESIGN.md. This brief's
+step 3 ("Edit link on #/workflows list rows") and step 3-of-BD ("Run button
+-> reuse C3's run flow") both assume C3's code exists. Before starting:
+  1. Re-run those greps yourself.
+  2. If they still return nothing, STOP — do not build C3's list/run-view
+     page as a side effect of this brief (that is out of C4's scope
+     whitelist and out of its timebox). Report back that C4 is blocked on
+     C3 and wait for it to land.
+  3. If C3 has landed by the time you read this, proceed, but treat every
+     line number / function name below from app.js as approximate — re-find
+     `renderWorkflows`, `route()`, and the run-stream consumer functions by
+     name in the actual landed file, do not trust stale numbers.
+
+Study: harness/hub/services/workflow.py (`parse_workflow`, `validate_workflow`,
+`build_ir`, `list_workflows`, `_walk_chain`, `WORKFLOWS_DIR`,
+`_REQUIRED_TOP_LEVEL_FIELDS = ("id", "nodes", "edges", "stop")` — note `ui` is
+NOT in this tuple and validate_workflow never inspects unknown top-level
+keys, so adding a `ui:` key to a workflow doc is already schema-safe today,
+no changes needed to parse_workflow/validate_workflow for that). harness/hub/
+workflows/review-ui.workflow.yaml (the only sample; it has NO `ui:` section
+today — GAP, resolved below). harness/hub/web/charts.js (SVG-string-template
+style to copy: build an SVG as a template literal assigned via
+`element.innerHTML`, no createElementNS/D3, `escapeHtml` for any
+user-controlled text going into the string). harness/hub/web/app.js (C3's
+`renderWorkflows`/`renderWorkflowRun`, the `route()` hash router, and
+whatever SSE-consumer function C3 factored out for run streaming — reuse it
+verbatim for the Run button, do not re-implement). harness/hub/server.py
+(`# --- C2a workflow routes ---` block, lines ~600-628: `GET /api/workflows`,
+`POST /api/workflows/validate` — this is the marker block your new PUT route
+goes in, since it's a workflow-definition write, same family as validate, NOT
+the C2b run-routes block. Confirmed gap: no PUT/POST `/api/workflows/{id}` to
+save yaml exists yet — C2a only shipped GET list + POST validate. Also note
+the existing `_http_error(exc)` helper used for FileNotFoundError/
+PermissionError -> HTTP error, e.g. in `api_workflow_validate` — reuse it for
+your new route's 404 case, do not hand-roll a new error mapping).
+
+GAP DECISION — `ui:` section convention: no prior convention exists anywhere
+in the codebase (checked review-ui.workflow.yaml and workflow.py). Define and
+use:
+```yaml
+ui:
+  nodes:
+    plan: {x: 40, y: 40}
+    act: {x: 240, y: 40}
+```
+Top-level optional key, sibling of `id`/`nodes`/`edges`/`stop`. Purely
+display metadata — never referenced by `validate_workflow`, `build_ir`, or
+`workflow_exec.py`. If a node id in `nodes` has no entry under `ui.nodes`,
+canvas.js falls back to auto-layout (see step 1). If `ui.nodes` has stale
+entries for node ids that no longer exist, drop them silently on next save
+(do not error).
+
+TASK:
+1. New file `harness/hub/web/canvas.js` (vanilla SVG, NO CDN/libs, same
+   IIFE + `window.HubCanvas = {...}` export style as charts.js's
+   `window.HubCharts`):
+   - `mount(container, model)` where `model` is a plain JS object already
+     parsed from the workflow yaml (`{id, nodes: [{id, agent, prompt, gate}],
+     edges: [[a,b],...], stop: {...}, ui: {nodes: {...}}}` — parsing the
+     yaml text into this shape happens in app.js via the existing
+     `POST /api/workflows/validate {yaml_text}` call's echoed-back data, or
+     by fetching `GET /api/workflows` and finding the entry by id; canvas.js
+     itself never talks to fetch/XHR, it is pure render+interaction).
+   - Render: one `<rect>`+`<text>` group per node ("node box") showing id,
+     agent name, and a small gate badge (only if `gate === "approval"`,
+     styled like an existing `.badge` class per DESIGN.md, do not invent a
+     new badge visual). Position from `model.ui.nodes[id].{x,y}` if present;
+     else auto-layout as a horizontal chain: walk `edges` in order starting
+     from the node with no incoming edge, `x = index * 200`, fixed `y`.
+   - Edges: arrow from each node's right edge to the next node's left edge,
+     following the chain order in `edges` (sequential only — this schema
+     only supports one linear chain, `_walk_chain` in workflow.py rejects
+     anything else, so canvas.js never needs to render branching or
+     freeform edges).
+   - Drag: pointerdown/pointermove/pointerup (or mousedown/mousemove/mouseup
+     — your call, no need for pointer capture polish) on a node box updates
+     that node's `model.ui.nodes[id].{x,y}` only. This is display metadata,
+     never touch `model.nodes`/`model.edges` semantics from a drag.
+   - Click node (not drag) -> open a side panel (plain DOM form, can live
+     outside the SVG, e.g. an absolutely-positioned `<div>` the mount
+     function also renders into `container`): prompt `<textarea>`, agent
+     `<select>` (options populated from `GET /api/agents` — canvas.js can
+     take agent list as a `mount(container, model, agentList)` third arg
+     rather than fetching itself, keep canvas.js fetch-free for testability),
+     gate `<select>` with exactly `none`/`approval`. Editing these fields
+     mutates the corresponding node in `model.nodes` in place.
+   - Add-node button: appends a new node to the end of the chain — new
+     unique id (e.g. `node-<n>` incrementing until unused), default
+     `agent: agentList[0].id`, default `prompt: "{{<lastNodeId>_output}}"`
+     (or `"{{objective}}"` if this is the first node), default `gate: "none"`,
+     pushes `[lastNodeId, newId]` onto `model.edges`, positions it at
+     `lastNode.x + 200, lastNode.y` (or auto-layout fallback position).
+   - Delete-node button (per-node, only enabled on the current chain's last
+     node — i.e. the node with no outgoing edge): removes it from
+     `model.nodes`, removes any edge pointing to it from `model.edges`.
+     Refuse (disable the button, no-op) when only 1 node remains — an empty
+     `nodes` list fails `_walk_chain` (no valid start/end), so canvas.js must
+     never produce that state client-side either.
+   - `mount()` returns an object exposing at least `{getModel(): model}` so
+     app.js can pull the current edited state out for the save flow, without
+     canvas.js knowing anything about yaml or fetch.
+
+2. Save flow (in app.js, driving canvas.js's model):
+   - Serialize `model` -> yaml text with a small HAND-ROLLED emitter
+     function (schema is flat/small — id, nodes list of 4 scalar fields,
+     edges list of 2-tuples, stop of 2 numbers, optional ui.nodes of x/y
+     pairs). Do NOT add a JS yaml library (no CDN, no npm — this app has
+     none). Quote every string field with `JSON.stringify(str)` (valid YAML
+     double-quoted scalar syntax for the ASCII/basic-escape strings these
+     prompts will contain) so embedded `:`/`{{`/`}}`/quotes in prompt text
+     never break the emitted YAML. Emit in the same field order as
+     review-ui.workflow.yaml (`id, nodes, edges, stop`, then `ui` last if
+     any node has a ui position) for a clean diff against hand-written files.
+   - POST the emitted text to `/api/workflows/validate` as
+     `{"yaml_text": <text>}` (existing endpoint, no change needed — see
+     `api_workflow_validate` in server.py, it already accepts `yaml_text`
+     directly, no backend work here).
+   - If `{ok: false}`, show `errors` inline near the save button, do not
+     proceed to diff/save.
+   - If `{ok: true}`, fetch the CURRENT on-disk text for this workflow id
+     (`GET /api/workflows` doesn't return raw yaml text, only parsed dicts —
+     either stash the original yaml_text you loaded the editor from in a
+     module-level var when the page opened, or add `?raw=true` handling...
+     do NOT add new GET behavior for this: simplest correct option is to
+     keep the original yaml_text you fetched/derived when entering the edit
+     page in a closure variable, and diff the new emitted text against
+     that). Render a SIMPLE LINE DIFF (old lines vs new lines, e.g. a
+     two-column or unified `+`/`-` prefixed `<pre>` block) — check app.js
+     first for any existing diff renderer to reuse (search for "diff" in
+     app.js); if none exists, write a minimal line-based diff (LCS is
+     overkill here — even a naive line-by-line comparison highlighting
+     added/removed/changed lines is acceptable, this is not a general-purpose
+     diff tool).
+   - Show a Confirm button next to the diff. Only on confirm: `PUT
+     /api/workflows/{id}` (new backend route, see step 6) with
+     `{"yaml_text": <emitted text>}`. On success, reload the editor from the
+     server's response (or re-fetch) so the page reflects exactly what's on
+     disk, including any normalization.
+
+3. Run button on the editor page: reuse C3's existing run-start flow
+   (whatever function C3 wired to the `#/workflows` list page's Run button —
+   find it by name in app.js, it should already do prompt-for-objective ->
+   POST `/api/workflows/{id}/runs` -> navigate to the run view). Do not
+   duplicate that logic; call the same function C3 defined, or factor a
+   one-line wrapper if it's currently anonymous/inline in the list-row
+   click handler.
+
+4. Wiring in app.js + index.html:
+   - New route `#/workflows/{id}/edit` -> `renderWorkflowEditor(id)`. Add
+     the branch in `route()`'s if/else-if chain (same style as the existing
+     `parts[0] === "workflows" && parts[1] === "runs" && parts[2]` /
+     `parts[0] === "workflows"` branches C3 added — insert yours alongside
+     them, e.g. `parts[0] === "workflows" && parts[1] && parts[2] ===
+     "edit"`). Keep the insertion minimal and clustered with the other
+     workflow branches, do not reformat the whole chain.
+   - `renderWorkflowEditor(id)`: fetch the workflow (from `GET
+     /api/workflows`, find by id, or a dedicated fetch if C3/C2a already
+     exposes single-workflow-by-id — check first, do not add a new GET
+     route if the list endpoint already gives you everything needed), call
+     `HubCanvas.mount(containerEl, model, agentList)`, wire the save-flow
+     buttons (validate/diff/confirm) and the Run button per steps 2-3.
+   - Add an "Edit" link/button on each `#/workflows` list row (from C3's
+     `renderWorkflows()`), pointing to `#/workflows/{id}/edit`, next to the
+     existing Run button.
+   - `web/index.html`: add `<script src="/static/canvas.js" defer></script>`
+     in the same script block as charts.js/app.js/workspace.js (after
+     charts.js, before app.js, since app.js will call `window.HubCanvas` at
+     route time).
+   - `web/styles-hub.css`: append (do not reorder/edit existing rules) any
+     classes canvas.js/the editor page needs (node box, side panel, diff
+     `<pre>` block) — follow DESIGN.md's existing token/class conventions
+     (`--hud-*` vars, `.card`/`.badge`/`.link-button` patterns), do not
+     invent a new visual language for this page.
+
+5. Backend addition — `harness/hub/services/workflow.py`:
+   add `save_workflow(workflow_id: str, yaml_text: str) -> dict[str, Any]`:
+   - `parse_workflow(yaml_text)` then `validate_workflow(data)` — if parse
+     raises `ValueError` or validate returns non-empty errors, raise
+     `ValueError` with the joined error text (or re-raise parse's
+     ValueError) — the route layer turns this into a 400, matching
+     `api_workflow_validate`'s existing error shape. Do NOT write anything
+     to disk on invalid input.
+   - Also verify `data["id"] == workflow_id` (path id must match the
+     document's own `id` field) — mismatch is also a `ValueError`.
+   - Target path: `WORKFLOWS_DIR / f"{workflow_id}.workflow.yaml"`. Require
+     it to already exist (`FileNotFoundError` if not — PUT updates an
+     existing workflow, it does not create new ones; the canvas only ever
+     opens workflows that already appear in `GET /api/workflows`/the file
+     glob, so creating brand-new workflow files from canvas is out of C4's
+     scope).
+   - Backup: copy the CURRENT on-disk bytes to
+     `WORKFLOWS_DIR / f"{workflow_id}.workflow.yaml.bak-{timestamp}"` (use
+     an integer unix timestamp or `YYYYMMDDHHMMSS`, your call, just make it
+     sortable) BEFORE overwriting.
+   - Write the new `yaml_text` to the target path (`encoding="utf-8"`,
+     match `parse_workflow`'s read convention elsewhere in this file).
+   - Return the re-parsed `data` dict (so the route can hand it straight
+     back to the client) or `{"ok": True}` — your call, keep it consistent
+     with `api_workflow_validate`'s response shape where reasonable.
+
+6. Backend route — `harness/hub/server.py`, inside the
+   `# --- C2a workflow routes ---` / `# --- end C2a workflow routes ---`
+   marker block (alongside `api_workflows`/`api_workflow_validate`, NOT the
+   C2b run-routes block which is a different concern):
+   ```python
+   @app.put("/api/workflows/{workflow_id}")
+   def api_workflow_save(workflow_id: str, payload: dict[str, object]) -> dict[str, object]:
+       yaml_text = payload.get("yaml_text")
+       if not isinstance(yaml_text, str):
+           raise HTTPException(status_code=400, detail="yaml_text must be a string")
+       try:
+           return workflow.save_workflow(workflow_id, yaml_text)
+       except FileNotFoundError as exc:
+           raise _http_error(exc) from exc
+       except ValueError as exc:
+           raise HTTPException(status_code=400, detail=str(exc)) from exc
+   ```
+   (adjust to match whatever `save_workflow`'s actual return/raise shape
+   ends up being — this is illustrative, not gospel; if `_http_error` only
+   handles `(FileNotFoundError, PermissionError)` per its existing usages,
+   follow that exact pattern rather than inventing a new helper.)
+
+7. Tests — `harness/hub/tests/test_workflow.py` (read the existing file
+   first to match its fixture/style conventions, e.g. how it builds a temp
+   `WORKFLOWS_DIR` or monkeypatches it for C2a's tests): add cases for
+   `save_workflow`:
+   - Valid yaml_text matching an existing on-disk workflow id -> file
+     written with new content, a `.bak-<timestamp>` file created containing
+     the OLD content, return value indicates success.
+   - Invalid yaml_text (fails validate_workflow, e.g. bad gate value or
+     broken chain) -> raises `ValueError`, original file untouched, no
+     `.bak-*` file created.
+   - `data["id"]` mismatched vs the `workflow_id` argument -> raises
+     `ValueError`, no write.
+   - Unknown `workflow_id` (no existing file) -> raises `FileNotFoundError`.
+   Frontend gate (no test runner for JS in this repo): `node --check
+   harness/hub/web/canvas.js` and `node --check harness/hub/web/app.js`
+   must both pass.
+
+8. Scope whitelist: `harness/hub/web/canvas.js` (new file), `harness/hub/
+   web/app.js` (new route branch, `renderWorkflowEditor`, Edit link on
+   `#/workflows` rows, diff/confirm UI, save-flow wiring — cluster it
+   physically near C3's workflow functions, do not scatter), `harness/hub/
+   web/styles-hub.css` (append only), `harness/hub/web/index.html` (one new
+   `<script>` tag only), `harness/hub/services/workflow.py` (add
+   `save_workflow`, do not modify `parse_workflow`/`validate_workflow`/
+   `build_ir`/`list_workflows`), `harness/hub/server.py` (one new PUT route
+   in the C2a marker block), `harness/hub/tests/test_workflow.py` (new test
+   cases only). Do NOT touch: `harness/hub/services/workflow_exec.py`,
+   `harness/hub/web/workspace.js`, `harness/hub/web/styles-workspace.css`,
+   `harness/hub/services/runtime_agents.py`, any C2b run-route in
+   server.py, any other tests/ file. Do NOT commit.
+
+9. TIMEBOX GUARD (verbatim from BD §"Rủi ro & guard" — C4 scope creep row):
+   this step is ONLY node/edge/save/diff. Explicitly OUT OF SCOPE, do not
+   build any of these even if it seems easy: minimap, zoom/pan controls,
+   undo/redo, multi-select, freeform/branching edges (the schema is
+   chain-only — `_walk_chain` in workflow.py enforces exactly one linear
+   chain and will reject anything else at validate time regardless of what
+   the canvas draws, so there is no point building branch UI), node
+   resizing, auto-save/autosave-on-drag (save is explicit
+   validate->diff->confirm only, per BD's "canvas = editor, YAML = chân
+   lý"), keyboard shortcuts, copy/paste of nodes, canvas pan/scroll beyond
+   whatever the browser gives you for free, or any new agent-profile CRUD
+   (agent select is read-only dropdown sourced from `GET /api/agents`, C4
+   does not create/edit agent profiles).
+
+VERIFY: `node --check harness/hub/web/canvas.js` and `node --check
+harness/hub/web/app.js` must both pass. Backend: run the repo's existing
+test command for `tests/test_workflow.py` (check README/CI config for the
+exact invocation used by prior steps, e.g. pytest) — new `save_workflow`
+cases must pass, existing C2a tests must still pass unchanged. Manual
+browser-verify (per BD DoD: "mở workflow mẫu trên canvas, sửa 1 prompt, save
+ra diff đúng, chạy được") is Claude main's job after this lands, not
+required from the Codex agent executing this brief.
+
+FINAL MESSAGE: files changed; `node --check` results for both JS files;
+pytest result for test_workflow.py; the exact PUT request/response shape
+you ended up using for save (in case it differed from this brief's
+illustrative route); confirmation of the precondition check in this brief's
+header (did C3 exist when you started, and if you found it missing, that
+you stopped instead of building it); and explicit confirmation you did not
+touch workflow_exec.py, workspace.js, or any C2b route.

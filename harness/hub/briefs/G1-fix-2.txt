@@ -1,0 +1,50 @@
+STEP G1-fix-2 — thứ bậc nút chưa có. FRONTEND ONLY. Model: gpt-5.6-luna.
+Không thêm dep. Không chạy pnpm build. Không commit. Cấm sửa file cấu hình thật để thử.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+VẤN ĐỀ — ĐO TRÊN CODE VÀ TRÊN TRÌNH DUYỆT:
+G1 đã chuyển hết control sang primitive (tốt), nhưng KHÔNG gán variant có chủ đích. Đếm thật:
+    ChatPage.tsx      : 25 <Button>, trong đó primary=1 ghost=1 destructive=1  -> 22 nút rơi vào MẶC ĐỊNH
+    WorkflowsPage.tsx :  6 <Button>, primary=1 secondary=1 ghost=1 destructive=1 -> 2 mặc định
+    UsagePage.tsx     :  2 <Button>, ghost=2 -> ổn
+Mặc định của `Button` trong ui.tsx là `secondary` — tức nút CÓ NỀN. Kết quả trên màn hình: 22 khối nền
+giống hệt nhau nằm cạnh nhau, không nút nào nổi lên.
+Đo màu thật: mọi nút "Gửi" đều `rgb(32,36,45)`; số phần tử dùng `--hub-accent` (#8b7cf6) trong cả trang
+chat là **2**. Toàn bộ điểm mấu chốt của design system — một accent duy nhất sở hữu hành động chính —
+chưa hề nhìn thấy được.
+Đây chính là lời chê "hierarchy chưa rõ" của review. G1 mới đổi màu, chưa đổi THỨ BẬC.
+
+VIỆC — gán variant có chủ đích cho TỪNG nút, theo luật trong DESIGN.md:
+
+1. LUẬT: mỗi vùng nhìn thấy được nhiều nhất MỘT primary.
+   Vùng ở đây nghĩa là: thanh trên cùng, từng pane, composer chung, panel artifact, inspector, mỗi trang.
+
+2. ChatPage — phân bổ cụ thể:
+   - `primary`  : ĐÚNG MỘT nút — nút Gửi của composer chung ở đáy.
+   - `secondary`: nút Gửi của từng pane (hành động quan trọng nhưng không phải chính), "+ Cửa sổ".
+   - `destructive`: "Dừng tất cả", "Xoá" trong menu `…`.
+   - `ghost`    : tất cả phần còn lại — Copy, Ghim/Bỏ ghim, Hiện toàn văn, Thu gọn, Hiện/Ẩn suy nghĩ,
+                  Mở (artifact), Xem prompt sẽ gửi, Tất cả, Bỏ chọn, Thử lại, Đổi model, Mở Settings,
+                  Mục lục, Xuất .md, Hoàn tác.
+   Nút trong error card: giữ ghost cả ba, vì thẻ đó đã có viền lỗi làm tín hiệu rồi.
+
+3. WorkflowsPage: `primary` = "Chạy" (đúng một). "Lưu" = secondary. "Kiểm tra", "Xếp theo thứ tự chạy" =
+   ghost. Nút xoá node = destructive.
+
+4. Rà nốt các trang còn lại (RunsPage, AgentsPage, ApprovalsPage, SkillsPage, SessionsPage, SettingsPage):
+   bảo đảm mỗi trang nhiều nhất một primary và không trang nào để nút rơi vào mặc định một cách vô tình.
+   Nếu một trang KHÔNG có hành động chính thì không có primary — đừng ép.
+
+5. Sau khi gán xong, ĐẾM LẠI và ghi vào DONE cho từng trang: primary / secondary / ghost / destructive /
+   tổng. Tổng phải bằng số `<Button>`, tức KHÔNG còn nút nào dựa vào variant mặc định.
+   Nếu bạn cho rằng một nút nên giữ mặc định thì phải ghi rõ variant ra một cách tường minh, đừng để trống.
+
+6. KIỂM CHỨNG MÀU: sau khi sửa, trên trang chat phải có ĐÚNG MỘT nút nền `#8b7cf6` (rgb(139,124,246)).
+   Không có cách chạy trình duyệt thì nói rõ là chưa kiểm được phần này, đừng khẳng định suông.
+
+KHÔNG ĐỔI HÀNH VI. Không đụng `send()`, parseSse, `patchMessage`, localStorage, luồng SSE.
+KHÔNG làm hỏng: trang chat ghim theo viewport (4 pane -> scrollHeight ≈ innerHeight, lưới cuộn nội bộ),
+panel artifact, canvas workflow.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b
+DONE = bảng đếm variant từng trang, kết quả kiểm màu ở mục 6, kết quả `tsc -b`.

@@ -1,0 +1,20 @@
+# Dùng khi: Chuyển objective thành brief, duyệt brief rồi mới cho code chạy.
+# Luồng: brief -> implement (gate: duyệt brief) -> review (gate: duyệt kết quả)
+# Lưu ý: gate:approval dừng TRƯỚC khi node đó chạy và hiển thị prompt đã render của chính node đó
+#        -> đặt gate lên node TIÊU THỤ output cần duyệt, không phải node sinh ra nó.
+id: code-task
+nodes:
+  - id: brief
+    agent: thinker
+    prompt: "Turn this objective into an implementation brief with acceptance criteria, risks, and a minimal change plan: {{objective}}"
+    gate: none
+  - id: implement
+    agent: coder
+    prompt: "Implement the approved brief for {{objective}} exactly. Approved brief: {{brief_output}} Make surgical changes only and report what changed."
+    gate: approval
+  - id: review
+    agent: thinker
+    prompt: "Review the implementation for {{objective}} against the approved brief. Identify correctness issues, regressions, and missing acceptance criteria. Brief: {{brief_output}} Implementation report: {{implement_output}}"
+    gate: approval
+edges: [[brief, implement], [implement, review]]
+stop: {max_nodes: 10, max_seconds: 3600}

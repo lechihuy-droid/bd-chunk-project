@@ -1,0 +1,12 @@
+id: review-ui
+nodes:
+  - id: plan
+    agent: reviewer
+    prompt: "Plan review for: {{objective}}"
+    gate: none
+  - id: act
+    agent: reviewer
+    prompt: "Execute: {{plan_output}}"
+    gate: approval
+edges: [[plan, act]]
+stop: {max_nodes: 10, max_seconds: 1800}

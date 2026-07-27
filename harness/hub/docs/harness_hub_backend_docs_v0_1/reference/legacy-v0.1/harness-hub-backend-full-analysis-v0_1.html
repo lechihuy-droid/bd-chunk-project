@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<!-- Superseded by ../../01_OVERALL_ASSESSMENT.md; retained for historical traceability. -->
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness Hub Backend — Full Analysis & Adaptation v0.1</title>
+  <link rel="stylesheet" href="../../../html-kit/styles.css">
+  <script src="../../../html-kit/diagram.js" defer></script>
+</head>
+<body>
+  <header class="doc-header">
+    <span class="badge navy">Architecture adaptation</span>
+    <h1>Harness Hub Backend — Full Analysis & Adaptation v0.1</h1>
+    <p class="lead">Đối chiếu toàn bộ tài liệu <code>harness_hub_backend_docs_v0_1</code> với Hub đang chạy, xác định phần áp dụng, gap thực tế và build plan có thể kiểm chứng.</p>
+    <p class="meta">2026-07-26 · Scope: <code>ai-project-opus/harness/hub</code> · Source: 00–16 + System Architect Review</p>
+  </header>
+
+  <main>
+    <div class="callout">
+      <strong>Kết luận:</strong> không đổi hướng kiến trúc. Hub hiện đã có khoảng 55–60% capability của một local runtime MVP, nhưng mới đạt khoảng 30–35% contract maturity mà bộ tài liệu yêu cầu. Đợt tiếp theo nên nâng “contract spine” — workflow schema, state machine, command/event, executor port và artifact provenance — trước khi thêm graph song song, database hay CLI sandbox.
+    </div>
+
+    <h2>1. Executive assessment</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>236 tests được thu thập</h3>
+        <p>Coverage hiện hữu rộng: API, providers, runtime, workflow, child-run, artifacts, governance, boundaries, integrity và UI.</p>
+        <span class="badge green">Nền tảng tốt</span>
+      </div>
+      <div class="card">
+        <h3>17 tài liệu + 1 review</h3>
+        <p>Nguồn có architecture vision mạnh nhưng phần lớn DD chỉ là outline; review chính thức chấm coding readiness 4/10.</p>
+        <span class="badge gray">Chưa code-ready</span>
+      </div>
+      <div class="card">
+        <h3>Local-first vs distributed</h3>
+        <p>Hub dùng FastAPI + file state/JSONL. Docs giả định PostgreSQL, queue, object storage, tenant và worker pools.</p>
+        <span class="badge navy">Cần adaptation</span>
+      </div>
+      <div class="card">
+        <h3>Rủi ro lớn nhất</h3>
+        <p>State mutation tự do, provider coupling, thiếu idempotency/versioning và artifact overwrite khiến restart/retry khó đảm bảo.</p>
+        <span class="badge red">P0</span>
+      </div>
+    </div>
+
+    <h3>Đánh giá theo lớp</h3>
+    <table>
+      <thead>
+        <tr><th>Lớp</th><th>Hiện trạng Hub</th><th>Mức tương thích</th><th>Nhận định</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>UI / API</td><td>FastAPI, SSE, workflow/runs/artifacts/interrupt endpoints</td><td><span class="badge green">Cao</span></td><td>Đủ local MVP; thiếu versioned API, typed errors, idempotency và concurrency token.</td></tr>
+        <tr><td>Workflow Registry</td><td>YAML + validation + layout sidecar + backup</td><td><span class="badge green">Khá</span></td><td>Linear chain tốt; chưa có immutable versions, publish lifecycle hoặc JSON Schema.</td></tr>
+        <tr><td>Runtime Core</td><td>Run state, checkpoint, interrupt, events, child runs, budgets</td><td><span class="badge gray">Trung bình</span></td><td>Capability có; state transition, attempts, retry, cancel và recovery contract còn thiếu.</td></tr>
+        <tr><td>Executor</td><td>Provider modules và <code>stream_chat</code></td><td><span class="badge red">Thấp</span></td><td>Chưa có unified request/result/error port; workflow executor gọi provider trực tiếp.</td></tr>
+        <tr><td>Review</td><td><code>validate</code> node + approval interrupt</td><td><span class="badge gray">Trung bình</span></td><td>Có deterministic gate/HITL, chưa có structured reviewer verdict lifecycle.</td></tr>
+        <tr><td>Artifacts</td><td>Node output files + artifact list/read</td><td><span class="badge red">Thấp</span></td><td>Boundary tốt; chưa immutable, versioned, checksum, lineage hoặc archive.</td></tr>
+        <tr><td>Policy / Security</td><td>Risk tiers, governance degradation, CSRF, path boundary, signed brief</td><td><span class="badge green">Khá</span></td><td>Local controls mạnh; thiếu explicit policy precedence và CLI threat model.</td></tr>
+        <tr><td>Persistence / Events</td><td>Atomic file replace + JSONL + checkpoint JSON</td><td><span class="badge gray">Trung bình</span></td><td>Phù hợp single-host; không có atomic state+event, sequence, dedup hay audit separation.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>2. Phạm vi và cách diễn giải tài liệu nguồn</h2>
+    <p>Bộ tài liệu có hai tầng chất lượng khác nhau. Hai tài liệu 00–02 bản 0.2 đã bổ sung governance và distributed-system principles khá sâu. Các tài liệu 03–16 vẫn là v0.1 ngắn, nhiều file mang nhãn Basic/Detailed Design nhưng chưa đủ chi tiết để code. Bản System Architect Review xác nhận verdict: <em>architecture baseline only</em>.</p>
+
+    <div class="compare">
+      <div>
+        <div class="col-head">Tài liệu nguồn giả định</div>
+        <div class="card">
+          <ul>
+            <li>Nhiều user/workspace/tenant.</li>
+            <li>PostgreSQL + durable queue + object storage.</li>
+            <li>API/CLI executor worker pool.</li>
+            <li>At-least-once + transactional outbox.</li>
+            <li>Workflow graph song song, retry, recovery.</li>
+            <li>Production security, SLO, HA/DR.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="col-head">Hub hiện tại</div>
+        <div class="card">
+          <ul>
+            <li>Local single-user command center.</li>
+            <li>File-backed JSON/JSONL/YAML.</li>
+            <li>In-process synchronous execution + SSE.</li>
+            <li>Append-only log nhưng chưa delivery guarantee.</li>
+            <li>Linear workflow + child runs + approval.</li>
+            <li>Boundary/governance local, chưa production tenancy.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <p>Do đó, “áp dụng” không đồng nghĩa copy toàn bộ deployment topology. Mỗi yêu cầu được phân thành:</p>
+    <ul>
+      <li><strong>Adopt now:</strong> nguyên tắc/contract cần đúng ngay cả ở local runtime.</li>
+      <li><strong>Translate:</strong> giữ semantics nhưng dùng file-backed implementation.</li>
+      <li><strong>Defer:</strong> chỉ triển khai khi requirement multi-user/production xuất hiện.</li>
+    </ul>
+
+    <h2>3. Review từng tài liệu đầu vào</h2>
+    <table>
+      <thead>
+        <tr><th>Doc</th><th>Thông điệp chính</th><th>Chất lượng theo review</th><th>Áp dụng vào Hub</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>00 — Governance</td><td>Precedence, lifecycle, DoR/DoD, stop conditions, traceability.</td><td>65%</td><td><strong>Adopt now.</strong> Dùng làm rule cho mọi task runtime; bổ sung metadata/approval cho contract docs.</td></tr>
+        <tr><td>01 — System Architecture</td><td>Runtime/Orchestrator/Executor/Reviewer/Artifact/Policy boundaries.</td><td>60%</td><td><strong>Translate.</strong> Giữ logical containers trong modular monolith; không triển khai PG/Redis/OBJ ngay.</td></tr>
+        <tr><td>02 — Principles</td><td>Contract-first, deterministic core, idempotency, provenance, fail-closed.</td><td>70%</td><td><strong>Adopt selective.</strong> P0: deterministic transitions, versioning, policy, executor port. Defer distributed outbox/tenancy.</td></tr>
+        <tr><td>03 — Module Map</td><td>Ownership và forbidden dependencies.</td><td>55%</td><td><strong>Adopt now.</strong> Viết conformance/import tests; map module hiện hữu thay vì tái cấu trúc toàn repo.</td></tr>
+        <tr><td>04 — Domain Model</td><td>Definition/version, run/node/attempt, artifact/review.</td><td>50%</td><td><strong>Translate.</strong> Thêm typed IDs, attempt, artifact manifest, status enums; defer Workspace aggregate.</td></tr>
+        <tr><td>05 — Workflow Runtime</td><td>Scheduler, transition, recovery, GO/NO-GO.</td><td>40%</td><td><strong>P0.</strong> Hub có loop nhưng thiếu state-machine contract, retry attempts, cancel/recovery/idempotency.</td></tr>
+        <tr><td>06 — Orchestrator</td><td>Structured decision, action allow-list, no direct mutation.</td><td>50%</td><td><strong>Defer model orchestrator.</strong> Trước mắt dùng deterministic routing; chỉ thêm decision contract khi có use case reroute.</td></tr>
+        <tr><td>07 — Executor Contract</td><td>Unified request/result/error, submit/stream/result/cancel.</td><td>45%</td><td><strong>P0.</strong> Đây là seam quan trọng nhất để tháo provider coupling khỏi runtime.</td></tr>
+        <tr><td>08 — API Executor</td><td>Provider adapter, streaming, retry, usage, tools.</td><td>45%</td><td><strong>Translate.</strong> Bọc provider hiện hữu dưới port; thêm conformance tests trước circuit breaker/rate coordinator.</td></tr>
+        <tr><td>09 — CLI Executor</td><td>Sandbox, process supervisor, workspace, diff, cancel.</td><td>35%</td><td><strong>Defer có điều kiện.</strong> Không coi provider CLI wrappers hoặc gitjobs là production CLI executor.</td></tr>
+        <tr><td>10 — Artifact Store</td><td>Immutable versions, lineage, workspace/generated views.</td><td>50%</td><td><strong>P0/P1.</strong> Manifest + checksum + versions trên filesystem trước; archive/compare sau.</td></tr>
+        <tr><td>11 — Backend API</td><td>Endpoint inventory v1.</td><td>25%</td><td><strong>Reference only.</strong> API hiện hữu phong phú hơn nhưng chưa versioned/typed; generate OpenAPI từ thực tế trước.</td></tr>
+        <tr><td>12 — Database</td><td>Core tables và transaction rules.</td><td>25%</td><td><strong>Defer.</strong> Không migrate PG khi chưa có concurrency/durability requirement; thiết kế repository port để không khóa đường.</td></tr>
+        <tr><td>13 — Security</td><td>RBAC, classification, secrets, filesystem/network, HITL, audit.</td><td>45%</td><td><strong>Adopt local subset.</strong> Default deny/boundary/redaction/approval; defer tenancy RBAC.</td></tr>
+        <tr><td>14 — Infrastructure</td><td>Workers, PG, queue, object storage, environments.</td><td>40%</td><td><strong>Defer.</strong> Chỉ giữ deployment boundary; chưa có evidence để trả chi phí vận hành.</td></tr>
+        <tr><td>15 — Coding Plan</td><td>Foundation → persistence → runtime → executors → integration.</td><td>60%</td><td><strong>Reorder.</strong> Với code đang có: contracts → transition → executor → artifact → APIs; không bootstrap lại project.</td></tr>
+        <tr><td>16 — Test Strategy</td><td>Golden GO/NO-GO, timeout, recovery, security.</td><td>55%</td><td><strong>Adopt now.</strong> Chuyển thành traceability matrix và bổ sung missing critical tests.</td></tr>
+        <tr><td>Architect Review</td><td>10 blockers, P0–P2 docs, Gates A–D.</td><td>Authoritative review</td><td><strong>Adopt.</strong> Dùng blocker list nhưng thu gọn cho local scope; machine-checkable contracts thay vì thêm prose.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>4. Bản đồ code hiện tại so với target modules</h2>
+    <table>
+      <thead>
+        <tr><th>Target module</th><th>Code hiện tại</th><th>Đã có</th><th>Gap cụ thể</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Application API</td><td><code>server.py</code></td><td>Routes, CSRF, SSE, error conversion</td><td>Route file lớn; payload dict tự do; thiếu API v1/error catalogue/idempotency.</td></tr>
+        <tr><td>Workflow Registry</td><td><code>services/workflow.py</code></td><td>Parse, validate, build IR, save/backup/layout</td><td>Không schema version, publish state, immutable snapshot hoặc ETag.</td></tr>
+        <tr><td>Agent Registry</td><td><code>runtime_agents.py</code></td><td>YAML validation, provider/model class, budget/risk</td><td>Definition mutable; run không pin content hash/version.</td></tr>
+        <tr><td>Skill Registry</td><td><code>runtime_skills.py</code>, <code>skill_library.py</code></td><td>Discovery, drift, deploy, metadata</td><td>Run provenance chỉ yếu; thiếu pinned skill version/content hash.</td></tr>
+        <tr><td>Runtime Core</td><td><code>runtime_state.py</code>, <code>workflow_exec.py</code>, reducers/pipeline</td><td>State, loop, budgets, checkpoints</td><td>Không transition guard tập trung; không NodeRun/Attempt; state/event không atomic.</td></tr>
+        <tr><td>Execution Router</td><td><code>runtime_agents.resolve_provider</code></td><td>Model class → provider/model</td><td>Chưa xét capability, policy, availability, data class; trả dict thay execution plan.</td></tr>
+        <tr><td>API Executor</td><td><code>services/providers/*</code></td><td>NVIDIA + CLI chat providers, stream normalization</td><td>Không unified ExecutionRequest/Result; retry/cancel/error taxonomy chưa đồng nhất.</td></tr>
+        <tr><td>CLI Executor</td><td><code>providers/*_cli.py</code>, <code>gitjobs.py</code></td><td>Process wrappers, timeout/cap, worktree jobs</td><td>Không sandbox executor contract, mount policy, manifest/diff/output validation.</td></tr>
+        <tr><td>Review Manager</td><td><code>runtime_validate.py</code>, interrupts</td><td>Deterministic checks, approval/reject</td><td>Không ReviewRequest/ReviewResult/verdict schema; reviewer agent chưa tách.</td></tr>
+        <tr><td>Artifact Service</td><td><code>runtime_artifacts.py</code></td><td>Safe write/list/read</td><td>Ghi đè theo node name; thiếu version/checksum/lineage/archive/diff.</td></tr>
+        <tr><td>Policy Engine</td><td><code>governance.py</code>, <code>risk.py</code>, <code>runtime_policy.py</code></td><td>Risk tiers, denial/degradation, command decision</td><td>Policy precedence/hard-soft policy chưa thành schema; quyết định chưa gắn policy version.</td></tr>
+        <tr><td>Event Service</td><td><code>runtime_events.py</code></td><td>Append JSONL, read/replay/SSE</td><td>Không sequence/schema version/dedup; runtime và audit chưa tách.</td></tr>
+        <tr><td>Persistence</td><td><code>runtime_state.py</code>, checkpoint files</td><td>Atomic replace cho state</td><td>Không transaction bao state + event; concurrent writers có thể lost update.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>5. Gap analysis chi tiết</h2>
+
+    <h3>5.1 Workflow definition</h3>
+    <p>Workflow hiện yêu cầu <code>id/nodes/edges/stop</code>, hỗ trợ node <code>agent</code> và <code>validate</code>, bắt buộc đúng một linear chain. Đây là scope tốt cho v1; vấn đề không phải thiếu feature mà là schema chỉ tồn tại trong Python validation.</p>
+    <div class="callout warn">
+      Nếu UI, API và runtime tiếp tục suy ra schema từ code, mỗi thay đổi field có thể tạo drift. Cần JSON Schema v1 làm contract, còn Python validator giữ semantic checks như template reference và graph order.
+    </div>
+    <ul>
+      <li>Thêm <code>schema_version: "1.0"</code>, definition hash và compatibility rule.</li>
+      <li>Pin exact workflow source/hash vào run metadata khi start.</li>
+      <li>Giữ linear chain; branch/fan-out là schema major/minor riêng sau khi chốt join/error semantics.</li>
+      <li>Save dùng expected hash/ETag để tránh tab cũ ghi đè workflow mới.</li>
+    </ul>
+
+    <h3>5.2 Runtime state machine</h3>
+    <p><code>update_run_state</code> hiện merge dict rồi ghi file. Bất kỳ caller nào có thể đặt status; không có bảng transition trung tâm. Target local v1:</p>
+    <table>
+      <thead><tr><th>Current</th><th>Command/event</th><th>Guard</th><th>Next</th></tr></thead>
+      <tbody>
+        <tr><td>queued</td><td>START_RUN</td><td>workflow snapshot valid</td><td>running</td></tr>
+        <tr><td>running</td><td>NODE_REQUIRES_APPROVAL</td><td>no pending interrupt for node</td><td>interrupted</td></tr>
+        <tr><td>interrupted</td><td>RESUME_RUN</td><td>matching pending interrupt + expected version</td><td>running</td></tr>
+        <tr><td>running</td><td>RUN_SUCCEEDED</td><td>all nodes terminal-success</td><td>succeeded</td></tr>
+        <tr><td>queued/running/interrupted</td><td>CANCEL_RUN</td><td>not terminal</td><td>cancelled</td></tr>
+        <tr><td>queued/running/interrupted</td><td>RUN_FAILED</td><td>error classified</td><td>failed</td></tr>
+        <tr><td>terminal</td><td>any mutation</td><td>none</td><td>reject conflict</td></tr>
+      </tbody>
+    </table>
+    <p>Node/attempt state cần tách khỏi <code>metadata.node_index</code>. Mỗi provider call tạo Attempt với <code>attempt_no</code>, <code>execution_id</code>, timestamps, provider/model, status, usage và error. Điều này mở khóa retry, recovery, audit và artifact provenance.</p>
+
+    <h3>5.3 Command, event và persistence</h3>
+    <p>JSONL hiện hữu có thể tiếp tục dùng, nhưng contract phải trung thực với guarantee local:</p>
+    <ul>
+      <li>Mỗi event có <code>schema_version</code>, <code>sequence</code> tăng theo run, <code>correlation_id</code>, <code>causation_id</code> và <code>actor</code>.</li>
+      <li>Mỗi state-changing command có <code>command_id</code>, idempotency key, request hash và expected run version.</li>
+      <li>Cùng key + cùng hash trả lại kết quả cũ; cùng key + khác hash trả conflict.</li>
+      <li>State file chứa <code>version</code>; write dùng compare-before-replace trong lock per-run.</li>
+      <li>State + event chưa atomic hoàn toàn trên filesystem: dùng per-run journal/commit record; không gọi đây là transactional outbox.</li>
+      <li>Tách runtime events dùng cho replay khỏi audit records dùng cho approval, policy denial và sensitive actions.</li>
+    </ul>
+
+    <h3>5.4 Executor boundary</h3>
+    <div class="diagram" data-chart='{
+      "type":"flow",
+      "nodes":[
+        {"id":"rt","label":"Workflow Runtime","shape":"rect"},
+        {"id":"route","label":"Execution Router","shape":"diamond"},
+        {"id":"port","label":"Executor Port v1","shape":"rect"},
+        {"id":"api","label":"API Provider Adapter","shape":"rect"},
+        {"id":"cli","label":"CLI Sandbox Adapter (future)","shape":"rect"},
+        {"id":"res","label":"Execution Result / Events","shape":"terminal"}
+      ],
+      "edges":[
+        {"from":"rt","to":"route"},
+        {"from":"route","to":"port"},
+        {"from":"port","to":"api","label":"API"},
+        {"from":"port","to":"cli","label":"CLI"},
+        {"from":"api","to":"res"},
+        {"from":"cli","to":"res"},
+        {"from":"res","to":"rt"}
+      ]
+    }'></div>
+    <p>Hiện tại <code>workflow_exec.py</code> gọi <code>get_provider(...).stream_chat</code> cho cả parent và child. Refactor nên giữ provider modules nguyên vẹn, thêm một port nhỏ:</p>
+    <pre><code>ExecutionRequest
+  contract_version, execution_id, idempotency_key
+  run_id, node_id, attempt_no
+  agent/profile provenance, provider/model
+  messages/input refs, deadline, token/cost limits
+  permission + data classification
+
+ExecutionEvent
+  started | output_delta | reasoning_delta | usage | completed | failed
+
+ExecutionResult
+  status, output refs/partial output, usage
+  provider request/session id, finish reason
+  normalized error category/code/retry_after</code></pre>
+    <p>Transport retry thuộc adapter; workflow retry thuộc runtime. Provider adapter không được tự chạy arbitrary tool. CLI wrappers phục vụ chat hiện tại không tự động trở thành CLI Executor.</p>
+
+    <h3>5.5 Artifact lifecycle</h3>
+    <p><code>write_node_artifact</code> đang ghi <code>{node_id}.md</code>, nên rerun/retry có thể overwrite bằng chứng cũ. Local filesystem đủ để đạt semantics tốt hơn:</p>
+    <pre><code>runtime/runs/{run_id}/artifacts/
+  index.json
+  {artifact_id}/
+    v0001/
+      content.md
+      manifest.json
+    v0002/
+      content.md
+      manifest.json</code></pre>
+    <p>Manifest cần checksum, media type, size, producer run/node/attempt, workflow/agent/skill hashes, input refs, parent version, review result và timestamps. Content/version đã publish không update; archive chỉ đổi logical status trong index.</p>
+
+    <h3>5.6 Review và human task</h3>
+    <p>Hub hiện gộp ba khái niệm: deterministic validation failure, approval gate và interrupt. Cần chuẩn hóa:</p>
+    <ul>
+      <li><strong>ValidationResult:</strong> deterministic pass/fail + violations.</li>
+      <li><strong>ReviewResult:</strong> <code>GO | NO_GO_REPAIRABLE | NO_GO_BLOCKING | NEED_USER_DECISION</code> + issues.</li>
+      <li><strong>HumanTask:</strong> pending/resolved/expired/cancelled, actor, decision, reason, before/after version.</li>
+    </ul>
+    <p>Reviewer chỉ trả verdict; runtime áp transition. Model Orchestrator chưa cần trong v1 nếu routing deterministic đủ dùng.</p>
+
+    <h3>5.7 API contract</h3>
+    <p><code>server.py</code> có nhiều endpoint hơn file 11, nhưng body chủ yếu là <code>dict[str, object]</code>. Thứ tự đúng là xuất OpenAPI hiện trạng, đánh dấu endpoint runtime ổn định, sau đó mới tạo <code>/api/v1</code>. Những mutation quan trọng cần:</p>
+    <ul>
+      <li>Typed request/response và normalized error: code, message, details, correlation id.</li>
+      <li><code>Idempotency-Key</code> cho create run/resume/cancel/approve.</li>
+      <li><code>If-Match</code> hoặc expected version/hash cho save workflow và state commands.</li>
+      <li>202 + run/execution handle nếu chuyển sang background worker trong tương lai.</li>
+      <li>Giữ compatibility shim cho UI v3 trước khi bỏ endpoint cũ.</li>
+    </ul>
+
+    <h3>5.8 Security và CLI</h3>
+    <p>Hub đã có nhiều control tốt hơn mức tài liệu v0.1: CSRF header/origin guard, traversal checks, signed briefs, risk tiers, denial degradation, bounded child permissions và worktree isolation. Gap còn lại:</p>
+    <ul>
+      <li>Policy precedence và hard/soft policy chưa machine-checkable.</li>
+      <li>Run không pin policy version, agent hash, skill hash.</li>
+      <li>Runtime event và artifact chưa có systematic redaction/secret scan.</li>
+      <li>CLI executor chưa có threat model cho network, mounts, process tree, dependency/supply chain và cleanup.</li>
+    </ul>
+    <div class="callout risk">
+      Không triển khai “CLI Executor production” bằng cách tái sử dụng thẳng <code>gitjobs.py</code>. Git job là managed coding workflow; executor contract có lifecycle, isolation và output guarantee khác.
+    </div>
+
+    <h2>6. Target architecture phù hợp project</h2>
+    <p>Target 1–2 phase tới vẫn là modular monolith, synchronous local execution và filesystem persistence. Boundary logic phải rõ để về sau đổi adapter mà không viết lại runtime.</p>
+    <div class="diagram" data-chart='{
+      "type":"flow",
+      "nodes":[
+        {"id":"ui","label":"Web v3 / API Client","shape":"terminal"},
+        {"id":"api","label":"FastAPI Application Layer","shape":"rect"},
+        {"id":"registry","label":"Workflow / Agent / Skill Registry","shape":"rect"},
+        {"id":"runtime","label":"Deterministic Runtime Core","shape":"rect"},
+        {"id":"policy","label":"Policy + Human Task","shape":"diamond"},
+        {"id":"executor","label":"Executor Port","shape":"rect"},
+        {"id":"providers","label":"Provider Adapters","shape":"rect"},
+        {"id":"store","label":"File Repositories + Journal","shape":"rect"},
+        {"id":"art","label":"Versioned Artifact Store","shape":"rect"}
+      ],
+      "edges":[
+        {"from":"ui","to":"api"},
+        {"from":"api","to":"registry"},
+        {"from":"api","to":"runtime"},
+        {"from":"runtime","to":"policy"},
+        {"from":"policy","to":"executor","label":"allow"},
+        {"from":"executor","to":"providers"},
+        {"from":"providers","to":"runtime"},
+        {"from":"runtime","to":"store"},
+        {"from":"runtime","to":"art"},
+        {"from":"registry","to":"store"}
+      ]
+    }'></div>
+    <p>Không cần tạo hàng loạt service/class theo sơ đồ enterprise. Các boundary trước hết là typed contracts + module tests trong thư mục <code>services</code>.</p>
+
+    <h2>7. Build plan áp dụng thực tế</h2>
+    <table>
+      <thead>
+        <tr><th>Phase</th><th>Deliverable</th><th>Files dự kiến</th><th>Acceptance</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A — Contract baseline</td><td>Workflow JSON Schema v1, status/event/error vocab, ADR local persistence</td><td><code>contracts/*</code>, <code>workflow.py</code>, docs, tests</td><td>Schema parity với fixtures; tất cả template hiện hữu valid; invalid cases không drift.</td></tr>
+        <tr><td>B — State safety</td><td>Run version, pure transition function, command idempotency, cancel</td><td><code>runtime_state.py</code>, new transition/command modules, tests</td><td>Invalid/terminal/stale transition bị reject; duplicate resume/cancel không tạo side effect.</td></tr>
+        <tr><td>C — Execution seam</td><td>Executor request/event/result + provider adapter + mock conformance</td><td><code>executors/*</code>, <code>workflow_exec.py</code>, provider tests</td><td>Golden workflow không import provider registry trực tiếp; hai adapters/mock cùng pass contract suite.</td></tr>
+        <tr><td>D — Attempts & recovery</td><td>Node attempt records, error taxonomy, bounded retry, restart reconciliation</td><td>runtime modules + file repository + tests</td><td>Retry tạo attempt mới; stale running attempt được phân loại; restart không duplicate call.</td></tr>
+        <tr><td>E — Artifact integrity</td><td>Immutable versions, checksum, lineage, archive/compare</td><td><code>runtime_artifacts.py</code>, API, tests</td><td>Version cũ còn đọc được; retry không overwrite; tamper/checksum test pass.</td></tr>
+        <tr><td>F — API stabilization</td><td>Typed API v1, error catalogue, idempotency/ETag, OpenAPI snapshot</td><td><code>server.py</code> hoặc route modules, models, tests</td><td>OpenAPI regression, stale save=409, duplicate command stable, UI compatibility pass.</td></tr>
+        <tr><td>G — Review semantics</td><td>ReviewResult/HumanTask lifecycle; optional reviewer adapter</td><td>review/interrupt modules, workflow schema, tests</td><td>GO/NO-GO/need-user/reject paths đều có structured evidence.</td></tr>
+        <tr><td>H — CLI decision gate</td><td>Threat model + ADR; chỉ sau đó mới CLI executor</td><td>docs/contracts trước code</td><td>Sandbox/mount/egress/process/output requirements được phê duyệt và testable.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Thứ tự không nên đảo</h3>
+    <ul class="timeline">
+      <li><span class="time">Gate 1</span><p>Schema + transition vocabulary được duyệt trước khi sửa runtime.</p></li>
+      <li><span class="time">Gate 2</span><p>Executor port và conformance test trước retry/recovery.</p></li>
+      <li><span class="time">Gate 3</span><p>Attempt/artifact provenance trước GO/NO-GO orchestrator phức tạp.</p></li>
+      <li><span class="time">Gate 4</span><p>Threat model trước CLI sandbox; production infra chỉ khi có NFR.</p></li>
+    </ul>
+
+    <h2>8. Test traceability</h2>
+    <table>
+      <thead><tr><th>Requirement</th><th>Coverage hiện tại</th><th>Missing test P0</th></tr></thead>
+      <tbody>
+        <tr><td>Workflow validation</td><td><code>test_workflow*</code>, template tests</td><td>JSON Schema parity, schema version compatibility, stale save.</td></tr>
+        <tr><td>Pause/resume/HITL</td><td>Runtime, workflow exec, validate, child-run tests</td><td>Duplicate resume; expired/wrong actor; expected-version conflict.</td></tr>
+        <tr><td>Budgets</td><td>Agent calls/seconds, job caps, pricing</td><td>Run token/cost limit; executor deadline; budget policy provenance.</td></tr>
+        <tr><td>Provider execution</td><td>Four provider registry entries, stream/error/session tests</td><td>Unified executor conformance, normalized errors, cancellation.</td></tr>
+        <tr><td>Recovery</td><td>Checkpoint read/write; orphan reconciliation for jobs</td><td>Workflow restart after started/completed boundary; no duplicate execution.</td></tr>
+        <tr><td>Artifacts</td><td>Safe write/list/read/traversal</td><td>Immutability, versions, hash, lineage, archive/restore, attempt linkage.</td></tr>
+        <tr><td>Events</td><td>Append/read/replay/SSE</td><td>Sequence, schema compatibility, duplicate/out-of-order, state reconstruction.</td></tr>
+        <tr><td>Security</td><td>CSRF, boundary, injection, integrity, governance, worktree tests</td><td>Secret scan/redaction; policy precedence; executor capability denial.</td></tr>
+        <tr><td>CLI timeout/cancel</td><td>Provider process timeout + concurrency tests</td><td>Full process-tree cancel, mount/egress isolation, orphan cleanup, output publish rules.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>9. Những phần chủ đích chưa áp dụng</h2>
+    <table>
+      <thead><tr><th>Đề xuất nguồn</th><th>Quyết định</th><th>Trigger để xem lại</th></tr></thead>
+      <tbody>
+        <tr><td>PostgreSQL + Redis/queue + object storage</td><td><span class="badge gray">Defer</span></td><td>Nhiều process/host, concurrent writers, durable background runs hoặc dữ liệu vượt filesystem local.</td></tr>
+        <tr><td>Multi-tenant identity/RBAC</td><td><span class="badge gray">Defer</span></td><td>Hub phục vụ nhiều user/workspace qua network.</td></tr>
+        <tr><td>Transactional outbox/at-least-once</td><td><span class="badge gray">Defer</span></td><td>Có broker/worker async thật; trước đó dùng local journal semantics.</td></tr>
+        <tr><td>Parallel graph/fan-in</td><td><span class="badge gray">Defer</span></td><td>Use case cụ thể đòi parallelism và chốt ALL/ANY/QUORUM + partial failure.</td></tr>
+        <tr><td>Model Orchestrator dynamic reroute</td><td><span class="badge gray">Defer</span></td><td>Deterministic workflow không đủ; có decision schema, stale-decision guard, loop cap.</td></tr>
+        <tr><td>Production CLI Executor</td><td><span class="badge red">Blocked by design</span></td><td>Threat model, sandbox runtime và security acceptance được duyệt.</td></tr>
+        <tr><td>HA/DR/SLO enterprise</td><td><span class="badge gray">Defer</span></td><td>Có deployment production, usage/capacity và RPO/RTO cụ thể.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>10. Decision register cần owner duyệt</h2>
+    <ol>
+      <li><strong>Persistence horizon:</strong> giữ file-backed single-host cho hai phase A–F. Đây là recommendation mặc định.</li>
+      <li><strong>Workflow v1:</strong> giữ linear chain; branch là contract version sau. Đây là recommendation mặc định.</li>
+      <li><strong>Executor scope:</strong> API/provider adapter trước; CLI executor chỉ sau threat model. Đây là recommendation mặc định.</li>
+      <li><strong>API compatibility:</strong> thêm typed <code>/api/v1</code> dần, giữ endpoint UI hiện tại đến khi migration xong.</li>
+      <li><strong>Source of truth:</strong> approved contracts &gt; runtime design &gt; API docs &gt; implementation plan &gt; code; khác biệt phải có ADR/change note.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>Go/no-go:</strong> GO cho Phase A (contract baseline) sau khi owner chấp nhận ba recommendation mặc định đầu tiên. NO-GO cho database migration, parallel graph và CLI sandbox trong cùng đợt.
+    </div>
+
+    <h2>11. Nguồn bằng chứng</h2>
+    <p>Tài liệu đầu vào: <code>C:\Users\HUY\Downloads\harness_hub_backend_docs_v0_1</code>. Code được đối chiếu chủ yếu: <code>server.py</code>, <code>services/workflow.py</code>, <code>workflow_exec.py</code>, <code>runtime_state.py</code>, <code>runtime_events.py</code>, <code>runtime_checkpoint.py</code>, <code>runtime_artifacts.py</code>, <code>runtime_agents.py</code>, <code>runtime_children.py</code>, <code>governance.py</code>, <code>gitjobs.py</code>, provider adapters và toàn bộ <code>tests/</code>. Pytest collection xác nhận 236 tests vào ngày 2026-07-26.</p>
+  </main>
+</body>
+</html>

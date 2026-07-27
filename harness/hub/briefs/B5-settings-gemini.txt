@@ -1,0 +1,33 @@
+STEP B5 — Settings page + real Gemini provider (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md Step B5. Read it + SD §3.4.
+Study: harness/hub/web/app.js (router, nav pattern, getJson, renderSkillLibrary
+as page example), harness/hub/services/providers/gemini_cli.py (stub),
+claude_cli.py (pattern to copy: status cache, procs.resolve_cmd, spawn via
+procs.registry, usage append), web/index.html (nav).
+
+TASK:
+1. gemini_cli.py — real implementation:
+   - status(): run `gemini --version` via procs.resolve_cmd, stdin DEVNULL,
+     timeout 10s, cache 60s; FileNotFoundError -> "not_installed" + keep hint
+     "npm i -g @google/gemini-cli"; other errors -> str(exc)[:200].
+   - stream_chat(): one-shot `gemini -p <prompt>`; history = transcript concat
+     of messages (cap 4000 chars) since gemini has no headless resume;
+     capabilities {stream: true, resume: false, models: None}. Parse stdout
+     plain text: stream each line as delta events. usage zeros unless parseable.
+     done event session_id None. Append usage model "cli:gemini" like others.
+   - Spawn via procs.registry (timeout config.CHAT_CLI_TIMEOUT), read-only note:
+     gemini CLI runs without sandbox flags — do NOT pass invented flags.
+2. app.js + index.html — Settings page #/settings:
+   - Nav: SYSTEM section, "Settings" link.
+   - Page: table from GET /api/providers: id, available (badge green/red),
+     version, detail, capabilities (stream/resume/model count); Refresh button;
+     offline row shows install/login hint (gemini: npm i -g @google/gemini-cli;
+     claude/codex: check CLI login).
+3. Tests: fake gemini script in test_providers.py: status parses version;
+   stream_chat yields delta+done from fake stdout; transcript concat contains
+   prior messages.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_providers.py -q (green)
++ node --check harness/hub/web/app.js.
+Do NOT touch workspace.js, codex_cli.py, claude_cli.py. Do NOT commit.
+FINAL MESSAGE: files changed, pytest + node results, gemini flags used.

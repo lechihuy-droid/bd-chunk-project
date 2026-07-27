@@ -1,0 +1,38 @@
+STEP B1v2 — Provider chat in Workspace UI (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md Step B1 (rewritten 2026-07-16 — read it).
+Study first: harness/hub/web/workspace.js (whole file — chat state, renderChatPanel,
+send flow, model selector, persistence), harness/hub/docs/workspace.md,
+harness/hub/web/styles-workspace.css.
+
+CONTEXT: backend already supports POST /api/chat {provider, messages, model?,
+session_id?} -> SSE reasoning|delta|done(usage,model,session_id)|error, and
+GET /api/providers -> [{id,available,version,detail,capabilities}]. All non-GET
+requests MUST send header X-Hub-Client: harness-hub. Providers: nvidia (needs
+model), claude/codex (CLI, read-only, support session resume), gemini (offline).
+
+TASK — edit ONLY harness/hub/web/workspace.js, web/styles-workspace.css,
+harness/hub/docs/workspace.md:
+1. Chat state: each chat object gains provider ("nvidia" default) and
+   sessionId (null). Persist wherever chats persist today; if chats are not
+   persisted today, do NOT add persistence (out of scope).
+2. Top-bar: provider selector next to existing model selector, populated from
+   GET /api/providers (cache in state). Model selector visible ONLY when active
+   chat's provider === "nvidia". CLI provider active -> small "read-only" badge
+   + version text.
+3. Provider binds per-chat: changing selector sets provider of ACTIVE chat only;
+   if active chat already has messages, lock selector (disabled + title tooltip
+   "provider locked after first message"); New Chat unlocks.
+4. Send flow: body {provider, messages, model only if nvidia, session_id if set},
+   header X-Hub-Client: harness-hub (check existing fetch — add header if missing).
+   On done event: store session_id (if any) on that chat; display usage tokens
+   as today.
+5. Switching chats must swap provider/model UI state correctly (no cross-chat
+   leakage); abort in-flight stream on switch (existing behavior — keep).
+6. Do NOT touch app.js, backend, SSE contract, styles.css, styles-hub.css.
+
+VERIFY: node --check harness/hub/web/workspace.js. Start server
+(NVIDIA_API_KEY=dummy .ih\Scripts\python.exe harness\hub\server.py background),
+curl -s -H "X-Hub-Client: harness-hub" http://127.0.0.1:8799/ -> 200, kill server.
+Do NOT commit.
+FINAL MESSAGE: files changed, node --check result, where provider/sessionId
+live in state, how selector lock works, anything intentionally deferred.

@@ -1,0 +1,61 @@
+STEP E1 — Backend cost/quota cho Usage (SD-usage-cost-canvas.md §6). BACKEND ONLY. Model: gpt-5.6-luna.
+Không đụng frontend (web/, web-v3/). Không thêm dep. Không commit.   [ĐÃ THỰC THI — 205 test xanh]
+
+BỐI CẢNH ĐÃ CHỐT (SD §2, §5): harness chạy CLI subscription + NVIDIA free → KHÔNG có hoá đơn theo token.
+Số tiền hiển thị là **ước tính (shadow cost)**, luôn kèm nhãn "không thực trả". Đặt tên field khó dùng sai:
+`estimated_cost_usd`, KHÔNG đặt là `cost`.
+
+DỮ LIỆU THẬT (đo trên workspace này — thiết kế theo cái này, đừng đoán):
+  totals: calls 28.216 · input 2.213.591.867 · output 14.574.233 · total 5.144.044.870
+          cache 2.915.878.770 · non_cache 2.228.166.100      <- cache chiếm ~57%
+  by_model: gpt-5.5, gpt-5.6-terra, gpt-5.4, claude-fable-5, claude-opus-4-8, gpt-5.6-luna,
+            gpt-5.4-mini, claude-sonnet-5 ...   (model id THẬT, không phải "cli:claude")
+  by_source: codex, claude, chat        by_day: 58 ngày
+
+HAI CÁI BẪY BẮT BUỘC TRÁNH:
+1. `total_tokens` ĐÃ BAO GỒM cache → `total_tokens * đơn giá` thổi phồng chi phí nhiều lần. Phải tính riêng
+   từng loại token.
+2. `services/usage.py::_add_tokens` gộp `cache_read_tokens + cache_creation_tokens` thành `cache_tokens`.
+   Hai loại giá RẤT khác nhau (đọc cache rẻ hơn nhiều so với tạo cache) → gộp là không tính đúng được. Phải tách.
+
+PHẠM VI:
+
+A. config.py — bảng giá NGƯỜI DÙNG SỬA ĐƯỢC:
+     PRICING_USD_PER_MTOK = {
+         # Ước tính do người dùng cấu hình — KHÔNG phải giá chính thức, KHÔNG phải hoá đơn.
+         # Khớp model id chính xác trước, rồi prefix. Không khớp -> None = chưa có giá.
+         "<model hoặc prefix>": {"input": ..., "output": ..., "cache_read": ..., "cache_write": ...},
+     }
+   QUY TẮC: chỉ điền giá cho family có căn cứ công khai rõ ràng; còn lại **để trống** → "chưa có giá".
+   TUYỆT ĐỐI KHÔNG bịa giá rồi để nó lặng lẽ cộng vào tổng.
+
+B. services/pricing.py (MỚI, thuần hàm, không I/O):
+   - `resolve_price(model) -> dict | None` — khớp chính xác trước, rồi prefix dài nhất; không có -> None.
+   - `estimate_cost(tokens) -> {"estimated_cost_usd", "unpriced_tokens", "priced"}`
+     Tính riêng: input*input + output*output + cache_read*cache_read + cache_creation*cache_write, chia 1e6.
+     Model không giá -> cost 0.0, priced False, toàn bộ token vào unpriced_tokens. Không bao giờ raise.
+
+C. services/usage.py — MỞ RỘNG ADDITIVE (không đổi/bỏ field cũ; cả UI cũ lẫn v3 đang đọc):
+   1. `_empty_rollup_totals()` + `_add_tokens()`: thêm `cache_read_tokens`, `cache_creation_tokens` RIÊNG.
+      Giữ nguyên `cache_tokens` (tổng gộp).
+   2. `rollup()`: by_model + totals thêm `estimated_cost_usd` + `unpriced_tokens`; by_day/by_source thêm
+      `estimated_cost_usd`. Cộng chi phí theo TỪNG event/model rồi mới tổng — KHÔNG lấy tổng token của hàng
+      nhân một đơn giá (hàng gộp nhiều model).
+   3. `cockpit_stats()`: mỗi provider trong `today` thêm `quota_pct` = calls/quota_warn_per_day*100
+      (1 số lẻ; quota 0/thiếu -> None, không chia 0). Giữ nguyên các field cũ.
+
+D. Tests — MỚI tests/test_pricing.py:
+   1. cache_read và cache_creation dùng ĐÚNG hai đơn giá khác nhau (fail nếu ai gộp chung).
+   2. Model chưa có giá -> priced False, unpriced_tokens = tổng token, cost 0.0, không raise.
+   3. resolve_price: khớp chính xác thắng prefix; prefix dài nhất thắng prefix ngắn.
+   4. totals.estimated_cost_usd == tổng các hàng by_model (không lệch do gộp).
+   5. REGRESSION: mọi field rollup CŨ vẫn còn, giữ nguyên ý nghĩa.
+   6. cockpit_stats: quota_pct đúng; quota 0/thiếu -> None chứ không ZeroDivisionError.
+
+KIỂM TRA: .ih\Scripts\python.exe -m pytest harness/hub/tests -q     # phải XANH
+DONE = file thay đổi, family nào có giá / family nào cố ý để trống, dòng pytest, số liệu thật.
+
+--- KẾT QUẢ ---
+Chỉ `claude-opus-4-8` + `claude-sonnet-5` có giá (nguồn Anthropic công khai); gpt-*/fable/CLI alias/NVIDIA
+để unpriced. Thật: total 5.148.411.688 · cache_read 2.890.808.726 · cache_creation 27.855.751 ·
+est_usd ~317 · unpriced 4.683.327.499 (=91% token chưa có giá). 205 passed.

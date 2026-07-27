@@ -1,0 +1,128 @@
+STEP C1 — Agent profile schema + CRUD (Hub v2 Phase C).
+Spec: harness/hub/BD-hub-v2-phaseC.md Step C1. Read it + ARCHITECTURE.md §9
+(Super Agent principles: config-first, budget cap mandatory) + RD FR-121→124.
+Study: harness/hub/services/runtime_agents.py (current stub — AGENTS list +
+list_agents/get_agent, to be replaced by real yaml loading), harness/hub/
+services/skill_library.py (list_skills — note the "id" field is
+f"{source}/{dirname}" e.g. "claude_project/opus-design-reviewer", but the
+"name" field is the bare display name e.g. "opus-design-reviewer" — the BD
+schema example uses a bare name "opus-design-reviewer" in skills:, so validate
+against skill_library.list_skills() "name" field, not "id"), harness/hub/
+services/providers/__init__.py (registry dict: nvidia|claude|codex|gemini —
+provider field must be a key in this dict), harness/hub/server.py (route
+patterns, _http_error helper, existing GET /api/agents at line ~180),
+harness/hub/tests/test_runtime.py (test style: TestClient with
+headers={"x-hub-client": "harness-hub"}, monkeypatch config paths via a
+pytest fixture, pytest.raises for validation errors).
+
+PyYAML CHECK (done already, do not re-verify): `.ih\Scripts\python.exe -c
+"import yaml; print(yaml.__version__)"` → 6.0.3, already installed in .ih.
+It is currently only a soft/optional import in services/runtime_skills.py
+(try/except ImportError). C1 makes yaml parsing load-bearing (agent
+profiles), so: (a) import `yaml` directly in runtime_agents.py, no try/except
+fallback — it is now a hard dependency; (b) add a `pyyaml` line to
+requirements-hub.txt anyway (it's installed but currently undeclared there —
+declare it for reproducibility). No `pip install` needed this session, it's
+already present in .ih.
+
+BACKWARD-COMPAT CHECK (done already): grepped harness/hub/web/*.js and
+harness/hub/services/*.py for callers of runtime_agents.list_agents() /
+GET /api/agents. Only caller found: the GET /api/agents route itself in
+server.py. No frontend code reads it yet. Conclusion: no compatibility shim
+needed — you may fully replace the stub's return shape (id/name/role/
+description/can_spawn/status) with the new yaml-backed schema (id/provider/
+model/system_prompt/skills/permission/budget/risk_tier). Do not try to keep
+both shapes.
+
+Schema `<id>.agent.yaml` (all fields required except model):
+  id: reviewer
+  provider: claude          # must be a key in services.providers.registry
+  model: null                # optional str|null, only meaningful for nvidia
+  system_prompt: |
+    You are a strict reviewer...
+  skills: [opus-design-reviewer]   # must match a skill_library "name"
+  permission: read_only            # read_only|workspace_write
+  budget: {seconds: 900, max_calls: 5}
+  risk_tier: read_only
+
+TASK:
+1. In runtime_agents.py: define `AGENTS_DIR = config.HUB_DIR / "agents"` as a
+   module-level constant (import `config` at top of the file — do NOT add a
+   new variable to config.py, it is out of scope for this brief; construct
+   the path locally the same way runtime_skills.py does with `config.HUB_DIR`).
+   Write `validate_agent_profile(data: dict) -> None` that raises ValueError
+   with a specific message for: missing required field (id/provider/
+   system_prompt/skills/permission/budget/risk_tier), provider not in
+   services.providers.registry, any entry in skills not matching a
+   skill_library.list_skills() "name", permission not in
+   {read_only, workspace_write}, budget.seconds not a positive int,
+   budget.max_calls not a positive int, id containing "/" or "\\" or ".."
+   (path-traversal guard, mirror the check style in runtime_state.py).
+   model may be any string or null — do not reject other providers for
+   setting it, just pass through unused.
+2. Write a loader that scans `AGENTS_DIR` for `*.agent.yaml`, yaml.safe_load
+   each, validate via validate_agent_profile. Invalid file → skip it from the
+   returned list, log a warning via the stdlib `logging` module (module
+   logger, e.g. `logging.getLogger(__name__).warning(...)) — do NOT raise,
+   do NOT include invalid entries in the API response body. Duplicate id
+   across two files → keep the first (sorted by filename), warn-skip the
+   second. `list_agents()` keeps its existing public name/signature (no
+   args, returns list[dict]) but now returns real parsed+validated profiles.
+   `get_agent(agent_id)` keeps raising FileNotFoundError for unknown id
+   (existing contract — test_runtime.py's child-run tests reference agent_id
+   "reviewer"/"lead" as opaque metadata strings only, they do not call
+   get_agent, so no coupling risk there — verify this by re-reading
+   test_runtime.py before you assume it).
+   Add `create_or_update_agent(data: dict) -> dict`: validate, then write
+   `AGENTS_DIR / f"{data['id']}.agent.yaml"` via yaml.safe_dump (create
+   AGENTS_DIR if missing). Returns the saved profile dict.
+   Add `delete_agent(agent_id: str) -> None`: validate id has no path
+   separators, raise FileNotFoundError if the file doesn't exist, else
+   delete it.
+3. server.py, inside a clearly marked block (do not scatter edits):
+   # --- C1 agent profile routes ---
+   GET /api/agents            → runtime_agents.list_agents() (extend the
+                                 existing route in place, same location)
+   POST /api/agents           → body is the full agent profile dict;
+                                 call create_or_update_agent; catch
+                                 ValueError → HTTPException 400 with the
+                                 message; return the saved profile
+   DELETE /api/agents/{id}    → call delete_agent; catch FileNotFoundError
+                                 → _http_error (404); return {"ok": true}
+   # --- end C1 agent profile routes ---
+   Keep this block contiguous so a parallel merge with C2a's own marked
+   block in server.py is a clean diff, not an interleave.
+4. Create harness/hub/agents/reviewer.agent.yaml matching the schema above
+   (this is the sample used by the DoD and by C2a's sample workflow, which
+   references an agent id "reviewer" — keep the id exactly "reviewer").
+5. Tests in harness/hub/tests/test_runtime_agents.py (new file):
+   - Fixture: monkeypatch `runtime_agents.AGENTS_DIR` to a tmp_path dir (do
+     NOT touch the real harness/hub/agents/ dir in tests). Monkeypatch
+     `runtime_agents.skill_library.list_skills` (or however you imported it)
+     to return a fixed fake list of {"name": ...} dicts — do NOT let tests
+     hit the real skill_library scanner, it walks Path.home()/.claude/skills
+     and is slow/environment-dependent.
+   - Valid yaml file → list_agents() includes it with correct fields.
+   - Invalid yaml (unknown provider) → list_agents() excludes it, no
+     exception raised.
+   - validate_agent_profile: reject unknown provider, reject unknown skill,
+     reject negative/zero budget.seconds and budget.max_calls, reject
+     missing required field, reject id with "/" or "..".
+   - TestClient: POST /api/agents with valid payload → 200, file created on
+     disk under the monkeypatched AGENTS_DIR; GET /api/agents then includes
+     it. POST with invalid payload (bad provider) → 400. DELETE existing →
+     200 + file removed; DELETE missing id → 404.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_runtime_agents.py -q
+(green) — then .ih\Scripts\python.exe -m pytest harness/hub/tests -q as a
+full-suite regression check (note: if C2a is landing in parallel and its
+server.py edits aren't merged into your working copy yet, unrelated
+workflow-route tests may not exist yet in your tree — that's expected, only
+worry about tests that were already green before you started).
+Do NOT touch: services/workflow.py, harness/hub/workflows/, tests/
+test_workflow.py, web/*.js, config.py (add AGENTS_DIR as a local constant in
+runtime_agents.py, not in config.py). Do NOT commit.
+FINAL MESSAGE: files changed, pytest result (both the scoped file and the
+full-suite run), the exact validation error messages you chose for each
+rejection case, and confirmation that reviewer.agent.yaml's id is exactly
+"reviewer".

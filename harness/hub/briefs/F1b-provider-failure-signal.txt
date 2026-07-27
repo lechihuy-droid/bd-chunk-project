@@ -1,0 +1,78 @@
+STEP F1b — Hub phải phân biệt được lượt HỎNG với lượt THÀNH CÔNG (SD-chat-control-plane.md §2.1).
+Model: gpt-5.6-luna. BACKEND ONLY. Không đụng web-v3. Không thêm dep. Không commit.
+(Lệnh "không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+════ LỖI, ĐO TRÊN MÁY THẬT ════
+Gọi chat qua provider `claude` lúc phiên OAuth đã hết hạn. Kết quả lưu trong UI:
+    { role: "assistant",
+      content: "Failed to authenticate: OAuth session expired and could not be refreshed",
+      usage: { input_tokens: 0, output_tokens: 0, total_tokens: 0 } }
+Tức là nó đi qua đường `delta` rồi `done` — Y HỆT một lượt trả lời bình thường. KHÔNG có sự kiện
+`{"type": "error"}` nào.
+
+BA HỆ QUẢ:
+1. Error card ở frontend (vừa làm xong ở F1) KHÔNG BAO GIỜ kích hoạt cho loại lỗi này. Đã kiểm chứng:
+   ép `role` thành `system` thì thẻ hiện đúng. Thẻ không sai — không có đường nào dẫn tới nó.
+2. Lượt hỏng bị `_append_usage_event` ghi vào thống kê usage NHƯ MỘT LƯỢT THÀNH CÔNG.
+   Trang Usage & chi phí đang ăn dữ liệu bẩn.
+3. Mọi cơ chế retry/fallback về sau đều vô dụng vì không có tín hiệu để bám.
+
+GỐC RỄ, services/providers/claude_cli.py::stream_chat (dòng 164-227):
+- Mọi dòng stream-json `type == "assistant"` đều được biến thành `{"type": "delta"}` (dòng 209-212),
+  kể cả khi nội dung là thông báo lỗi.
+- Dòng `type == "result"` chỉ được đọc `usage` và `session_id` (dòng 213-218). KHÔNG hề kiểm cờ lỗi.
+- Sau vòng lặp KHÔNG kiểm `process.returncode` (dòng 217-227). Chỉ kiểm timeout.
+- stderr KHÔNG được đọc trong đường streaming (chỉ `status()` ở dòng 67 mới đọc).
+- Kết cục luôn là `_append_usage_event(usage)` + `yield {"type": "done"}`.
+
+════ VIỆC PHẢI LÀM ════
+
+A. TRƯỚC KHI SỬA — BẮT LẤY SỰ THẬT, ĐỪNG ĐOÁN.
+   Phiên OAuth của claude đang hỏng sẵn, nên lỗi này TÁI HIỆN ĐƯỢC ngay bây giờ. Chạy đúng câu lệnh mà
+   `_build_cmd` dựng ra (đọc hàm đó để lấy tham số thật) và GHI LẠI NGUYÊN VĂN:
+     - từng dòng stream-json trên stdout (đặc biệt các dòng `type: "assistant"` và `type: "result"`,
+       xem `result` có `is_error`, `subtype`, `error` hay không)
+     - nội dung stderr
+     - mã thoát của tiến trình
+   Dán kết quả đó vào phần DONE. Thiết kế phải bám vào output THẬT, không bám vào phỏng đoán.
+
+B. Sửa `claude_cli.py::stream_chat` để phát ra `{"type": "error", "message": ..., "code": ...}` thay cho
+   `done` khi lượt gọi hỏng. Tín hiệu lỗi lấy theo thứ tự ưu tiên, dựa trên cái bắt được ở bước A:
+     1. dòng `result` có cờ lỗi (`is_error` true, hoặc `subtype` báo lỗi) — dùng đúng tên trường THẬT.
+     2. `process.returncode != 0` sau khi stream kết thúc.
+     3. stderr có nội dung mà không hề có dòng `assistant`/`result` nào.
+   `message` phải mang nguyên văn lời giải thích của CLI (frontend đang hiện thẳng cho người dùng đọc —
+   xem error card của F1). Đừng thay bằng câu chung chung.
+
+C. LƯỢT HỎNG KHÔNG ĐƯỢC TÍNH VÀO USAGE.
+   Chỉ gọi `_append_usage_event(usage)` trên đường THÀNH CÔNG. Đường lỗi thì không ghi.
+   Đây là lý do trang Usage đang có dữ liệu bẩn.
+
+D. LÀM TƯƠNG TỰ CHO codex_cli.py và gemini_cli.py.
+   Đọc từng file, tìm đúng chỗ tương ứng. KHÔNG chép mù logic của claude sang — ba CLI có định dạng
+   output khác nhau. Nếu một CLI nào đó không tái hiện được lỗi ngay bây giờ thì nói rõ đã suy luận từ
+   đâu, đừng lặng lẽ đoán.
+
+E. `status()` — nói thật về xác thực.
+   Hiện `status()` chỉ chạy lệnh kiểm phiên bản (dòng 67-79), nên claude báo
+   `available: true, version "2.1.207", detail "ok"` TRONG KHI phiên OAuth đã chết.
+   Sửa để trạng thái phân biệt được "đã cài" với "dùng được".
+   ⚠️ RÀNG BUỘC: `status()` được gọi mỗi lần tải trang. TUYỆT ĐỐI không thêm một lượt gọi model thật vào
+   đó — sẽ đốt quota mỗi lần refresh. Chỉ dùng lệnh kiểm tra rẻ, cục bộ, không tốn token (ví dụ lệnh con
+   kiểm trạng thái đăng nhập nếu CLI có, hoặc đọc file phiên). Nếu không có cách nào rẻ, thì GIỮ NGUYÊN
+   `status()` và nói rõ vì sao — đừng đánh đổi quota lấy một cái chấm màu.
+   Nếu có thêm trạng thái mới, giữ nguyên kiểu `ProviderStatus` trong services/providers/base.py
+   (id, available, version, detail, capabilities) — frontend F1 đã suy trạng thái từ `available` + `detail`,
+   đừng đổi hợp đồng.
+
+F. TEST trong harness/hub/tests/:
+   1. dòng `result` mang cờ lỗi -> phát ra sự kiện `error`, KHÔNG phát `done`.
+   2. `returncode != 0` -> phát ra `error`.
+   3. đường lỗi KHÔNG gọi `_append_usage_event` (monkeypatch rồi assert không được gọi).
+   4. đường thành công vẫn y như cũ: `delta` rồi `done`, có ghi usage. REGRESSION, bắt buộc.
+   Giả lập tiến trình con, đừng gọi CLI thật trong test.
+
+KIỂM TRA: cd /c/Users/HUY/workspace/ai-project-opus && .ih/Scripts/python.exe -m pytest harness/hub/tests -q
+          # đang là 209 passed, phải XANH
+DONE = output thô bắt được ở bước A (nguyên văn), file đã sửa, tín hiệu lỗi cuối cùng chọn theo trường nào,
+       quyết định về mục E kèm lý do, dòng pytest.

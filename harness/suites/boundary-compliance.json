@@ -1,0 +1,57 @@
+{
+  "id": "boundary-compliance",
+  "name": "Boundary Compliance Harness",
+  "description": "Negative probes that verify the harness blocks outside-root file access, unsafe cwd, shell launchers, and outside-root command arguments.",
+  "checks": [
+    {
+      "id": "safe-preflight-still-runs",
+      "type": "command",
+      "command": ["{py311}", "harness/run_harness.py", "--suite", "workspace-smoke", "--check", "root-agents", "--json"],
+      "cwd": "{root}",
+      "timeout_seconds": 60,
+      "expected_exit": 0,
+      "stdout_contains": ["Result: PASS"],
+      "hint": "Boundary policy should block unsafe probes without breaking normal in-project checks."
+    },
+    {
+      "id": "reject-outside-file-read",
+      "type": "command",
+      "command": ["{py311}", "harness/run_harness.py", "--suite", "harness/suites/probes/outside-root-read.json", "--json"],
+      "cwd": "{root}",
+      "timeout_seconds": 60,
+      "expected_exit": 1,
+      "output_contains": ["Boundary policy violation", "outside project root"],
+      "hint": "Path-based checks must not read files outside the workspace root unless explicitly allowlisted."
+    },
+    {
+      "id": "reject-outside-command-cwd",
+      "type": "command",
+      "command": ["{py311}", "harness/run_harness.py", "--suite", "harness/suites/probes/outside-command-cwd.json", "--json"],
+      "cwd": "{root}",
+      "timeout_seconds": 60,
+      "expected_exit": 1,
+      "output_contains": ["Boundary policy violation", "command cwd outside project root"],
+      "hint": "Command checks should not execute from a directory outside the project root."
+    },
+    {
+      "id": "reject-shell-launcher",
+      "type": "command",
+      "command": ["{py311}", "harness/run_harness.py", "--suite", "harness/suites/probes/shell-launcher.json", "--json"],
+      "cwd": "{root}",
+      "timeout_seconds": 60,
+      "expected_exit": 1,
+      "output_contains": ["Boundary policy violation", "shell launcher"],
+      "hint": "Raw shells should require explicit allow_shell because they bypass argv-level safety."
+    },
+    {
+      "id": "reject-outside-command-arg",
+      "type": "command",
+      "command": ["{py311}", "harness/run_harness.py", "--suite", "harness/suites/probes/outside-command-arg.json", "--json"],
+      "cwd": "{root}",
+      "timeout_seconds": 60,
+      "expected_exit": 1,
+      "output_contains": ["Boundary policy violation", "command argument outside project root"],
+      "hint": "Command arguments that are path-like should stay inside the project root unless explicitly allowlisted."
+    }
+  ]
+}

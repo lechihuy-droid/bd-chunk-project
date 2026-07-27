@@ -1,0 +1,92 @@
+STEP U0 — UI v3: scaffold Vite + React + Tailwind, app shell, FastAPI serving
+(Upstream: harness/hub/SD-ui-v3-rebuild.md §5 Phase U0 — APPROVED 2026-07-20)
+
+READ FIRST (in this order):
+1. harness/hub/SD-ui-v3-rebuild.md — §3 design tokens, §4 page map (source of truth)
+2. harness/hub/mockups/ui-v3-mockup.html — visual reference: replicate sidebar/topbar
+   look (colors, spacing, zone labels, provider chips) as close as practical
+3. harness/hub/server.py — the two route changes you will make (see STEP 6)
+
+GOAL:
+New frontend app at harness/hub/web-v3/ (Vite + React + TypeScript + Tailwind v4).
+Shell only: sidebar (4 zones, 9 nav entries) + topbar (breadcrumb + 3 quota chips,
+static placeholder data) + 9 placeholder pages with hash routing. Build committed
+to web-v3/dist. FastAPI serves: "/" -> v3 index, "/legacy" -> old UI (unchanged
+behavior otherwise). Backend API 100% untouched.
+
+HARD CONSTRAINTS:
+- Do NOT modify: harness/hub/services/**, harness/hub/parsers/**, harness/hub/config.py,
+  harness/hub/web/** (legacy stays byte-identical), any existing test file except
+  adding the new test file described in STEP 7.
+- server.py: only the minimal route/mount edits in STEP 6.
+- No SSR, no Node process at runtime, no new Python dependencies.
+- pnpm is at C:\Users\HUY\AppData\Local\pnpm (already on PATH in your session).
+- Commit NOTHING yourself — leave working tree for review.
+
+STEPS:
+
+1. Scaffold:
+   cd harness/hub && pnpm create vite web-v3 --template react-ts
+   cd web-v3 && pnpm install && pnpm add react-router-dom && pnpm add -D tailwindcss @tailwindcss/vite
+   Wire @tailwindcss/vite plugin in vite.config.ts. Delete demo assets (App.css logo etc).
+
+2. vite.config.ts:
+   - base: "/"
+   - build.outDir: "dist" (default ok)
+   - server.proxy: { "/api": "http://127.0.0.1:8799" }  (dev convenience)
+
+3. Design tokens — src/index.css (@theme / CSS vars, exact values from SD §3):
+   --ink #14161B, --panel #1B1E25, --panel2 #20242D, --line #2B303B,
+   --text #E8EAF0, --dim #8B92A3, --faint #5A6172,
+   --claude #D97757, --codex #A78BFA, --nvidia #76B900, --gemini #5B9CF5,
+   --gate #E4B15E, --ok #5FBF77, --err #E06C75.
+   font-sans: "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif
+   font-mono: "Cascadia Code","Consolas",monospace
+   Dark-only. Body bg --ink, text --text, 14px base.
+
+4. Shell:
+   - src/components/Sidebar.tsx — agent row (avatar gradient claude->codex, name
+     "Harness Hub", green "3 provider online" sub) + 4 zones exactly:
+       TRÒ CHUYỆN: Chat đa cửa sổ (/chat), Phiên đã lưu (/sessions)
+       ĐIỀU PHỐI: Workflows (/workflows), Runs (/runs), Agents (/agents), Skills (/skills)
+       GIÁM SÁT: Chờ duyệt (/approvals), Usage & quota (/usage)
+       HỆ THỐNG: Cài đặt (/settings)
+     Active item: bg --panel2, font-weight 600. Zone label: 10px, letter-spacing .14em,
+     color --faint, uppercase. Footer "Hub v3 · localhost:8799".
+   - src/components/Topbar.tsx — left breadcrumb (page title from route), right 3 chips
+     (mono 11px, pill, colored dot): "claude —", "codex —", "nvidia free". Static for
+     now; add code comment: TODO(U4): wire /api/usage quota.
+   - Layout: grid 236px | 1fr, sidebar full height, topbar 1 row, content scrolls.
+
+5. Routing + placeholder pages:
+   createHashRouter (react-router-dom) — hash routing, no server rewrites needed.
+   Default route -> /runs. 9 pages under src/pages/, each renders: zone eyebrow label,
+   page h1, one dim paragraph "Sẽ build ở phase <U1|U2|U3|U4>" per SD §5 mapping
+   (chat,sessions -> U1; runs -> U2; workflows,agents,skills -> U3; approvals,usage,settings -> U4).
+
+6. server.py (minimal, surgical):
+   - Add: WEB_V3_DIST = HUB_DIR / "web-v3" / "dist" (mirror how web/ path is derived).
+   - Mount dist assets: app.mount("/assets", StaticFiles(directory=str(WEB_V3_DIST / "assets")), name="assets-v3")
+     ONLY if WEB_V3_DIST exists (guard so tests/dev without dist don't crash startup).
+   - Route GET "/" : if WEB_V3_DIST/index.html exists -> FileResponse(it); else fall back
+     to current legacy index response (keep old behavior as fallback).
+   - Add route GET "/legacy" -> FileResponse(web/index.html). Existing "/static" mount
+     unchanged (legacy assets keep loading).
+   - Also serve v3 icon/manifest files if vite emitted any at dist root (vite.svg): add
+     GET "/vite.svg" FileResponse guard OR simpler: remove the icon reference from
+     index.html and ship no favicon file. Simpler path preferred.
+
+7. Tests — new file harness/hub/tests/test_ui_v3.py (pytest, reuse client fixture
+   pattern from tests/test_api.py):
+   - GET / -> 200, body contains 'id="root"'
+   - GET /legacy -> 200, body contains 'app.js'
+   - GET /api/health -> 200 (regression canary)
+   Then run FULL suite: .ih\Scripts\python.exe -m pytest harness/hub/tests -q
+   from repo root C:\Users\HUY\workspace\ai-project-opus. Must be green
+   (162 existing + 3 new). Fix your own breakage; do not touch unrelated tests.
+
+8. Build: cd harness/hub/web-v3 && pnpm build. Confirm dist/index.html + dist/assets/*.
+   dist WILL be committed later by reviewer — do not gitignore it. Add web-v3/node_modules
+   to .gitignore (web-v3/.gitignore from the template already covers it — verify).
+
+DONE = print summary: files created/changed list, pytest result line, dist file list (top level).

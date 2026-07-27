@@ -1,0 +1,14 @@
+{
+  "id": "probe-shell-launcher",
+  "name": "Probe Shell Launcher",
+  "description": "Intentional policy violation used by boundary-compliance.",
+  "checks": [
+    {
+      "id": "shell-launcher",
+      "type": "command",
+      "command": ["powershell.exe", "-NoProfile", "-Command", "Write-Output should-not-run"],
+      "cwd": "{root}",
+      "expected_exit": 0
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+STEP G1-fix-7 — nối nốt phần G1-fix-6 bỏ dở. FRONTEND ONLY. Model: gpt-5.6-luna.
+Không thêm dep. Không chạy pnpm build. Không commit. Cấm sửa file cấu hình thật để thử.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH: G1-fix-6 đã thêm prop `selected` cho `Button` và `Chip`, `muted` cho `Chip` — phần đó XONG,
+đừng làm lại. Nhưng CHỖ GỌI vẫn đang biểu đạt trạng thái bằng chuỗi class điều kiện, nên trạng thái chọn
+vẫn thua class của variant và gần như không nhìn thấy.
+
+BỐN CHỖ CẦN CHUYỂN (đã định vị chính xác):
+  pages/ChatPage.tsx:114
+      selected ? 'border-accent bg-accent-subtle text-primary' : 'border-border-subtle text-muted opacity-60'
+      -> chip đích trong composer. Dùng `selected={selected}` (+ `muted` khi không chọn nếu cần).
+  pages/UsagePage.tsx:109
+      range === id ? 'border-[var(--hub-accent)] bg-[var(--hub-accent)] text-app' : '...'
+      -> chip khoảng thời gian. Dùng `selected={range === id}`.
+  pages/WorkflowsPage.tsx:40 (hai chỗ trong cùng dòng)
+      selected?.id === row.id ? 'border-[var(--hub-accent)] bg-elevated' : '...'
+      -> mục workflow ở sidebar. Dùng `selected={selected?.id === row.id}`.
+      activeId === node.id ? 'border-[var(--hub-accent)] ring-1 ring-[var(--hub-accent)]' : '...'
+      -> node đang chọn trên canvas. Node là <div>, KHÔNG phải Button — ở đây giữ class điều kiện,
+         NHƯNG bảo đảm nó không bị class khác cùng thuộc tính tranh (kiểm computed style).
+
+VIỆC:
+1. Bỏ chuỗi class điều kiện ở ba chỗ đầu, thay bằng prop `selected` (và `muted` nếu hợp).
+   Chỉ giữ lại class BỐ CỤC ở `className` (flex, gap-, px-, w-, truncate…).
+2. Bảo đảm trong ui.tsx, nhánh `selected` và nhánh variant KHÔNG cùng đặt một thuộc tính CSS
+   (nền/viền/màu chữ). Nếu `selected` đặt `bg-*` thì nhánh variant phải bỏ `bg-*` trong trường hợp đó.
+   Đây là gốc rễ đã làm hỏng ba lần liên tiếp — hai class cùng thuộc tính thì thứ tự trong stylesheet
+   quyết định, không phải thứ tự trong `class`.
+
+NGHIỆM THU BẮT BUỘC — ĐO COMPUTED STYLE, ĐỪNG ĐỌC CODE RỒI KẾT LUẬN:
+   a. /#/chat: bấm bỏ chọn MỘT chip đích. Chip đang chọn và chip không chọn phải khác nhau ở
+      `borderTopColor` HOẶC `backgroundColor` — nêu số đo cả hai.
+   b. /#/usage: chip khoảng thời gian đang chọn khác chip không chọn, nêu số đo.
+   c. /#/workflows: mục workflow đang chọn ở sidebar khác mục không chọn, nêu số đo.
+   d. /#/chat vẫn giữ: 0 phần tử viền rgb(238,242,248) · ĐÚNG MỘT nút nền rgb(139,124,246) ·
+      4 pane -> scrollHeight ≈ innerHeight.
+   Nếu không chạy được trình duyệt thì NÓI RÕ mục nào chưa kiểm. Lần trước đã báo "đã chuyển sang accent"
+   trong khi thực tế vẫn là border-subtle — đừng lặp lại.
+
+KHÔNG ĐỔI HÀNH VI. Không đụng `send()`, parseSse, `patchMessage`, localStorage, luồng SSE.
+Giữ nguyên: panel artifact, canvas (cạnh `<line>` có mũi tên, số thứ tự chạy ①②③, nút "Xếp theo thứ tự chạy").
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b
+DONE = 4 chỗ đã xử lý thế nào, SỐ ĐO computed style của mục a/b/c/d, `tsc -b`.

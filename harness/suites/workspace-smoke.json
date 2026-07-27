@@ -1,0 +1,95 @@
+{
+  "id": "workspace-smoke",
+  "name": "Workspace Smoke Harness",
+  "description": "Fast deterministic checks for Opus workspace structure, memory recall, and core scripts.",
+  "checks": [
+    {
+      "id": "root-agents",
+      "type": "path_exists",
+      "path": "{root}/AGENTS.md",
+      "kind": "file",
+      "hint": "Root operating rules should stay visible for every agent session."
+    },
+    {
+      "id": "animus-status",
+      "type": "file_contains",
+      "path": "{root}/opus-animus/ai/status.md",
+      "contains": ["Current objective", "MEM-1", "Next step"],
+      "hint": "Refresh opus-animus/ai/status.md or update the suite if the operating model changed."
+    },
+    {
+      "id": "consilium-readme",
+      "type": "path_exists",
+      "path": "{root}/opus-animus/opus-consilium/README.md",
+      "kind": "file"
+    },
+    {
+      "id": "wiki-index",
+      "type": "path_exists",
+      "path": "{root}/opus-animus/opus-consilium/personal-wiki/INDEX.md",
+      "kind": "file",
+      "hint": "The Consilium wiki index is the routing map for recall and wiki work."
+    },
+    {
+      "id": "actio-schema",
+      "type": "path_exists",
+      "path": "{root}/opus-animus/opus-actio/data/schema.sql",
+      "kind": "file"
+    },
+    {
+      "id": "profile-json",
+      "type": "json_load",
+      "path": "{root}/user-profile/preferences.json"
+    },
+    {
+      "id": "recall-fixtures",
+      "type": "glob_count",
+      "pattern": "{root}/opus-animus/opus-consilium/memory/_fixtures/*.md",
+      "min": 2,
+      "hint": "Recall tests need fixture markdown files."
+    },
+    {
+      "id": "compile-core-python",
+      "type": "python_compile",
+      "files": [
+        "{root}/harness/run_harness.py",
+        "{root}/opus-animus/run_home.py",
+        "{root}/opus-animus/opus-consilium/run_recall.py",
+        "{root}/opus-animus/opus-consilium/memory/indexer.py",
+        "{root}/opus-animus/opus-consilium/memory/search.py",
+        "{root}/opus-animus/opus-consilium/memory/sources.py"
+      ],
+      "hint": "Syntax failure here usually means a recent edit broke the Python pipeline before runtime."
+    },
+    {
+      "id": "recall-tests",
+      "type": "command",
+      "command": ["{py311}", "memory/test_recall.py"],
+      "cwd": "{root}/opus-animus/opus-consilium",
+      "timeout_seconds": 60,
+      "expected_exit": 0,
+      "stdout_contains": ["17 tests passed"],
+      "hint": "Run the saved stdout/stderr logs in the report; failing recall tests are the first repair target."
+    },
+    {
+      "id": "recall-index",
+      "type": "command",
+      "command": ["{py311}", "run_recall.py", "index"],
+      "cwd": "{root}/opus-animus/opus-consilium",
+      "timeout_seconds": 60,
+      "expected_exit": 0,
+      "stdout_contains": ["Indexed"],
+      "hint": "The recall database should be rebuildable from checked-in markdown sources."
+    },
+    {
+      "id": "recall-query-json",
+      "type": "command",
+      "command": ["{py311}", "run_recall.py", "weekly synthesis", "--json", "--limit", "2"],
+      "cwd": "{root}/opus-animus/opus-consilium",
+      "timeout_seconds": 30,
+      "expected_exit": 0,
+      "stdout_json": true,
+      "hint": "If this fails after recall-index passed, inspect memory/search.py and query parsing."
+    }
+  ]
+}

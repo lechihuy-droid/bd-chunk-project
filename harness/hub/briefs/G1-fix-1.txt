@@ -1,0 +1,53 @@
+STEP G1-fix-1 — G1 mới làm một nửa. FRONTEND ONLY. Model: gpt-5.6-luna.
+Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+⚠️ CẤM: sửa file cấu hình thật để thử (`harness/hub/agents/*.agent.yaml`, `harness/hub/workflows/*.yaml`).
+Ở phase trước có file agent bị sửa ngoài phạm vi, gồm cả thêm `skills: [agentic-engineering]` vào `coder`.
+Cần dữ liệu thử thì dùng fixture trong tests/.
+
+──────────────────────────────────────────────────────────────────────
+1. BUILD ĐANG GÃY:
+       src/pages/ChatPage.tsx(6,56): error TS6133: 'Select' is declared but its value is never read.
+       src/pages/ChatPage.tsx(6,72): error TS6133: 'Textarea' is declared but its value is never read.
+   ⚠️ `pnpm exec tsc --noEmit` KHÔNG bắt được lỗi này. Lệnh dựng thật dùng `tsc -b`.
+   Từ giờ verify bằng `pnpm exec tsc -b`. Nếu EPERM `.tsbuildinfo` thì xoá file đó rồi chạy lại,
+   và nói rõ trong DONE.
+   ĐỪNG sửa bằng cách xoá import — đó là dấu hiệu của mục 2.
+
+2. MỤC 4 CỦA BRIEF G1 ("DÙNG PRIMITIVE, ĐỪNG DỰNG LẠI") CHƯA LÀM Ở BA TRANG LỚN NHẤT.
+   Đếm thật trên code hiện tại:
+       ChatPage.tsx      : 29 <button>, 4 <select>, 1 <textarea>, 3 <input>  -> 0 Button/Input/Select
+       WorkflowsPage.tsx :  8 <button>, 4 <select>, 2 <textarea>, 1 <input>  -> 0 Button/Input/Select
+       UsagePage.tsx     :  2 <button>, 2 <select>                           -> 0 Button/Select
+   (AgentsPage.tsx và RunsPage.tsx đã chuyển đúng — xem hai file đó làm mẫu.)
+   VIỆC: chuyển hết sang primitive trong src/lib/ui.tsx:
+     - `<button>` -> `<Button>` đúng variant (primary | secondary | ghost | destructive).
+       LUẬT: mỗi vùng nhiều nhất MỘT primary. Trong ChatPage, primary là nút Gửi của composer chung.
+       Nút Gửi của từng pane là secondary. Mọi thứ trong toolbar/header là ghost.
+       "Dừng tất cả" và "Từ chối" là destructive.
+     - Nút chỉ có icon (`×`, `…`) -> `<IconButton>`, vùng bấm >= 32x32, cùng cỡ và cùng hover.
+     - `<select>` -> `<Select>` · `<textarea>` -> `<Textarea>` · `<input>` -> `<Input>`.
+     - Chip đích của composer và chip skill -> `<Chip>` (biến thể xoá được).
+     - Mọi biểu diễn trạng thái còn sót -> `<Status>`.
+   Sau khi xong, số control thô ở ba trang trên phải VỀ GẦN 0. Nếu có chỗ cố ý giữ thô thì liệt kê ra
+   kèm lý do, đừng im lặng bỏ qua.
+
+3. KIỂM LẠI PHẦN G1 ĐÃ KHAI LÀ XONG (báo cáo nói đã làm, hãy tự đối chiếu lại code):
+   - 19 chỗ dùng sai màu provider đã sửa hết chưa? Đếm lại `bg-claude|border-claude|text-claude|bg-codex|
+     border-codex|text-codex|bg-nvidia|bg-gemini` trong src/, chỉ được còn trong `ProviderDot`.
+   - `RunSpine` trạng thái running: đã lấy provider THẬT của node chưa, hay vẫn cứng `claude`?
+   - Còn mã hex tự phát nào trong src/ không? (ArtifactRail.tsx, GateCard.tsx trước đây có 4 chỗ.)
+
+──────────────────────────────────────────────────────────────────────
+KHÔNG ĐƯỢC LÀM HỎNG (đã đo tay, sẽ đo lại):
+  a. Trang chat ghim theo chiều cao viewport: với 4 pane, `document.documentElement.scrollHeight`
+     phải xấp xỉ `innerHeight` (720) và đáy composer < innerHeight. KHÔNG đặt `min-height` cứng cho pane.
+  b. Panel artifact chiếm cột phải khi mở; ở <1024px thì xếp xuống dưới.
+  c. Canvas workflow: cạnh vẽ bằng `<line>` có marker mũi tên, node có số thứ tự chạy, nút
+     "Xếp theo thứ tự chạy".
+KHÔNG đổi hành vi. Không đụng `send()`, parseSse, `patchMessage`, lược đồ localStorage, luồng SSE,
+hay bất kỳ logic nghiệp vụ nào. Đây là đổi lớp trình bày.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b, không phải --noEmit
+DONE = số control thô còn lại từng trang (trước/sau), kết quả 3 mục kiểm ở phần 3, kết quả `tsc -b`.

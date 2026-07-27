@@ -1,0 +1,76 @@
+STEP G1 — Áp design system vào toàn bộ trang (SD-chat-control-plane.md §4-bis). Model: gpt-5.6-luna.
+FRONTEND ONLY (web-v3). Zero Python. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+⚠️ CHẠY SAU CÙNG: brief này chạm MỌI trang. Chỉ chạy khi F5, F6 và E4 đã commit xong.
+
+ĐỌC TRƯỚC, ĐÂY LÀ HỢP ĐỒNG:
+  harness/hub/web-v3/DESIGN.md        — token, component API, bảng ánh xạ token cũ -> mới, checklist di trú
+  harness/hub/web-v3/src/styles/tokens.css — nguồn sự thật duy nhất của token
+  harness/hub/web-v3/src/lib/ui.tsx   — primitive đã dựng sẵn: Button, IconButton, Input, Select,
+                                        Textarea, Chip, Status, ProviderDot, EmptyState
+Ba file này đã commit (0f78e8f) và CHƯA được dùng ở đâu. Việc của G1 là đưa chúng vào dùng.
+
+VIỆC:
+
+1. NẠP TOKEN: import `src/styles/tokens.css` vào chỗ app đang nạp CSS (xem `src/index.css` và entry point).
+   Sau bước này mọi component phải dùng token, KHÔNG dùng giá trị màu/radius/spacing tự phát.
+
+2. THAY GIÁ TRỊ TỰ PHÁT bằng token, theo bảng ánh xạ ở DESIGN.md §3. Đặc biệt:
+   - 4 chỗ hardcode mã hex: ArtifactRail.tsx:10, GateCard.tsx:3 — đưa về token.
+   - Radius: `rounded-[3px]` / `rounded-[9px]` / `rounded-[10px]` và các giá trị lẻ khác -> chỉ còn
+     sm 6 / md 8 / lg 12 / full 999. Input, button, menu item = md. Pane, card, modal = lg. Chip = full.
+   - Nhãn eyebrow `text-[10px] tracking-[.14em]` -> scale "section" (12px, tracking 0.08em).
+   - `h1` trang đang là `text-xl` (20px) = scale "display"; đổi về "title" 16px theo DESIGN.md.
+
+3. MÀU PROVIDER CHỈ CÒN LÀ CHẤM NHẬN DIỆN. DESIGN.md §5.1 liệt kê 19 chỗ dùng sai ở 6 file
+   (WorkflowsPage 6, RunsPage 2, AgentsPage 4, SettingsPage 1, ApprovalsPage 1, RunSpine 4, Sidebar 1).
+   Sửa hết: button, navigation active, selection, viền chọn -> dùng brand accent; provider chỉ còn
+   `<ProviderDot>`.
+   ⚠️ TRONG SỐ ĐÓ CÓ MỘT BUG THẬT, KHÔNG PHẢI CHUYỆN THẨM MỸ:
+   `RunSpine.tsx` tô node trạng thái "running" bằng `border-claude`/`bg-claude` CỐ ĐỊNH, bất kể provider
+   nào đang chạy. Sửa: trạng thái running dùng màu semantic của Status; nếu muốn hiện provider thì dùng
+   `ProviderDot` với provider THẬT của node đó. Đừng chỉ đổi màu — sửa cho đúng nguồn dữ liệu.
+
+4. DÙNG PRIMITIVE, ĐỪNG DỰNG LẠI:
+   - Mọi button -> `Button` với đúng variant. Luật: MỖI VÙNG NHIỀU NHẤT MỘT primary.
+   - Mọi nút chỉ có icon (`×`, `…`) -> `IconButton`, vùng bấm tối thiểu 32x32, cùng cỡ và cùng hover.
+   - Mọi input/select/textarea -> primitive tương ứng.
+   - Mọi biểu diễn trạng thái (chữ có màu, chấm, badge, pill) -> `Status` duy nhất.
+     Hiện trạng thái đang được vẽ bằng 5 kiểu khác nhau; sau G1 chỉ còn một.
+   - Chip đích ở composer, chip skill -> `Chip` (biến thể xoá được).
+
+4b. SỬA KÈM — header pane đang hiện `READ-ONLY READ-ONLY` (đo thật sau F5).
+    Badge `READ-ONLY` suy từ provider (F1, nghĩa: hub không truyền được tham số sinh văn bản cho CLI)
+    và badge quyền của agent (F5, nghĩa: quyền thao tác của agent) đang cùng hiện, chữ giống hệt nhau.
+    Hai thứ này KHÁC NGHĨA nhưng trùng chữ -> người đọc không phân biệt được, và nhìn như lỗi.
+    SỬA: khi pane có agent, hiện quyền của AGENT (`Quyền: read_only`) và bỏ badge suy từ provider.
+    Khi không có agent, giữ badge provider nhưng đổi chữ cho khác hẳn để không nhầm với quyền agent.
+    Dùng `Status` cho cả hai, đừng vẽ badge riêng.
+    Bố cục hai tầng theo DESIGN.md: trái = provider + model; dòng phụ = runtime/version; phải = trạng thái
+    + hành động. Không nhét version vào dòng chính.
+
+5. EMPTY STATE: pane chat chưa có tin nhắn đang để trống trơn. Dùng `EmptyState` với 3-4 hành động ghost
+   (ví dụ: xem phiên đã lưu, mở workflow, chọn agent). Nhạt, không được cạnh tranh với composer.
+
+6. QUYẾT ĐỊNH ĐÃ CHỐT cho câu hỏi mở trong DESIGN.md (nút "Duyệt" của GateCard):
+   Nút **"Duyệt" = Button variant primary (violet)**, vì nó là HÀNH ĐỘNG.
+   Màu amber giữ nguyên cho **dấu hiệu trạng thái** của gate (hình thoi ◆, badge "chờ duyệt"), vì nó là
+   TRẠNG THÁI cần chú ý. Nút "Từ chối" = variant destructive.
+   Nguyên tắc: amber = "cần để mắt tới", violet = "đây là việc cần bấm". Cập nhật DESIGN.md theo quyết
+   định này, bỏ phần câu hỏi mở.
+
+⚠️ KHÔNG ĐƯỢC LÀM HỎNG hai thứ đã đo và sửa bằng tay:
+  a. Trang chat bị ghim theo chiều cao viewport. Với 4 pane phải giữ được
+     `document.documentElement.scrollHeight ≈ innerHeight` (720) và đáy composer < innerHeight.
+     Review gợi ý pane `min-height: 420px` — **KHÔNG áp dụng cứng**, nó làm sống lại lỗi composer bị đẩy
+     khuất. Pane phải co được và cuộn bên trong.
+  b. Panel artifact (E5) chiếm cột phải khi mở, và xếp xuống dưới ở màn <1024px.
+
+RÀNG BUỘC: KHÔNG đổi hành vi. Đây là đổi lớp trình bày. Không đụng `send()`, parseSse, `patchMessage`,
+lược đồ localStorage, luồng SSE, hay bất kỳ logic nghiệp vụ nào. Không thêm dep.
+Nhãn tiếng Việt giữ nguyên như hiện tại.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = danh sách file đã đổi, số chỗ dùng sai màu provider đã sửa (phải là 19), cách sửa bug RunSpine,
+       xác nhận đã import tokens.css ở đâu, kết quả tsc.

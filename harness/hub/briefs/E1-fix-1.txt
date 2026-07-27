@@ -1,0 +1,31 @@
+STEP E1-fix-1 — hai lỗi từ review. BACKEND ONLY. Model: gpt-5.6-luna. Không frontend, không dep, không commit.
+[ĐÃ THỰC THI — 205 test xanh]
+
+1. HIGH — test regression bị nới lỏng: harness/hub/tests/test_usage_cache.py (~dòng 177-179).
+   Bản cũ (HEAD) so sánh nguyên dict:
+       "by_source": [{"source": "claude", "calls": 2, "total_tokens": 21}],
+   Bản mới chỉ kiểm tra phần tử [0]:
+       assert rolled["by_source"][0]["source"] == "claude"   ... (calls, total_tokens)
+   So sánh nguyên list ngầm khẳng định `len(by_source) == 1`. Bản mới mất điều đó → nếu khoá gom nhóm by_source
+   lỗi làm tách/nhân đôi hàng thì test KHÔNG bắt được. Không phải hệ quả bắt buộc của việc thêm field: ngay trong
+   cùng file, by_model/by_day vẫn giữ so sánh nguyên list.
+   SỬA: khôi phục khẳng định đủ mạnh cho by_source — kiểm tra SỐ LƯỢNG hàng và thứ tự như by_model/by_day đang
+   làm (so sánh list các tuple field quan tâm), đồng thời chấp nhận field additive mới. Không chỉ kiểm tra [0].
+
+2. MED — `rollup([])["totals"]` THIẾU HẲN `estimated_cost_usd` và `unpriced_tokens`.
+   services/usage.py: `_empty_rollup_totals()` không seed hai field; `totals` tạo từ nó TRƯỚC vòng lặp event, hai
+   field kia chỉ được thêm "lười" trong vòng lặp bằng `.get(key, default)`. Khi không có event nào → totals thiếu
+   hai key. Trong khi by_model/by_day/by_source đều seed sẵn lúc tạo hàng → totals lệch chuẩn.
+   Sắp gây lỗi thật: E2 (frontend) sẽ đọc `totals.estimated_cost_usd` và crash ở trạng thái rỗng.
+   SỬA: seed `estimated_cost_usd: 0.0` và `unpriced_tokens: 0` ngay trong `_empty_rollup_totals()` để totals LUÔN
+   có, đối xứng với các hàng khác. Bỏ phần `.get(...)` lười nếu đã seed.
+
+3. TEST cho lỗi #2: assert `rollup([])["totals"]` có `estimated_cost_usd == 0.0` và `unpriced_tokens == 0`
+   (`test_rollup_preserves_legacy_fields` chỉ kiểm tra field cũ nên không bắt được).
+
+KIỂM TRA: .ih\Scripts\python.exe -m pytest harness/hub/tests -q     # phải XANH
+DONE = hunk từng mục + dòng pytest + output `rollup([])['totals']`.
+
+--- KẾT QUẢ ---
+by_source khôi phục so sánh nguyên list: `[... for row in rolled["by_source"]] == [("claude", 2, 21)]`.
+`rollup([])['totals']` nay có đủ 10 field gồm estimated_cost_usd 0.0 + unpriced_tokens 0. 205 passed.

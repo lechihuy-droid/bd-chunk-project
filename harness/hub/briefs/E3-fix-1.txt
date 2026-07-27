@@ -1,0 +1,79 @@
+STEP E3-fix-1 — 6 lỗi (1 từ browser thật, 4 từ review, 1 dọn dẹp). Model: gpt-5.6-luna.
+Chủ yếu frontend + 1 test backend. Không thêm dep. Không chạy pnpm build. Không commit.
+File: harness/hub/web-v3/src/pages/WorkflowsPage.tsx và harness/hub/tests/test_api.py.
+
+──────────────────────────────────────────────────────────────────────
+1. HIGH — chuỗi KHÔNG BAO GIỜ dựng được từ edges; luôn rơi về thứ tự mảng `nodes`.
+   BẰNG CHỨNG TRÊN MÀN HÌNH THẬT (/#/workflows, code-task, server đang chạy):
+   canvas ghi "Chuỗi không hợp lệ" trong khi backend ngay dưới ghi "Workflow hợp lệ." — mâu thuẫn.
+   Nguyên nhân, dòng 18:
+       const next = new Map(workflow.edges)
+   `edges` là mảng cặp [from, to] -> Map thành from -> to, VALUE LÀ MỘT CHUỖI, không phải tuple.
+   Dòng 22:
+       const nextId = next.get(current.id)?.[1]
+   `?.[1]` trên CHUỖI = ký tự thứ hai. next.get('brief') === 'implement'; 'implement'[1] === 'm';
+   byId.get('m') === undefined -> vòng lặp dừng sau node đầu -> ordered.length 1 !== 3 ->
+   valid=false + trả về workflow.nodes theo thứ tự mảng.
+   Đúng thứ brief E3 cấm ("bắt buộc dựng từ edges").
+   SỬA: `const next = new Map(workflow.edges.map(([from, to]) => [from, to]))` rồi dùng thẳng
+   `next.get(current.id)`, BỎ `?.[1]`.
+   KIỂM CHỨNG BẮT BUỘC: dựng một workflow test có mảng `nodes` xếp NGƯỢC với chuỗi edges ->
+   canvas phải hiện theo chuỗi edges và KHÔNG hiện "Chuỗi không hợp lệ".
+
+2. HIGH — tham chiếu tới node KHÔNG TỒN TẠI không bao giờ bị bắt.
+   Dòng 29 + 35:
+       const positions = new Map(nodes.map((node, index) => [node.id, index]))
+       if (token !== 'objective' && (!ref || (positions.get(ref[1]) ?? -1) >= index)) found.push(token)
+   Khi `ref[1]` không phải id node nào, `positions.get(...)` là undefined -> `?? -1` -> -1.
+   `-1 >= index` LUÔN false với mọi index >= 0 -> không bao giờ báo lỗi.
+   Backend (services/workflow.py:225-229) đòi `match.group(1) in walk_position` TRƯỚC rồi mới so vị trí;
+   tên không khớp node nào LUÔN là lỗi.
+   Ví dụ hỏng: node `draft` (index 0), prompt chứa `{{qqq_output}}`, không có node nào tên `qqq` ->
+   frontend im lặng, backend báo "Node draft has invalid template reference: {{qqq_output}}".
+   SỬA: tách rõ hai trường hợp — (a) không tồn tại trong chuỗi -> LỖI; (b) tồn tại nhưng vị trí >= vị trí
+   node hiện tại -> LỖI. Đừng dùng `?? -1` để gộp hai ca này.
+
+3. MED — luật `validate.target` chặt hơn backend, báo lỗi giả.
+   Dòng 37: `!== index - 1` bắt target phải là node LIỀN TRƯỚC.
+   Backend (services/workflow.py:207) chỉ đòi target đứng TRƯỚC bất kỳ đâu:
+   lỗi khi `walk_position[target] >= walk_position[node]`.
+   Ví dụ hỏng: chuỗi A -> B -> C, C là validate target=A. Backend hợp lệ; frontend tô đỏ C.
+   SỬA: hợp lệ khi target CÓ trong chuỗi VÀ vị trí target < vị trí node hiện tại.
+   Target không tồn tại, hoặc target === chính nó -> vẫn lỗi (khớp workflow.py:203-206).
+
+4. MED — mất `setYaml('')` khi đổi workflow -> hiện YAML của workflow CŨ.
+   Dòng ~49: effect khi `selected` đổi chỉ reset `selectedNode` + `validation`, KHÔNG reset `yaml`.
+   Bản cũ (HEAD) có `setYaml('')` ngay đầu effect. Trong lúc `/source` của workflow mới chưa về,
+   Inspector hiện YAML thô của workflow TRƯỚC ĐÓ.
+   SỬA: reset `setYaml('')` đồng bộ ngay đầu effect, trước khi gọi fetch.
+
+5. MED — test traversal không chứng minh được điều nó tuyên bố (test giả).
+   tests/test_api.py, test mới `test_workflow_source_reads_raw_file_and_rejects_traversal`,
+   vòng lặp qua ("..", "../outside", "nested/workflow").
+   Đã chứng minh bằng thực nghiệm: thay `boundary.resolve_in_root` bằng bản KHÔNG an toàn
+   (`Path(base) / p`) thì CẢ BA ca vẫn trả 404 y hệt. Lý do: ".." và "../outside" bị chính HTTP client
+   chuẩn hoá URL trước khi gửi (`/api/workflows/../outside/source` -> `/api/outside/source`);
+   "nested/workflow" không khớp pattern một đoạn `{workflow_id}`. Không ca nào chạm tới handler với giá trị
+   nguy hiểm -> test xanh kể cả khi guard bị XOÁ.
+   SỬA: dùng vector THỰC SỰ tới được handler dưới dạng MỘT đoạn URL. Vector đã kiểm chứng là chạm được:
+   `workflow_id = "..\\..\\..\\Windows\\win"` gửi dạng URL-encode `%5C` (dấu backslash không phải dấu phân
+   cách URL nên route vẫn khớp). Endpoint hiện tại BẮT ĐÚNG ca này (403 "Path is outside allowed root").
+   Viết lại test để assert ca đó, và assert mã trạng thái là 403 chứ không phải 404 chung chung.
+   Test phải ĐỎ nếu ai bỏ `boundary.resolve_in_root` đi — tự kiểm chứng lại điều này trước khi báo xong.
+
+6. LOW — dọn phần chết của E3 (E3 là CHỈ ĐỌC):
+   - Inspector: textarea YAML `readOnly` nhưng vẫn gắn `onChange={onYaml}` -> handler chết, xoá đi.
+   - Nút "Lưu": vô hiệu hoá trong E3. Hiện nó luôn bật (yaml đã có nội dung) và bấm vào sẽ PUT lại
+     đúng nội dung cũ, khiến `save_workflow()` đẻ một file `*.workflow.yaml.bak-<timestamp>` mỗi lần bấm.
+     E4 mới bật lại khi thực sự có chỉnh sửa. Giữ nút "Kiểm tra" như hiện tại.
+
+──────────────────────────────────────────────────────────────────────
+KHÔNG ĐỤNG:
+- Endpoint /source trong server.py — đã verify trên server thật (YAML thô đúng, comment đầu file nguyên
+  vẹn, id lạ 404) và review xác nhận nó an toàn, dùng boundary.resolve_in_root đúng cách.
+- `chainOrder` phần chọn node đầu (`!right.has(...)`) và nhánh fallback — đúng, chỉ sửa đúng dòng 18/22.
+- Kiểu dáng hình thoi gate ở mép phải kèm chữ "duyệt" — CỐ Ý khác RunSpine, giữ nguyên.
+
+VERIFY: cd /c/Users/HUY/workspace/ai-project-opus && .ih/Scripts/python.exe -m pytest harness/hub/tests -q
+        cd harness/hub/web-v3 && pnpm exec tsc -b        # EPERM .tsbuildinfo -> chạy --noEmit, nói rõ
+DONE = hunk từng mục 1-6, dòng pytest, kết quả tsc, và nói rõ đã tự kiểm chứng mục 5 (test đỏ khi bỏ guard).

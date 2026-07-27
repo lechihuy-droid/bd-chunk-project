@@ -1,0 +1,48 @@
+STEP G1-fix-5 — dọn nốt va chạm class, bỏ `!important`. FRONTEND ONLY. Model: gpt-5.6-luna.
+Không thêm dep. Không chạy pnpm build. Không commit. Cấm sửa file cấu hình thật để thử.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+════ BA VIỆC, ĐỀU ĐO ĐƯỢC ════
+
+1. TRẠNG THÁI CHỌN ĐANG DÙNG CLASS CHẾT.
+   ChatPage.tsx, chip đích trong composer:
+       className={`... ${selected ? 'border-text text-primary' : 'border-border-subtle text-muted opacity-60'}`}
+   `border-text` không còn token nào (đã xoá `--color-text` ở G1-fix-4), nên viền rơi về `currentColor`
+   = trắng. Đo thật trên /#/chat: 4 phần tử có viền `rgb(238,242,248)`, đúng 4 chip đang chọn.
+   DESIGN.md quy định: trạng thái CHỌN luôn dùng brand accent.
+   SỬA: chip được chọn -> viền accent (+ nền accent-subtle nếu cần), bỏ `border-text`.
+   Sau khi sửa, trang /#/chat phải có **0** phần tử viền trắng.
+
+2. BỎ `!important` TRONG PRIMITIVE — chữa nguyên nhân, không vá triệu chứng.
+   lib/ui.tsx dòng ~41:
+       primary: '!bg-accent text-app hover:!bg-accent-hover'
+   Phải dùng `!important` chỉ vì CHỖ GỌI đang truyền nền đè lên. Ví dụ thật trong ChatPage.tsx:
+       <Button variant="primary" type="submit" className="rounded-lg border border-border-subtle bg-elevated px-3 text-xs ...">
+   Nút primary mà chỗ gọi lại đặt `bg-elevated`.
+   SỬA THEO THỨ TỰ NÀY:
+     a. Rà TẤT CẢ chỗ gọi `<Button>`, `<IconButton>`, `<Chip>`, `<Input>`, `<Select>`, `<Textarea>`:
+        BỎ khỏi `className` mọi class NỀN / VIỀN / BO GÓC / CỠ CHỮ mà variant đã lo
+        (`bg-*`, `border`, `border-*`, `rounded*`, `text-xs`/`text-[10px]` nếu variant đã định cỡ).
+        CHỈ giữ class bố cục: flex, grid, w-, h-, min-w-, max-w-, gap-, p-, m-, ml-auto, truncate,
+        absolute/relative + toạ độ, opacity trạng thái.
+     b. Rồi mới bỏ `!` khỏi các variant trong ui.tsx.
+     c. Nếu sau khi bỏ mà một chỗ nào đó cần khác biệt thật (ví dụ nút tròn nhỏ trên canvas), thì THÊM
+        VARIANT/SIZE mới vào ui.tsx, KHÔNG quay lại đè bằng className.
+   Nghiệm thu: `grep -c '!bg-\|!text-\|!border-' src/lib/ui.tsx` phải là 0, và nút Gửi của composer vẫn
+   `rgb(139,124,246)`.
+
+3. CANVAS WORKFLOW dùng `<IconButton icon="·">` làm điểm nối cạnh.
+   Đó không phải nút biểu tượng — nó là handle kéo-thả, và dấu `·` không nói lên gì.
+   SỬA: dùng một phần tử handle riêng (div/span có `aria-label` sẵn có), hoặc thêm biến thể `handle`
+   vào ui.tsx. Giữ nguyên `aria-label` hiện tại và toàn bộ hành vi nối cạnh (pointerdown/up, chặn nhánh).
+   KHÔNG được làm hỏng: cạnh vẽ bằng `<line>` có mũi tên, số thứ tự chạy ①②③, nút "Xếp theo thứ tự chạy".
+
+════ NGHIỆM THU ════
+- `grep` src/: 0 lượt `border-text`; 0 lượt `!bg-`/`!text-`/`!border-` trong ui.tsx.
+- Nếu chạy được trình duyệt: /#/chat có 0 phần tử viền `rgb(238,242,248)`, và ĐÚNG MỘT nút nền
+  `rgb(139,124,246)`. Không chạy được thì NÓI RÕ chưa kiểm, đừng khẳng định suông.
+- Giữ nguyên: chat ghim viewport (4 pane -> scrollHeight ≈ innerHeight), panel artifact, canvas.
+
+KHÔNG ĐỔI HÀNH VI. Không đụng `send()`, parseSse, `patchMessage`, localStorage, luồng SSE.
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b
+DONE = số chỗ gọi đã gỡ class đè, xác nhận 0 `!important`, kết quả nghiệm thu, `tsc -b`.

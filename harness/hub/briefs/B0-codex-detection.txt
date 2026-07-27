@@ -1,0 +1,22 @@
+STEP B0 — Fix codex provider detection (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md (Step B0). Read it first.
+
+PROBLEM: GET /api/providers shows codex available:false detail:"not_installed"
+although pnpm codex-cli 0.144.3 exists. claude detection already works via
+procs.resolve_cmd (see harness/hub/services/providers/procs.py).
+
+TASK — edit ONLY harness/hub/services/providers/codex_cli.py (+ its tests in
+harness/hub/tests/test_providers.py):
+1. In status(): run version check with stdin=subprocess.DEVNULL (codex hangs
+   reading stdin), timeout 10s, command via procs.resolve_cmd (already applied
+   — keep). If returncode != 0 or exception: set detail to the REAL stderr/
+   exception text (truncated 200 chars), never a blanket "not_installed"
+   unless FileNotFoundError. This makes /api/providers debuggable.
+2. Keep 60s status cache behavior.
+3. Tests (fake codex script, NO real CLI): (a) returncode!=0 -> available
+   False and detail contains stderr text; (b) FileNotFoundError -> detail
+   "not_installed"; (c) success path parses version.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_providers.py -q
+Must be green. Do NOT run full suite. Do NOT touch other files. Do NOT commit.
+FINAL MESSAGE: files changed + pytest line + what detail codex now reports.

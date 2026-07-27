@@ -1,0 +1,38 @@
+STEP E2-fix-1 — ba lỗi từ review. FRONTEND ONLY (web-v3). Model: gpt-5.6-luna.
+Zero Python. Không thêm dep. Không chạy pnpm build. Không commit. File: src/pages/UsagePage.tsx.
+
+1. HIGH — VÒNG LẶP FETCH VÔ HẠN (đã xác nhận trên server thật: 270 request rollup, `since` tăng dần
+   01:49:21.656Z -> 01:49:23.204Z -> 01:49:25.033Z, ~2s/lần, quét dataset 28k+ event).
+   Nguyên nhân: `query(...)` tính `since` từ `Date.now()` NGAY TRONG THÂN RENDER (dòng ~22-32), rồi
+   `const filter = query(...)` (dòng ~49) → `filter` là chuỗi MỚI ở gần như mọi lần render. Hai `useEffect`
+   phụ thuộc `[filter]` (dòng ~61) và `[filter, logOpen]` (dòng ~79) → deps đổi mỗi render → refetch →
+   setRollup/setCockpit/setEvents → re-render → `since` mới → refetch... lặp vô tận.
+   SỬA: ổn định `filter` để nó CHỈ đổi khi người dùng thực sự đổi bộ lọc:
+       const filter = useMemo(() => query(range, source, model), [range, source, model])
+   (hoặc tính `since` một lần mỗi khi `range` đổi). Sau khi sửa, mở trang và để yên ~30s thì số request
+   `/api/usage/rollup` phải DỪNG ở 1 (cộng 1 cho cockpit), không tăng thêm.
+   Đây là lỗi nặng nhất — sửa trước.
+
+2. MED — nhầm "chưa có giá" với "chi phí bằng 0".
+   `price(value) = value > 0 ? "~$X.XX" : null` (dòng ~33) rồi `price(...) ?? 'chưa có giá'` (dòng ~99, và
+   nhánh "chưa xác định" dòng ~97) suy ra trạng thái từ DẤU của số tiền. Sai: một model CÓ giá nhưng chi phí
+   đúng bằng 0 (giá 0/MTok, hoặc dùng quá ít) sẽ bị dán nhãn "chưa có giá".
+   Dữ liệu đã có sẵn thứ đúng để phân biệt: mỗi hàng by_model và totals đều có `unpriced_tokens`
+   (E1 thêm) và `total_tokens`.
+   SỬA: quyết định theo ĐỘ PHỦ, không theo dấu tiền:
+     - `unpriced_tokens >= total_tokens` (toàn bộ token không có giá) -> "chưa có giá" (màu --faint)
+     - ngược lại -> hiện "~$X.XX" (kể cả $0.00 — đó là chi phí thật đã tính được)
+     - nếu chỉ phủ một phần (0 < unpriced_tokens < total_tokens) -> vẫn hiện số tiền, kèm dấu hiệu phủ một
+       phần (vd chú thích nhỏ % có giá) để không bị hiểu là tổng đầy đủ.
+   Áp dụng cho cả bảng by_model lẫn ô KPI tổng.
+
+3. MED — trạng thái ĐANG TẢI bị hiển thị thành "Chưa có dữ liệu".
+   Lần tải đầu sau khi restart server mất ~45s (backend quét session log lúc cache nguội). Trong suốt thời gian
+   đó trang hiện "Chưa có dữ liệu" / "—" ở mọi ô → người dùng tưởng hỏng.
+   SỬA: thêm state `loading` riêng cho lần fetch rollup/cockpit (và cho log khi mở). Khi đang tải:
+   hiện "Đang tải…" (mono, --dim) ở các ô KPI/chart/bảng thay vì thông báo rỗng. Chỉ hiện "Chưa có dữ liệu"
+   khi fetch ĐÃ xong và kết quả thật sự rỗng. Phân biệt rõ ba trạng thái: đang tải / rỗng / lỗi.
+
+KHÔNG đụng: lib/Chart.tsx (đã PASS review), logic allSettled (giữ nguyên độc lập), Table.tsx, các trang khác.
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b phải pass (EPERM .tsbuildinfo -> chạy no-emit, nói rõ).
+DONE = hunk từng mục 1/2/3 + kết quả tsc.

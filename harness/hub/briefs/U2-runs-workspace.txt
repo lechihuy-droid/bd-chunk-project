@@ -1,0 +1,98 @@
+STEP U2 — Runs workspace (SD-ui-v3-rebuild.md §4 + §5 Phase U2). FRONTEND ONLY (web-v3, React).
+Model: gpt-5.6-luna. This is the MAIN screen of the harness: "run đang chạy là màn hình chính".
+NO backend change (server.py, services/, tests/*.py = zero edits). Do NOT touch web/ (legacy).
+
+READ FIRST:
+1. harness/hub/SD-ui-v3-rebuild.md — §3 tokens, §4 (Runs = màn hình chính: spine trái + artifact rail phải),
+   §3 signature element "run spine": cột dọc; node tròn = agent step; GATE = hình thoi (diamond) amber
+   (--gate #E4B15E); node live có pulse — MUST respect prefers-reduced-motion (no pulse if reduced).
+2. harness/hub/mockups/ui-v3-mockup.html — the Runs workspace screen is the visual reference (spine on
+   the left with node dots + a gate card, artifact rail on the right with tabs). Match its look.
+3. harness/hub/web-v3/src/lib/{api.ts, sse.ts, markdown.tsx} — REUSE all three (do not reinvent).
+   sse.ts already parses event/data blocks; markdown.tsx renders node output safely (React elements only).
+4. harness/hub/web-v3/src/pages/ChatPage.tsx — reference for how SSE POST + streaming is consumed today.
+
+BACKEND API (all EXISTS — confirmed; use exactly these, change none):
+- GET  /api/workflows                                  -> [{id, ...}] list to choose a workflow to run.
+- POST /api/workflows/validate   {id}                  -> {ok, errors, ir}. ir = ordered node list, each
+    node has at least {id, gate, order} (+ agent, prompt). USE ir TO DRAW THE FULL SPINE SKELETON upfront
+    (all nodes pending), before/at run start. (POST → api.ts adds X-Hub-Client header automatically.)
+- POST /api/workflows/{workflow_id}/runs   {objective} -> SSE stream (text/event-stream). Drives the run.
+- GET  /api/agent/runs                                 -> list of ALL runtime runs (workflow runs included):
+    each = run state {run_id, status, thread_id, metadata:{objective, node_index, completed_nodes,
+    node_outputs, current_node, updated_at, ...}}. USE for the "recent runs" list to reopen a run.
+- GET  /api/agent/runs/{run_id}                        -> full run state (reopen).
+- GET  /api/agent/runs/{run_id}/events                 -> events.jsonl as list (reopen a finished/paused run).
+- POST /api/workflows/runs/{run_id}/interrupts/{interrupt_id}/resume  {approved:bool, ...} -> SSE continues.
+    (For a gate: Approve sends {approved:true}; Reject sends {approved:false}. Confirm payload against how
+     runtime resolves it — the run stream at a gate creates an interrupt then ENDS; resume continues it.)
+- GET  /api/workflows/runs/{run_id}/artifacts          -> {"artifacts":[{name, chars}]}  (D1, node .md files).
+- GET  /api/workflows/runs/{run_id}/artifacts/{name}   -> {"name", "text"}  (full node output markdown).
+
+SSE EVENT CONTRACT (events emitted by the run stream — map each to spine/rail):
+  assistant_delta {node, text}  -> append to that node's live output (plain text while streaming).
+  reasoning       {node, text}  -> that node's collapsible dim "thinking" (append, hidden by default).
+  node_update     {...}         -> node status transition (refresh node state from snapshot).
+  state_snapshot  {state}       -> authoritative full state; recompute spine node states from
+                                    metadata.node_index / completed_nodes / current_node / node_outputs.
+  artifact_written{node, path, chars} -> mark node "has artifact"; refresh the Artifact tab list.
+  interrupt       {...}         -> a GATE is waiting: render the amber diamond node + inline Gate card
+                                    (objective/prompt) with Approve / Reject. Stream ENDS here.
+  done            {status, state} -> finalize run (succeeded/failed); stop spinner.
+  error           {message, ...}  -> red inline error on the node/run.
+
+SCOPE — build these (new files under web-v3/src):
+
+1. pages/RunsPage.tsx — the workspace. Layout: a left run-launcher + recent-runs column is optional inline;
+   the core is a 2-column workspace: SPINE (left, ~48%) | ARTIFACT RAIL (right, ~52%), matching mockup.
+   - Launcher (top strip): workflow <select> (from GET /api/workflows) + objective <textarea> + "Chạy"
+     button. On run: first POST /api/workflows/validate to fetch ir → seed spine nodes all "pending";
+     then POST /api/workflows/{id}/runs and consume the SSE stream, updating spine live.
+   - Capture run_id from the first state_snapshot/event (state.run_id) so gate-resume + artifact fetch work.
+   - "Phiên chạy gần đây" (recent runs) small list from GET /api/agent/runs (show objective + status +
+     updated_at; click → reopen: GET state + events + artifacts, rebuild spine read-only).
+
+2. components/RunSpine.tsx — the signature vertical timeline:
+   - One row per node (order from ir). Left gutter: connector line + marker. Marker shape:
+       normal node = circle; GATE node = diamond (rotate a square 45°) in amber --gate.
+     Marker color by state: pending --faint, running --claude (or provider color) WITH pulse,
+     done --ok, failed --err. Pulse = subtle scale/opacity keyframe; wrap in
+     @media (prefers-reduced-motion: reduce){ animation:none }.
+   - Node body: node id + provider/agent (if available from ir), live output (markdown ON DONE, plain text
+     while streaming — same pattern as ChatPage), collapsible reasoning block.
+   - Provide provider color via tokens (--claude/--codex/--nvidia/--gemini) when the node agent provider is known.
+
+3. components/GateCard.tsx — inline at the gate node: amber-bordered card, shows the pending prompt/objective,
+   two buttons "Duyệt" (Approve → resume {approved:true}) and "Từ chối" (Reject → resume {approved:false}).
+   On click: POST the resume endpoint, then CONTINUE consuming the returned SSE into the same spine.
+   Disable buttons while resuming; show result inline.
+
+4. components/ArtifactRail.tsx — right column, 3 tabs (SD §4 "tab Artifact/Trạng thái/Sự kiện"):
+   - Artifact: list from GET .../artifacts ([{name,chars}]); click a node artifact → GET .../artifacts/{name}
+     → render text via markdown.tsx. Empty state "Chưa có artifact".
+   - Trạng thái: pretty-print current run state (status, node_index, completed_nodes, objective) — compact,
+     mono for the raw fields; not the whole JSON dump, a readable summary + a collapsible raw <pre>.
+   - Sự kiện: events timeline (from live stream buffer + GET .../events on reopen): ts · type · node · short.
+     mono, newest-last, auto-scroll while live.
+
+5. lib/runsApi.ts (or extend api.ts) — typed helpers: listWorkflows, validateWorkflow(id), startRun(id,objective)
+   returning the fetch Response for SSE, listRuns, getRun(id), getRunEvents(id), listArtifacts(runId),
+   readArtifact(runId,name), resumeGate(runId,interruptId,approved). All via the existing api.ts baseURL +
+   X-Hub-Client header rule. Keep SSE POالسST parsing consistent with ChatPage (AbortController, sse.ts).
+
+6. Routing: update pages/index.tsx so /runs renders RunsPage (it's the default route per U0). Remove the
+   /runs placeholder. Leave other placeholders intact.
+
+7. FOLD-IN CLEANUP (from U1 review, LOW): in src/lib/api.ts delete the now-unreachable `if (!response.ok)`
+   detail-extraction block inside `api()` (apiRequest already throws first with the detail). One-file, dead
+   code only — do not change api() behavior otherwise.
+
+CONSTRAINTS:
+- No new npm deps. Tailwind utilities + U0 tokens only. Vietnamese UI labels, sentence case, active-voice buttons.
+- Reuse sse.ts + markdown.tsx + api.ts — do not duplicate SSE parsing or markdown rendering.
+- Do NOT run pnpm build (architect builds). Do NOT commit. Do NOT edit any Python or web/.
+- Match mockup spacing/colors; spine + amber diamond gate is the signature — get it visually right.
+
+VERIFY YOURSELF (no build): cd harness/hub/web-v3 && pnpm exec tsc -b  → must pass.
+DONE = summary: files created/changed, tsc result, and a short list of the run lifecycle behaviors wired
+(launch → spine live → gate approve/reject → artifact rail → reopen recent run).

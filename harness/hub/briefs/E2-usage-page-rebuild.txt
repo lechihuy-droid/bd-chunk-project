@@ -1,0 +1,77 @@
+STEP E2 — Xây lại trang Usage & chi phí (SD-usage-cost-canvas.md §3, §6). FRONTEND ONLY (web-v3 React).
+Model: gpt-5.6-luna. Zero Python. Không đụng web/ (legacy). KHÔNG thêm npm dep. Không chạy pnpm build. Không commit.
+
+MỤC TIÊU: trang Usage hiện tại là một đống phẳng, bỏ mất 4 thứ hub cũ có. Xây lại thành công cụ điều tra:
+bộ lọc điều khiển toàn trang → KPI → xu hướng theo ngày → breakdown kèm chi phí → nhật ký event thô.
+
+ĐỌC TRƯỚC:
+1. harness/hub/SD-usage-cost-canvas.md §2 (chi phí là ƯỚC TÍNH, không phải hoá đơn), §3 (bố cục).
+2. web-v3/src/pages/UsagePage.tsx hiện tại (sẽ viết lại), và các trang khác để khớp style/token.
+3. web-v3/src/lib/{api.ts, Table.tsx} — DÙNG LẠI. Không tự viết fetch.
+
+API (đã có sẵn; E1 vừa thêm field — hãy gọi thử xem shape thật trước khi code, đừng đoán):
+  GET /api/usage/rollup?source=&model=&since=
+      -> {totals, by_model[], by_day[], by_source[]}
+         totals/by_model: calls, input_tokens, output_tokens, total_tokens, cache_tokens,
+                          non_cache_tokens, cache_read_tokens, cache_creation_tokens,
+                          estimated_cost_usd, unpriced_tokens
+         by_day: {day, calls, input_tokens, output_tokens, total_tokens, estimated_cost_usd}
+         by_source: {source, calls, total_tokens, estimated_cost_usd}
+  GET /api/usage?source=&model=&since=   -> mảng event thô
+      {ts, source, model, total_tokens, calls, session, command}
+  GET /api/usage/cockpit -> {today, week7d, quota_warn_per_day, warn, providers_online}
+      today theo provider có thêm quota_pct (E1; có thể null)
+  GET /api/tools | /api/suites | /api/inspect/logs  (mục phụ, giữ như hiện tại)
+
+SỐ LIỆU THẬT (thiết kế theo cái này, không phải giả định):
+  total 5.148.411.688 token · cache_read 2.890.808.726 · cache_creation 27.855.751
+  estimated_cost_usd ~317 · unpriced 4.683.327.499  ->  **91% token CHƯA CÓ GIÁ**
+  by_day có 58 ngày · by_source: codex / claude / chat
+
+PHẠM VI — viết lại src/pages/UsagePage.tsx theo 5 tầng:
+
+1. THANH LỌC (trên cùng, điều khiển TOÀN TRANG — một state duy nhất):
+   - Chip khoảng thời gian: "Hôm nay" | "7 ngày" | "30 ngày" | "Tất cả" -> tính ra `since` ISO
+     (Tất cả = không gửi since).
+   - <select> source + <select> model, suy ra từ dữ liệu (by_source / by_model), không hardcode.
+   - Mặc định 7 ngày. Đổi filter -> refetch rollup (và log nếu đang mở) với đúng query param.
+
+2. HÀNG KPI (4 ô, số mono lớn, nhãn 10px uppercase):
+   a. Tokens — totals.total_tokens; phụ: "{input} in · {output} out".
+   b. Calls — totals.calls; phụ: breakdown ngắn theo by_source.
+   c. Cache — cache_tokens/total_tokens dạng %; phụ: "{cache_read} đọc · {cache_creation} tạo".
+      (Thật ~57% -> đòn bẩy tiết kiệm lớn nhất, xứng đáng KPI riêng.)
+   d. Ước tính chi phí — totals.estimated_cost_usd dạng "~$317.48".
+      BẮT BUỘC kèm ngay cạnh: nhãn "ước tính — không thực trả" VÀ độ phủ giá
+      = (total_tokens - unpriced_tokens)/total_tokens.
+      Dữ liệu thật chỉ 9% -> phải hiện rõ "chỉ 9% token có giá · 91% chưa có giá", dùng --dim/--gate.
+      KHÔNG được hiện mỗi con số $ trần trụi.
+
+3. XU HƯỚNG THEO NGÀY (nhân vật chính):
+   - Viết src/lib/Chart.tsx — bar chart SVG tự vẽ (~80-120 dòng, KHÔNG dep):
+     props {rows, labelKey, valueKey, height}. Cột theo ngày, hover có tooltip (title/aria-label là đủ),
+     cuộn ngang khi nhiều ngày.
+   - LƯU Ý DỮ LIỆU: by_day KHÔNG tách theo provider -> chart MỘT chuỗi, KHÔNG phải stacked.
+     Muốn xem riêng provider thì dùng bộ lọc source ở tầng 1. Đừng giả vờ stacked.
+   - Cho đổi chỉ số: tokens | calls | ước tính $.
+
+4. BREAKDOWN (2 cột):
+   - "Theo model": Table — model, calls, total_tokens, cache, estimated_cost_usd; hàng CHƯA CÓ GIÁ phải hiện
+     chữ "chưa có giá" màu --faint, KHÔNG hiện $0.00 (đọc thành "miễn phí").
+   - "Theo provider": Table — source, calls, total_tokens, estimated_cost_usd + quota burn từ cockpit
+     (quota_pct + thanh nhỏ; null -> "—").
+
+5. NHẬT KÝ (log) — <details> ĐÓNG SẴN, chỉ fetch KHI MỞ (lazy):
+   - GET /api/usage với đúng filter hiện tại. Table: Thời gian · Source · Model · Tokens · Calls · Session · Command.
+   - Dataset thật 28k+ event -> render tối đa 200 dòng mới nhất, hiện "hiển thị 200/N".
+   - KHÔNG tự fetch khi trang load.
+
+GIỮ NGUYÊN: 3 mục phụ Công cụ / Suites / Inspect như hiện tại (<details>, fetch độc lập allSettled — đừng làm
+hỏng fix cũ: một mục lỗi không được làm trắng cả trang).
+
+RÀNG BUỘC: dùng lại api.ts + Table.tsx, tokens + Tailwind, nhãn tiếng Việt, không dangerouslySetInnerHTML,
+không thêm dep. Fetch độc lập/allSettled để một endpoint lỗi không chặn phần còn lại.
+Trạng thái rỗng phải an toàn: rollup rỗng vẫn có totals.estimated_cost_usd = 0.0 (E1 đã đảm bảo) — không crash.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b phải pass (EPERM .tsbuildinfo thì chạy no-emit và nói rõ).
+DONE = tóm tắt: file tạo/sửa, kết quả tsc, liệt kê hành vi từng tầng đã nối.

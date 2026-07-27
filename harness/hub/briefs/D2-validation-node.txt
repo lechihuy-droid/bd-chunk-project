@@ -1,0 +1,96 @@
+STEP D2 — Validation node (BD-hub-v2-phaseD.md §D2). BACKEND ONLY. Model: gpt-5.6-luna.
+No frontend (do NOT touch web/ or web-v3/). No new Python deps. Do NOT commit.
+
+WHY: governance layer is missing a cheap pre-gate check — catch bad node output with pure rules before
+spending a human review. A `validate` node reads a previous node's output and runs deterministic checks.
+
+READ FIRST (understand exact current shapes — do not guess):
+1. services/workflow.py:
+   - validate_workflow() (~line 79): TODAY every node requires ("id","agent","prompt","gate") and gate ∈
+     {none,approval}. A validate node has NO agent/prompt — you MUST branch on node type or valid workflows break.
+   - build_ir() (~line 191): TODAY does agents_by_id[node["agent"]] for EVERY node — this KeyErrors on an
+     agent-less validate node. Must branch.
+   - _walk_chain(): validate nodes participate in the edge chain like any other node (no change expected).
+2. services/workflow_exec.py run_workflow(): the node loop does `agent = node["agent"]` almost immediately
+   (~line 175) then budget checks. A validate node must be handled BEFORE that line and must NOT consume any
+   agent budget (no agent, no provider call).
+   Reuse: _event() (events.jsonl), _yield_event(), _snapshot(), _fail(), _has_resolved_interrupt(),
+   _resolved_interrupt_action(), runtime_interrupts.create_interrupt() — copy the approval-gate pattern.
+3. services/runtime_artifacts.py (D1): read_artifact(run_id, name) — the target node's full output lives at
+   artifacts/<target>.md. metadata.node_outputs[target] is the in-state fallback.
+
+SCOPE:
+
+A. NEW services/runtime_validate.py — pure, no LLM, no I/O:
+   def run_checks(text: str, checks: list[dict]) -> list[dict]   # returns violations, [] when all pass
+   Supported check kinds (unknown kind -> a violation saying so, never crash):
+     - {kind: min_length, value: int}          -> violation if len(text) < value
+     - {kind: must_include, values: [str,...]} -> violation per missing string
+     - {kind: must_not_include, values: [...]} -> violation per present string
+     - {kind: json_parseable}                  -> violation if json.loads(text) raises
+   Each violation: {"kind": ..., "message": "<human readable, Vietnamese ok>", plus a relevant detail field
+   (e.g. "expected"/"found"/"missing")}. Keep it small and deterministic.
+
+B. services/workflow.py — schema + IR support for `type: validate`:
+   YAML shape:
+     - id: check_draft
+       type: validate
+       target: draft                 # id of an EARLIER node whose output is checked
+       checks:
+         - {kind: min_length, value: 200}
+         - {kind: must_include, values: ["## Kết luận"]}
+       on_fail: interrupt            # interrupt | fail
+   1. validate_workflow(): treat node.get("type") absent or "agent" as TODAY's agent node (unchanged rules).
+      For type == "validate": require id, target, checks, on_fail; do NOT require agent/prompt/gate.
+      Errors for: target missing / not an existing node id / target == own id; checks not a non-empty list of
+      mappings; a check with unknown kind or wrong value type (min_length needs int value; must_include /
+      must_not_include need a non-empty list of strings); on_fail not in {interrupt, fail}. Unknown node type -> error.
+   2. build_ir(): for a validate node emit {"id", "type": "validate", "target", "checks", "on_fail", "order"}
+      and DO NOT look up an agent. Agent nodes keep their current IR shape exactly (add "type": "agent" only if
+      you are certain nothing else depends on its absence — otherwise leave agent-node IR byte-identical and let
+      the executor use node.get("type") == "validate" as the only discriminator). Prefer the non-breaking option.
+
+C. services/workflow_exec.py — execute validate nodes:
+   At the TOP of the per-node handling (before `agent = node["agent"]`), branch on node.get("type") == "validate":
+   1. Resolve the target text: prefer runtime_artifacts.read_artifact(run_id, f"{target}.md"); on
+      FileNotFoundError fall back to str(node_outputs.get(target, "")).
+   2. If the node already has a RESOLVED interrupt (reuse _has_resolved_interrupt / _resolved_interrupt_action):
+      action "reject" -> _fail(run_id, f"rejected at validate:{node_id}") and return;
+      otherwise (human overrode) -> treat as passed, do NOT re-run checks, advance.
+   3. Else run runtime_validate.run_checks(text, checks):
+      - no violations -> _event(run_id, "validation_pass", node=node_id, target=target); mark the node completed
+        (same bookkeeping as a finished agent node: completed_nodes + node_index advance, NO agent budget touched,
+        no node_outputs entry) and continue the loop.
+      - violations -> _event(run_id, "validation_fail", node=node_id, target=target, violations=violations), then:
+          on_fail == "fail"      -> _fail(run_id, f"validation failed at {node_id}") and return.
+          on_fail == "interrupt" -> runtime_interrupts.create_interrupt(run_id, reason="validation_failed",
+                                    payload={"node": node_id, "target": target, "violations": violations},
+                                    node=node_id); yield the new interrupt event + _snapshot(run_id); return.
+                                    (Exactly the approval-gate pattern: the stream ENDS, the existing resume
+                                    endpoint continues it — the UI already renders pending interrupts as gates.)
+   Do NOT change agent-node behavior, node_outputs shape, _context, or the D1 artifact write.
+
+D. Tests — NEW harness/hub/tests/test_runtime_validate.py (pytest; FAKE provider only, reuse fixtures from
+   tests/test_workflow_exec.py — never call real claude/codex/NVIDIA):
+   1. run_checks unit: each kind passing and failing (min_length, must_include, must_not_include, json_parseable)
+      + unknown kind yields a violation instead of raising.
+   2. Workflow schema: a valid validate-node workflow passes validate_workflow and build_ir; bad ones produce the
+      specific errors (unknown target, bad on_fail, malformed check).
+   3. Executor on_fail=fail: run a 2-node workflow (fake agent node -> validate) where checks fail -> run status
+      failed, "validation_fail" event present with violations.
+   4. Executor on_fail=interrupt: checks fail -> run status interrupted, a pending interrupt exists carrying the
+      violations; after runtime_interrupts.resolve_interrupt(..., action="resume") the re-entered run SUCCEEDS
+      (checks not re-run); with action="reject" it fails.
+   5. Happy path: checks pass -> "validation_pass" event, run succeeds, validate node counted in completed_nodes.
+   6. CARRY-OVER HARDENING (D1 review gap — the existing traversal test only exercises Starlette routing, never
+      the service's own reject logic): add DIRECT unit calls in this file (or extend tests/test_runtime_artifacts.py):
+      runtime_artifacts.read_artifact(run_id, "../run.json"), "..\\run.json", "/etc/passwd" -> each raises
+      FileNotFoundError; runtime_artifacts.write_node_artifact(run_id, "../../evil", "x") -> sanitized, file stays
+      inside the run's artifacts dir and nothing is written above it.
+
+VERIFY (from repo root C:\Users\HUY\workspace\ai-project-opus):
+  .ih\Scripts\python.exe -m pytest harness/hub/tests -q
+  Must be GREEN — all existing (170) + your new tests. Fix your own breakage; touch no unrelated test.
+  The existing workflow tests (test_workflow*.py) MUST still pass — agent-node behavior is unchanged.
+
+DONE = print: files created/changed, the YAML shape supported, pytest result line, and the test names.

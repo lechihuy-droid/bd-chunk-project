@@ -1,0 +1,64 @@
+STEP F1 — Sự thật về provider + hành động nguy hiểm (SD-chat-control-plane.md §4). Model: gpt-5.6-luna.
+FRONTEND ONLY (web-v3). Zero Python — phần sửa health check là F1b, KHÔNG làm ở đây.
+Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH: review ChatGPT (harness/review-harness-v2-round-1-chatgpt.md §2, §5.6) chê đúng bốn thứ:
+trạng thái provider không nói nguyên nhân, header pane lặp chữ mà không thêm thông tin, `READ-ONLY`
+không rõ áp cho cái gì, và `Xoá` nằm quá trực tiếp. Sửa cả bốn, thuần frontend.
+
+DỮ LIỆU ĐÃ CÓ SẴN — gọi thử trước khi code, đừng đoán:
+  GET /api/providers -> [{id, available, version, detail, capabilities:{stream, resume, models}}]
+  Giá trị `detail` THẬT đang trả về lúc này:
+    nvidia  -> available false · detail "NVIDIA_API_KEY not set in environment" · capabilities.models = 21 model
+    claude  -> available true  · version "2.1.207 (Claude Code)" · detail "ok"    · resume true
+    codex   -> available true  · version "codex-cli 0.144.3"      · detail "ok"    · resume true
+    gemini  -> available false · detail "not_installed"
+
+PHẠM VI — src/pages/ChatPage.tsx (và tách component nhỏ nếu file phình):
+
+1. PHÂN LOẠI TRẠNG THÁI PROVIDER — suy từ `available` + `detail`, KHÔNG hardcode theo tên provider:
+   - available true                       -> "sẵn sàng"
+   - available false + detail chứa "not set" / "not configured" / tên biến môi trường -> "chưa cấu hình"
+   - available false + detail "not_installed"                                          -> "chưa cài"
+   - available false, còn lại                                                          -> "không khả dụng"
+   Mỗi trạng thái một màu khác nhau (dùng token có sẵn: --ok/--gate/--err/--faint). Hiện `version` khi có.
+   ⚠️ KHÔNG được hiện "sẵn sàng" như một lời bảo đảm — xem mục 2.
+
+2. ERROR CARD trong pane khi gửi thất bại (thay cho dòng chữ đỏ trơ trọi hiện nay):
+   Hiện tại lỗi rơi vào một message `role: system` viền đỏ, chỉ có chữ. Nâng thành thẻ:
+       <tiêu đề: provider không khả dụng>
+       Nguyên nhân: <message lỗi thật từ stream, HOẶC detail từ /api/providers nếu provider offline>
+       [Thử lại] [Đổi model] [Mở Settings]
+   - "Thử lại" gửi lại đúng prompt của lượt vừa rồi (message user cuối cùng).
+   - "Đổi model" focus vào ô chọn model của pane đó.
+   - "Mở Settings" điều hướng `#/settings`.
+   BẮT BUỘC hiện nguyên văn message lỗi, đừng nuốt. Ví dụ thật gặp hôm nay, phải đọc được trên màn hình:
+       "Failed to authenticate: OAuth session expired and could not be refreshed"
+   (Provider này lúc đó vẫn báo available:true — nên error card là chỗ DUY NHẤT người dùng biết sự thật.
+    Sửa chỗ đo là việc của F1b, đừng đụng.)
+
+3. HEADER PANE — bỏ chữ lặp, thêm thông tin thật:
+   Hiện tại: `claude · mặc định` + badge `READ-ONLY`.
+   - Khi model rỗng, ĐỪNG ghi "mặc định" trơ trọi — ghi rõ model do CLI tự chọn, ví dụ "model: theo CLI".
+   - `READ-ONLY` phải nói rõ nó áp cho cái gì. Nó đang suy từ `provider !== 'nvidia'` (hàm `ro`), nghĩa là
+     "provider này chạy qua CLI, hub không gửi được tham số sinh văn bản" — viết `title` giải thích đúng
+     điều đó bằng tiếng Việt. Đừng để người đọc tưởng là quyền ghi file.
+   - Hiện `version` của provider (đã có trong /api/providers) dưới dạng chữ nhỏ.
+
+4. `XOÁ` KHÔNG ĐƯỢC BẤM PHÁT CHẾT NGAY:
+   Hiện `Xoá` xoá sạch messages của pane, không hỏi, không hoàn tác được.
+   - Đưa `Xoá` và `Xuất .md` vào menu `…` ở góc phải header (nút × đóng pane thì để ngoài).
+   - Sau khi xoá, hiện dải hoàn tác trong pane ~8 giây: "Đã xoá N tin nhắn · [Hoàn tác]".
+     Giữ bản sao messages trong state cục bộ của ChatPage (KHÔNG ghi vào localStorage, KHÔNG nhét vào Pane).
+     Hết giờ hoặc bấm ra ngoài thì bỏ bản sao.
+   - Hoàn tác phải trả lại đúng mảng messages cũ.
+   - ⚠️ `onClear` hiện đã reset state `artifact` (commit ebf4a2a) — hoàn tác thì KHÔNG cần mở lại panel,
+     nhưng tuyệt đối đừng làm hỏng dòng reset đó.
+
+RÀNG BUỘC: dùng lại lib/api.ts, token màu + Tailwind sẵn có, nhãn tiếng Việt, không dangerouslySetInnerHTML,
+không thêm dep. KHÔNG đụng: `send()`, parseSse, `patchMessage`, lược đồ localStorage `hub-v3-chat`,
+broadcast "Gửi tất cả" (F3 sẽ làm lại), giới hạn 4 pane, panel artifact và lib/artifact.ts.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = file tạo/sửa, bảng phân loại trạng thái đã suy ra thế nào, kết quả tsc, mô tả ngắn mục 1-4.

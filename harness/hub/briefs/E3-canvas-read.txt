@@ -1,0 +1,63 @@
+STEP E3 — Canvas workflow, phần ĐỌC-HIỂN THỊ (SD-usage-cost-canvas.md §4-bis). Model: gpt-5.6-luna.
+Backend nhỏ + frontend. KHÔNG thêm npm dep (React Flow ĐÃ BỊ HUỶ — xem lý do dưới). Không chạy pnpm build.
+Không commit. Không đụng web/ (legacy).
+
+════ SỰ THẬT QUYẾT ĐỊNH — ĐỌC KỸ TRƯỚC KHI CODE ════
+services/workflow.py:181 -> "Edges must form exactly one linear chain covering every node once".
+`_walk_chain` bắt in_degree <= 1, out_degree <= 1, đúng 1 node đầu, đúng 1 node cuối.
+=> Workflow LUÔN LÀ CHUỖI THẲNG. Không nhánh, không merge.
+=> Canvas KHÔNG phải graph editor. Là trình biên tập CHUỖI. Không vẽ cạnh tay, không toạ độ x/y.
+   Thứ tự trong chuỗi quyết định vị trí hiển thị. Không tạo file layout nào.
+E3 này CHỈ ĐỌC-HIỂN THỊ. Kéo-thả/sửa/lưu là E4 — ĐỪNG làm trước.
+
+════ A. BACKEND (nhỏ) ════
+Thêm `GET /api/workflows/{workflow_id}/source` trong server.py, trả `{"id": ..., "yaml_text": <nguyên văn file>}`.
+- Đọc `workflow.WORKFLOWS_DIR / f"{workflow_id}.workflow.yaml"`.
+- workflow_id phải được chặn path traversal. Xem cách các route khác trong server.py đã xử lý
+  (hoặc services/boundary.py) và LÀM THEO ĐÚNG cách đó — đừng tự nghĩ cách mới.
+- Không tìm thấy -> 404 qua `_http_error` như các route workflow khác.
+- Vì sao cần: WorkflowsPage hiện bắt người dùng DÁN YAML vào textarea mới sửa được
+  (placeholder ghi thẳng "YAML không có endpoint đọc thô"). E4 cũng cần yaml thô để giữ comment.
+Test mới trong tests/: đọc được file thật; id không tồn tại -> 404; id có `..` hoặc `/` -> KHÔNG đọc
+được file ngoài WORKFLOWS_DIR.
+
+════ B. FRONTEND — src/pages/WorkflowsPage.tsx ════
+Hiện tại: sidebar workflow + bảng node + textarea YAML. Thay khu vực GIỮA bằng canvas chuỗi.
+GIỮ: sidebar trái, nút Chạy/Kiểm tra/Lưu, luồng validate hiện có, textarea YAML (E4 sẽ bỏ, giờ để yên).
+
+Dữ liệu: `GET /api/workflows` đã trả nodes + edges + stop -> đủ dựng model, KHÔNG cần endpoint mới cho việc này.
+Thêm gọi `GET /api/workflows/{id}/source` để hiện YAML thô (chỉ đọc) thay cho textarea rỗng khó hiểu.
+
+1. TÍNH THỨ TỰ CHUỖI — bắt buộc dựng từ `edges`, KHÔNG dùng thứ tự mảng `nodes`.
+   Mảng `nodes` trong YAML có thể xếp khác chuỗi thật. Thuật toán: node đầu = node không xuất hiện ở
+   vế PHẢI của edge nào; rồi lần theo edge. Nếu lần ra không đủ số node (dữ liệu lạ) -> rơi về thứ tự
+   mảng `nodes` VÀ hiện cảnh báo "chuỗi không hợp lệ", đừng crash.
+
+2. CANVAS (cột giữa) — chuỗi DỌC, cuộn dọc:
+   - Mỗi node = một thẻ: số thứ tự ①②③ · `id` (mono) · tên agent · badge `type` nếu là `validate`.
+   - Node `validate` khác màu viền và hiện `target` + số lượng `checks` + `on_fail`.
+   - Gate `approval` -> hình thoi ◆ màu `--gate` (amber) trên mép phải thẻ + nhãn "duyệt".
+     Dùng lại đúng ngôn ngữ hình ảnh spine của RunsPage.tsx — MỞ FILE ĐÓ RA XEM trước khi tự chế.
+   - Giữa hai thẻ: đoạn nối dọc + mũi tên. Thuần CSS/SVG.
+   - Click thẻ -> chọn node (viền sáng), đổ vào Inspector.
+
+3. INSPECTOR (cột phải, CHỈ ĐỌC ở E3):
+   - node agent: id, agent, gate, prompt (mono, wrap, cuộn được).
+   - node validate: target, danh sách checks (kind + value/values), on_fail.
+   - Chưa chọn gì -> "Chọn một node để xem".
+
+4. KIỂM TRA THAM CHIẾU (giá trị thật của canvas — làm ngay từ E3):
+   Quét `{{...}}` trong prompt mỗi node. Hợp lệ khi: token là `objective`, HOẶC khớp `(.+)_(output|claims)`
+   với node đó đứng TRƯỚC trong chuỗi (đúng luật workflow.py:225-229).
+   Không hợp lệ -> chấm đỏ trên thẻ + dòng lỗi trong Inspector, ghi rõ token nào.
+   Với node `validate`: `target` phải là node đứng trước, và không được trỏ chính nó.
+   Đây là kiểm tra CỤC BỘ để phản hồi tức thì; KHÔNG thay thế `POST /api/workflows/validate`.
+
+RÀNG BUỘC: dùng lại lib/api.ts (đừng tự viết fetch), token màu + Tailwind sẵn có, nhãn tiếng Việt,
+không dangerouslySetInnerHTML, KHÔNG thêm dep, không sửa schema workflow.
+Lỗi một endpoint không được làm trắng cả trang.
+
+VERIFY: .ih\Scripts\python.exe -m pytest harness/hub/tests -q   # phải XANH
+        cd harness/hub/web-v3 && pnpm exec tsc -b              # phải pass (EPERM .tsbuildinfo -> chạy
+                                                               # --noEmit và nói rõ)
+DONE = file tạo/sửa, cách tính thứ tự chuỗi, dòng pytest + tsc, mô tả ngắn từng phần đã nối.

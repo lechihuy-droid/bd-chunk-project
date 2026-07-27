@@ -1,0 +1,39 @@
+STEP U2-fix-1 — four review fixes in web-v3 Runs workspace. FRONTEND ONLY. Model: gpt-5.6-luna.
+No Python, no web/ (legacy), do NOT run pnpm build (architect builds), do NOT commit.
+Files: harness/hub/web-v3/src/{lib/runsApi.ts, pages/RunsPage.tsx, components/RunSpine.tsx}. Line refs approximate — locate by logic.
+
+1. HIGH — "Từ chối" (Reject) currently behaves as Approve.
+   runsApi.ts resumeGate posts only { approved }. Backend (services/workflow_exec.py resume_workflow_run_stream)
+   reads action = str(payload.get("action") or "resume") — with no "action" key it is ALWAYS "resume", so Reject
+   proceeds exactly like Approve. FIX: change resumeGate body to send the action verb the backend expects:
+     body: JSON.stringify({ action: approved ? 'resume' : 'reject' })
+   (Verified contract: reject → run_workflow hits `_resolved_interrupt_action == "reject"` → _fail("rejected at
+   gate:<node>") which emits an `error` event WITH state. So Reject now genuinely fails the gated node — this is
+   why fix #2 below must render the error/failed state.) Keep the resumeGate(runId, interruptId, approved) signature.
+
+2. HIGH — a failed run leaves the spine stuck on "running" forever; failed node never shows.
+   RunsPage.tsx SSE handler: the `done` branch calls applyState(data.state); the `error` branch only setError(...).
+   The backend _fail() emits `error` with the full updated state (state=state). FIX the `error` branch to:
+     a. call applyState(data.state) when data.state is present (mirror the done branch) so run.status flips to
+        'failed' and node states refresh from the snapshot;
+     b. mark the node that was streaming (the current/last running node, or data.node if present) state:'failed'
+        and set its NodeView.error to String(data.message ?? 'Run thất bại').
+   RESULT: RunSpine.tsx already renders a red '!' marker for state==='failed' and a red node.error line — but
+   NodeView.error is currently never assigned anywhere (dead). After this fix it must be populated. Confirm the
+   failed marker + inline error actually render (they were unreachable before). Keep the top-level setError banner too.
+
+3. MED — no abort on unmount (SSE/fetch leaks when navigating away from /runs mid-stream).
+   RunsPage.tsx: add a mount cleanup:  useEffect(() => () => controller.current?.abort(), [])
+   so leaving the route aborts the in-flight run/resume stream. Do not change the existing per-launch abort.
+
+4. LOW — node "has artifact" indicator + dead branch.
+   a. NodeView.artifact (RunSpine.tsx) is declared but never set. On the `artifact_written` event {node, ...} in
+      RunsPage.tsx, set that node's artifact = true; in RunSpine.tsx show a tiny "▤" glyph (text-faint, mono 10px)
+      next to the node id when node.artifact is true. (List already refreshes via refreshKey — this only adds the
+      per-node marker the brief asked for.)
+   b. Remove the dead `node_update` handler branch that reads data.status (backend never emits status on node_update;
+      it sends {node, goto}). The following state_snapshot already drives node state — deleting the dead read is safe.
+
+Do NOT change anything else (spine layout, ArtifactRail tabs, api.ts, markdown are fine).
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b (must pass).
+DONE = list changed hunks (file + what) + tsc result line.

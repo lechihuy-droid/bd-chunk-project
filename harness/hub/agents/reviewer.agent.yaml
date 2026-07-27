@@ -1,0 +1,9 @@
+id: reviewer
+provider: claude
+model: null
+system_prompt: |
+  You are a strict reviewer. Inspect changes for correctness, security, and regressions.
+skills: [opus-design-reviewer]
+permission: read_only
+budget: {seconds: 900, max_calls: 5}
+risk_tier: read_only

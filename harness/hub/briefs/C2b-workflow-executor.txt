@@ -1,0 +1,273 @@
+STEP C2b — Executor: LLM node via provider layer + budget (Hub v2 Phase C,
+size L — highest-risk step). Runs AFTER C1 and C2a land (depends on both).
+Spec: harness/hub/BD-hub-v2-phaseC.md Step C2b. Read it + ARCHITECTURE.md §9
+(Super Agent principles: config-first, budget cap mandatory, blackboard
+append-only/replayable) + RD FR-121→124.
+
+Study: harness/hub/services/runtime_pipeline.py (FULL — you are NOT editing
+this file, but you must copy its patterns exactly: `execute_run`'s
+node-loop/interrupt/checkpoint/SSE-event structure, `create_run_stream`,
+`resume_run_stream`, the `_event`/`_yield_event`/`_snapshot` helpers, the
+`_materialize_artifacts` helper shape). harness/hub/services/runtime_state.py
+(create_run, update_run_state, read_run, runtime_path, now_iso — all public,
+reuse directly). harness/hub/services/runtime_events.py (append_event,
+read_events, to_sse — reuse directly). harness/hub/services/
+runtime_checkpoint.py (write_checkpoint — reuse directly, one call per node
+exactly like runtime_pipeline does). harness/hub/services/
+runtime_interrupts.py (create_interrupt, get_interrupt, resolve_interrupt —
+reuse directly; note `create_interrupt(run_id, reason=, payload=, node=)`
+stores `node` and sets `metadata.next_node = node`, i.e. the SAME node that
+raised the interrupt, not the following one — see CRITICAL GATE SEMANTICS
+below). harness/hub/services/providers/__init__.py + base.py (get_provider(id)
+returns a module with `.stream_chat(messages, session_id=None, model=None)`
+yielding `{"type": "reasoning"|"delta"|"done"|"error", ...}` dicts; `done` has
+`usage: dict` and `session_id: str|None` — nvidia_api.py always yields
+`session_id: None`, there is no cross-call session continuity, treat every
+node's stream_chat call as stateless). harness/hub/services/workflow.py (C2a's
+output — `parse_workflow`, `validate_workflow`, `build_ir`; build_ir returns
+`[{"id":, "agent": <resolved agent profile dict>, "prompt":, "gate":,
+"order":}, ...]` in start→end order; agent profile dict shape per C1:
+id/provider/model/system_prompt/skills/permission/budget{seconds,max_calls}/
+risk_tier). harness/hub/server.py (route patterns, `_http_error`, the
+`from services import (...)` tuple, existing `/api/agent/runs*` routes —
+study these as the pattern to mirror, NOT to extend: see ROUTE CONTRACT GAP
+below). harness/hub/tests/test_runtime.py and test_providers.py (test style:
+TestClient headers `{"x-hub-client": "harness-hub"}`, `runtime_tmp` fixture
+pattern for monkeypatching config paths, `monkeypatch.setitem` style for
+patching a plain-dict registry — see test_providers.py's provider tests for
+how modules are swapped in).
+
+CRITICAL GATE SEMANTICS (do not implement the naive reading of the BD prose):
+runtime_pipeline's `act()` node checks `_needs_interrupt` as the FIRST thing
+it does, BEFORE producing any output. If a gate is pending, it returns
+`goto="act"` (itself) with an interrupt tied to `node="act"`, and produces NO
+output that call. On resume, `resume_run_stream` sets `start_node =
+metadata.next_node` (which `create_interrupt` set to the SAME node) and calls
+`execute_run(run_id, start_node=start_node)` — i.e. resume RE-ENTERS the same
+node, which now sees a resolved interrupt via `_has_resolved_interrupt` and
+proceeds to do its real work and advance. Mirror this exactly for
+`gate: approval` nodes: check gate-resolved BEFORE calling the provider; if
+not resolved, create the interrupt (node=<this node's id>), emit interrupt +
+state_snapshot events, and STOP the generator without advancing your node
+pointer past this node. Your own resume function must re-enter this SAME
+node id/index (not "the next node" — the BD prose's "resume continues from
+next node" is imprecise; implement the self-loop pattern above, which is what
+the existing runtime actually does and what C3's HITL gate panel will expect).
+
+ROUTE CONTRACT GAP (real, not hypothetical): the existing
+`POST /api/agent/runs/{run_id}/interrupts/{interrupt_id}/resume` route in
+server.py is hardcoded to `runtime_pipeline.resume_run_stream`, which resumes
+into `runtime_pipeline.NODES` (prepare_context/plan/act/review/finalize).
+Workflow runs are NOT pipeline runs and must NOT be resumed through that
+route — reusing it would silently execute the pipeline's deterministic
+`plan`/`act` node functions instead of your workflow's real nodes (the C2a
+sample workflow even reuses the node ids "plan"/"act", making the collision
+concrete, not just theoretical). You MUST add your own resume route for
+workflow runs (see TASK 3). The BD's "GET reuse existing /api/agent/runs
+endpoints, no new read endpoints" instruction is still correct and unaffected
+— `GET /api/agent/runs/{run_id}` and `.../events` are generic state/event
+readers that work for any run regardless of which executor produced it; only
+the POST resume path needs a workflow-specific route.
+
+TASK:
+1. Create services/workflow_exec.py (NEW):
+   - Low-level function `run_workflow(ir: list[dict], *, stop: dict[str, Any],
+     objective: str, run_id: str) -> Iterator[str]` — the core node loop,
+     operating on an already-built IR (from `workflow.build_ir`) and an
+     existing run_id (already created via `runtime_state.create_run`). Tests
+     call this directly with a hand-built IR + fake agents, no yaml/disk
+     involved.
+   - Run metadata to track (stored via `runtime_state.update_run_state`,
+     merged like runtime_reducers does): `node_index` (int, next node to
+     run), `completed_nodes` (list[str] of ids), `node_outputs` (dict id ->
+     str, the concatenated delta text for that node), `run_started_at` (ISO
+     string via `runtime_state.now_iso()`), `agent_calls` (dict agent_id ->
+     int, calls made so far), `agent_elapsed_seconds` (dict agent_id ->
+     float, cumulative wall-clock seconds spent in that agent's provider
+     calls so far).
+   - IMPORTANT: use wall-clock timestamps (`runtime_state.now_iso()` /
+     `datetime`), not `time.monotonic()`, for anything that must survive a
+     resume across a process restart — `time.monotonic()`'s epoch is only
+     valid within one process and checkpoints/resume can cross a restart (per
+     BD: "Checkpoint mỗi node → resume sau restart"). Compute elapsed
+     wall-clock seconds by parsing the stored ISO timestamps. `time.monotonic`
+     is fine only for a single in-process timing delta around one
+     `stream_chat` call, not for anything persisted across checkpoints.
+   - Template rendering: `render_template(prompt: str, context: dict[str,
+     str]) -> str` — replace every `{{token}}` where token is "objective" or
+     "<node_id>_output", using `objective` and `node_outputs`. Trust that
+     `workflow.validate_workflow` already rejected bad tokens, but raise
+     ValueError defensively if a token isn't in context (do not silently
+     leave `{{...}}` in the rendered string).
+   - Per-node loop, in IR order starting at `node_index`:
+     a. Budget/stop checks BEFORE doing anything else for this node:
+        `completed_nodes` count >= `stop["max_nodes"]` → fail
+        `budget_exceeded: max_nodes`. Elapsed wall-clock since
+        `run_started_at` >= `stop["max_seconds"]` → fail
+        `budget_exceeded: max_seconds`. Then per-agent:
+        `agent_calls.get(agent_id, 0) >= agent["budget"]["max_calls"]` → fail
+        `budget_exceeded: agent max_calls (<agent_id>)`.
+        `agent_elapsed_seconds.get(agent_id, 0.0) >=
+        agent["budget"]["seconds"]` → fail
+        `budget_exceeded: agent seconds (<agent_id>)`.
+        On any of these: `runtime_state.update_run_state(run_id,
+        {"status": "failed", "metadata": {"error": "<message above>",
+        "finished_at": runtime_state.now_iso()}})`,
+        `runtime_checkpoint.write_checkpoint(..., reason="run-failed")`,
+        yield an `error` SSE event (reuse `runtime_events`/`to_sse`), stop the
+        generator (do not raise — this is a controlled stop like
+        runtime_pipeline's interrupt early-return, not an exception path).
+     b. Gate check: if `node["gate"] == "approval"` and there is no resolved
+        interrupt for this node id yet (write a local helper mirroring
+        runtime_pipeline's `_has_resolved_interrupt`/`_needs_interrupt› — do
+        not import the underscore-private functions from
+        runtime_pipeline.py, reimplement the ~5 lines locally), call
+        `runtime_interrupts.create_interrupt(run_id, reason=
+        "approval_required", payload={"node": node["id"], "prompt":
+        rendered_prompt, "objective": objective}, node=node["id"])`, emit the
+        interrupt event + a state_snapshot event, and stop the generator
+        (same early-return pattern as runtime_pipeline.execute_run).
+     c. Render the node's prompt via `render_template`. Build messages:
+        `[{"role": "user", "content": f"SYSTEM INSTRUCTIONS:\n{agent['system_prompt']}"},
+        {"role": "user", "content": rendered_prompt}]` (two separate
+        role="user" messages — providers only accept role user/assistant,
+        see base.py's ChatEvent/server.py's `_chat_messages`).
+     d. `provider = get_provider(agent["provider"])`; record call start
+        (ISO timestamp); iterate `provider.stream_chat(messages,
+        session_id=None, model=agent.get("model"))`:
+        - `type == "delta"`: append `text` to this node's output buffer;
+          emit `assistant_delta` SSE event (node id, text) via
+          `runtime_events.append_event` + `to_sse`, same shape as
+          runtime_pipeline's `_assistant_events`.
+        - `type == "reasoning"`: optionally emit a `reasoning` SSE event
+          (not required by tests, but don't crash on it and don't fold its
+          text into the node output).
+        - `type == "done"`: call `runtime_state.update_run_state(run_id,
+          {"usage": item.get("usage", {})})` — `runtime_reducers.merge_state`
+          already sums usage dicts additively (verified in
+          test_runtime_reducers_merge_state_fields), so this accumulates run
+          usage across nodes for free. Update `agent_calls[agent_id] += 1` and
+          `agent_elapsed_seconds[agent_id] += (now - call_start)` in metadata.
+        - `type == "error"`: `runtime_state.update_run_state(run_id,
+          {"status": "failed", "metadata": {"error": item.get("message"),
+          "finished_at": ...}})`, checkpoint `reason="run-failed"`, yield
+          `error` SSE event, stop the generator (no further nodes) — do not
+          swallow the error into the node's output text.
+     e. On successful node completion: store `node_outputs[node["id"]] =
+        <accumulated text>`, append to `completed_nodes`, advance
+        `node_index`, write checkpoint (`runtime_checkpoint.write_checkpoint`,
+        `reason=f"node:{node['id']}"`), emit `node_update` SSE event (node id,
+        next node id or null) + `state_snapshot` event.
+   - After the last node: `runtime_state.update_run_state(run_id, {"status":
+     "succeeded", "metadata": {"finished_at": ...}})`, checkpoint
+     `reason="run-finished"`, yield `done` SSE event with the final state —
+     same shape as runtime_pipeline's finish.
+   - `create_workflow_run_stream(workflow_id: str, objective: str) -> Iterator[str]`:
+     reads `workflow.WORKFLOWS_DIR / f"{workflow_id}.workflow.yaml"` (raise
+     FileNotFoundError if missing → route maps to 404), `parse_workflow` +
+     `validate_workflow` FRESH (never trust a stale cached IR — config-first,
+     YAML is truth, re-validate every run in case the file changed since the
+     last `/validate` call). If `validate_workflow` returns non-empty errors,
+     do NOT open a stream at all — let the caller (route) turn this into a
+     400 with the error list, same response shape as C2a's
+     `/api/workflows/validate`. If valid, `build_ir`, `runtime_state.create_run(
+     agent_id="lead", messages=[...], metadata={"objective": objective,
+     "workflow_id": workflow_id, ...})`, then delegate to `run_workflow`.
+     **`agent_id="lead"` is mandatory, not stylistic** — C2c's child-spawn
+     path (`runtime_children.create_child_run`) raises ValueError unless the
+     PARENT run's `metadata.agent_id == "lead"`; if you set it to the
+     workflow id or a node's agent id here, every future child spawn on this
+     run will hard-fail. Do not let node-level agent ids leak into the run's
+     own `agent_id` metadata field.
+   - `resume_workflow_run_stream(run_id: str, interrupt_id: str, payload:
+     dict) -> Iterator[str]`: resolve the interrupt via
+     `runtime_interrupts.resolve_interrupt`, then re-enter `run_workflow` at
+     the SAME node index/id the interrupt was raised on (read it back from
+     the run's persisted `metadata["node_index"]`/current node — do not
+     recompute from `next_node`, that field belongs to runtime_pipeline's own
+     convention; use your own metadata key). You'll need the IR again to
+     resume — re-derive it the same way `create_workflow_run_stream` does
+     (re-read + re-validate the workflow yaml by `workflow_id` stored in the
+     run's metadata) rather than trying to serialize the whole IR into run
+     state.
+2. server.py: add `workflow_exec` to the `from services import (...)` tuple
+   (alphabetical). In a clearly marked block, placed after C2a's workflow
+   routes:
+   # --- C2b workflow run routes ---
+   POST /api/workflows/{workflow_id}/runs   → body `{"objective": str}`;
+     call `workflow.parse_workflow`+`validate_workflow` (or let
+     `create_workflow_run_stream` do it and catch a sentinel) — on missing
+     file → 404 via `_http_error`; on validation errors → 400 with
+     `{"errors": [...]}`; else `StreamingResponse(
+     workflow_exec.create_workflow_run_stream(workflow_id, objective),
+     media_type="text/event-stream")`.
+   POST /api/workflows/runs/{run_id}/interrupts/{interrupt_id}/resume →
+     body is the resume payload (same shape as the existing pipeline resume
+     route); validate run_id/interrupt_id exist first (`runtime_state.read_run`,
+     `runtime_interrupts.get_interrupt`, catch FileNotFoundError/PermissionError
+     → `_http_error`); then
+     `StreamingResponse(workflow_exec.resume_workflow_run_stream(run_id,
+     interrupt_id, payload), media_type="text/event-stream")`. This is a NEW
+     route, distinct path from `/api/agent/runs/{run_id}/interrupts/...` — do
+     not reuse that path or its handler (see ROUTE CONTRACT GAP above).
+   # --- end C2b workflow run routes ---
+   Do not touch the existing `/api/agent/runs*` routes or
+   `runtime_pipeline.py` at all.
+3. Tests in harness/hub/tests/test_workflow_exec.py (new file):
+   - Fake provider: a small module-like object (e.g. `types.ModuleType` or a
+     class instance with `.status()`/`.stream_chat()`) whose `stream_chat`
+     yields a scripted sequence you control per test (e.g. two `delta`
+     events + one `done`). Register it via
+     `monkeypatch.setitem(providers.registry, "fake", fake_module)` (registry
+     is a plain dict per services/providers/__init__.py — see
+     test_providers.py for the module-swap pattern). Build IR by hand in the
+     test (list of dicts matching `build_ir`'s output shape, with
+     `agent: {"id": ..., "provider": "fake", "model": None, "system_prompt":
+     ..., "budget": {"seconds": N, "max_calls": N}, ...}`) — do not go
+     through `workflow.py`'s yaml/validate path for these unit tests, call
+     `run_workflow` directly. Use the `runtime_tmp`-style fixture (copy the
+     pattern from test_runtime.py) to isolate `config.RUNTIME_*` paths.
+   - 2-node chain: node A's fake stream yields deltas "foo"+"bar", node B's
+     prompt template references `{{a_output}}` — assert B's rendered prompt
+     (you can have the fake provider's stream_chat capture/echo the messages
+     it received, e.g. via a mutable list closed over in the test) contains
+     "foobar"; assert final state status "succeeded", `node_outputs` has both
+     nodes, checkpoints written (assert via
+     `runtime_checkpoint.list_checkpoints` count >= number of nodes).
+   - Gate approval: node with `gate: "approval"` → `run_workflow` stops after
+     an `interrupt` SSE event, run status "interrupted", no output stored for
+     that node yet; call `resume_workflow_run_stream` (or resolve the
+     interrupt + re-invoke `run_workflow` at the same index, whichever your
+     API design uses) → node now executes and produces output, run completes.
+   - Budget: agent with `budget.max_calls = 1` used by two nodes in the
+     chain → second node's call is rejected before invoking the provider,
+     run status "failed", metadata.error mentions "budget_exceeded" and
+     "max_calls".
+   - Provider error: fake stream yields a `type: "error"` event mid-node →
+     run status "failed", no further nodes execute (assert a node after the
+     failing one never appears in `node_outputs`/`completed_nodes`).
+   - Checkpoint per node: assert `runtime_checkpoint.list_checkpoints(thread_id)`
+     contains one checkpoint per completed node (reason `node:<id>` entries).
+   - TestClient smoke test (optional but recommended): write one real
+     `<id>.workflow.yaml` + monkeypatch `workflow.runtime_agents.list_agents`
+     to return a fake agent with `provider: "fake"`, monkeypatch the registry
+     the same way, hit `POST /api/workflows/{id}/runs` through TestClient,
+     assert SSE contains `event: done`.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_workflow_exec.py -q
+(green) — then .ih\Scripts\python.exe -m pytest harness/hub/tests -q as a
+full-suite regression check.
+Then Claude main will run ONE real end-to-end verify (nvidia, 1-node workflow,
+cheap prompt) per the BD's DoD — do not attempt this yourself with real CLI
+calls in your own session.
+Scope whitelist: services/workflow_exec.py (new), server.py (only the marked
+"# --- C2b workflow run routes ---" block + the `workflow_exec` import line),
+tests/test_workflow_exec.py (new). Do NOT touch: runtime_pipeline.py (leave
+the deterministic pipeline intact for existing /api/agent/runs — no shared
+code extraction, some duplication of the event/checkpoint helper pattern is
+expected and fine), workflow.py, runtime_agents.py, the existing
+/api/agent/runs* routes. Do NOT commit.
+FINAL MESSAGE: files changed, pytest result (scoped + full-suite), the exact
+metadata keys you used to track node position/budget state (so C2c can read
+them), the exact wording of your budget_exceeded error messages, and explicit
+confirmation that the workflow run's `agent_id` metadata is "lead".

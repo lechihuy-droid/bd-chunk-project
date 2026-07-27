@@ -1,0 +1,34 @@
+STEP B4 — Skill drift tab + deploy UX + deploy log (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md Step B4. Read it first.
+Study: harness/hub/web/app.js (renderSkillLibrary + renderSkillDetail functions),
+harness/hub/services/skill_library.py, harness/hub/server.py (skill-library routes),
+harness/hub/tests/test_skill_library.py.
+
+NOTE: another agent is editing web/workspace.js concurrently — do NOT touch
+workspace.js or styles-workspace.css.
+
+TASK:
+1. Backend — new endpoint GET /api/skill-library/deploy-log:
+   services/skill_library.py add deploy_log(limit=50) -> last N lines of
+   config.SKILL_DEPLOY_LOG (.cache/skill_deploy_log.jsonl), newest first,
+   each {ts, id, target, path} (whatever fields deploy() writes — check code).
+   Missing file -> []. Route in server.py BEFORE the {skill_id:path} route
+   (path-converter would swallow "deploy-log" otherwise — same trick as /drift).
+   Test in tests/test_skill_library.py: fixture log file -> endpoint returns
+   parsed rows newest-first; missing file -> [].
+2. Frontend #/skills-lib (app.js + styles-hub.css append only):
+   - Tab bar: "Skills" | "Drift" | "Deploy log" (client-side tabs, no route change).
+   - Drift tab: table of DriftEntry from GET /api/skill-library/drift showing
+     name, variants (source + content_hash first 8 chars + mtime), in_sync badge;
+     per variant a "Deploy this version ->" flow: pick target source (dropdown of
+     other sources), confirm via window.confirm showing from -> to and backup
+     warning, then POST /api/skill-library/{id}/deploy {target}, show result.
+   - Deploy log tab: table from new endpoint (ts, skill, target).
+   - Keep existing Skills table + detail page working unchanged.
+3. Header X-Hub-Client: harness-hub already global via HUB_CLIENT_HEADERS/postJson
+   — use postJson/getJson helpers.
+
+VERIFY: node --check harness/hub/web/app.js. Run backend tests:
+.ih\Scripts\python.exe -m pytest harness/hub/tests/test_skill_library.py harness/hub/tests/test_api.py -q  (green).
+Do NOT run full suite. Do NOT commit. Do NOT touch workspace.js.
+FINAL MESSAGE: files changed, pytest + node --check results, endpoint shape.

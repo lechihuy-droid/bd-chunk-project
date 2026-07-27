@@ -1,0 +1,151 @@
+STEP Cx-extras — Three small batched items (Hub v2 Phase C): model alias
+pass-through for claude/codex CLI providers, a max_tokens regression test,
+and a Settings page capability display. Not a numbered BD step — see
+harness/hub/docs/research-applicability.md action items #1, #3, #5 for the
+rationale behind each (read that file first, section "4. Đề xuất hành động").
+Runs IN PARALLEL with harness/hub/briefs/C3-run-view-ui.txt — see the
+PARALLEL-WORK note at the end before touching app.js.
+
+Study: harness/hub/services/providers/claude_cli.py (`_build_cmd(prompt,
+session_id)` at line ~29, `stream_chat(messages, session_id=None,
+model=None)` at line ~162 — `model` is already an accepted parameter, it is
+simply never used). harness/hub/services/providers/codex_cli.py (same shape:
+`_build_cmd(prompt, session_id)` at line ~29, `stream_chat(..., model=None)`
+at line ~161; note the resume grammar comment above `_build_cmd` — codex
+clap requires `exec [OPTIONS] resume [SESSION_ID] [PROMPT]`, i.e. any new
+flag must be inserted into the OPTIONS position, BEFORE the literal
+`"resume"` token / prompt, in both the resume and non-resume branches).
+harness/hub/services/chat.py (`stream_chat(messages, model, max_tokens)` at
+line ~174, the `"max_tokens": max_tokens` key at line ~192 — this is NVIDIA's
+own OpenAI-compatible path, already correct; you are adding a regression test
+for it, not fixing anything). harness/hub/tests/test_providers.py (existing
+tests to extend: `test_claude_cli_build_cmd_includes_disallowed_tools_and_
+resume` at line ~112 calls `claude_cli._build_cmd("hello", "sess-1")`
+positionally — your new `model` parameter MUST default to `None` and be
+added as the 3rd positional/keyword-optional param so this existing call
+keeps passing unchanged; same for `test_codex_cli_build_cmd_has_fresh_start_
+preamble_and_flags` at line ~166 calling `codex_cli._build_cmd("do the
+thing", None)`). harness/hub/tests/test_chat.py (`test_chat_streams_delta_
+done_and_records_usage` at line ~117 already asserts one call's
+`"max_tokens": config.CHAT_MAX_TOKENS` — your new test should generalize
+this across multiple model branches, not duplicate that single case). web/
+app.js (`renderSettings` at line ~3462, `providerCapabilities` at line
+~3456, `providerHint` at line ~3450 — this is the ONLY function cluster you
+touch in app.js).
+
+TASK:
+1. Model alias pass-through (services/providers/claude_cli.py,
+   services/providers/codex_cli.py):
+   a. claude_cli.py: change `_build_cmd(prompt: str, session_id: str | None)`
+      to `_build_cmd(prompt: str, session_id: str | None, model: str | None =
+      None)`. If `model` is truthy, insert `["--model", model]` into the cmd
+      list (position doesn't matter for claude's CLI grammar, but keep it
+      grouped with the other flags before the `-r <session_id>` resume tail
+      for readability). Update the one internal call site inside
+      `stream_chat` to pass `model=model` (the `model` parameter `stream_chat`
+      already accepts).
+   b. codex_cli.py: change `_build_cmd(prompt: str, session_id: str | None)`
+      to `_build_cmd(prompt: str, session_id: str | None, model: str | None =
+      None)`. If `model` is truthy, insert `["-m", model]` into the OPTIONS
+      segment — i.e. immediately after `"-s", "read-only",
+      "--skip-git-repo-check", "--json"` and BEFORE the `"resume"` literal /
+      prompt in both the `if session_id:` branch and the fallback branch
+      (mirror the existing `-s read-only` placement exactly; do not append it
+      after the prompt, clap will parse it as a positional arg not a flag).
+      Update the internal call site inside `stream_chat` to pass
+      `model=model`.
+   c. Do NOT touch `status()` in either file — `capabilities.models` stays
+      `None` for both (per the BD/research doc: neither CLI has a
+      list-models command, so there is no dynamic catalog to report; `None`
+      is the correct "unknown/not applicable" sentinel, distinct from an
+      empty list which would imply "zero models available"). Do not invent a
+      static alias list inside `capabilities.models` either — that belongs to
+      task 3 below (a UI-only hint), not the provider status payload.
+   d. Tests in tests/test_providers.py:
+      - `claude_cli._build_cmd("hello", "sess-1", model="opus")` → assert
+        `"--model" in cmd and "opus" in cmd`.
+      - `claude_cli._build_cmd("hello", "sess-1")` (no model, or
+        `model=None`) → assert `"--model" not in cmd`.
+      - `codex_cli._build_cmd("do the thing", None, model="gpt-5")` → assert
+        cmd contains `["-m", "gpt-5"]` as a contiguous pair AND that `-m`
+        appears before the prompt string (index comparison).
+      - `codex_cli._build_cmd("do the thing", "sess-1", model="gpt-5")` (the
+        resume branch) → same contiguous-pair assertion, AND assert `-m`
+        appears BEFORE the literal `"resume"` token in the list (this is the
+        one that actually exercises the clap-grammar constraint from the
+        code comment — get this one right, it's the risky case).
+      - `codex_cli._build_cmd("do the thing", None)` (no model) → assert
+        `"-m" not in cmd` (regression guard so the existing
+        `test_codex_cli_build_cmd_has_fresh_start_preamble_and_flags` and
+        your new no-model case both stay green).
+      - Confirm the two PRE-EXISTING `_build_cmd` calls listed in the Study
+        section above still pass unmodified (they call with only 2 positional
+        args — your new param must default to None).
+2. max_tokens regression test (tests/test_chat.py):
+   Add one new test function (do not edit the existing
+   `test_chat_streams_delta_done_and_records_usage`) that parametrizes over
+   at least 3 of the model branches already exercised elsewhere in this file
+   (e.g. `config.CHAT_DEFAULT_MODEL`, `"deepseek-ai/deepseek-v4-flash"`,
+   `"openai/gpt-oss-120b"` — one plain, one with extra_body reasoning, one
+   with top-level reasoning_effort, so a future refactor that special-cases
+   `max_tokens` per-branch would be caught) and asserts, for every call
+   captured in `calls`, `call["max_tokens"] == config.CHAT_MAX_TOKENS`. Use
+   the existing `_install_fake_openai`/`client` fixtures and `_messages()`
+   helper — do not build new fixtures. Name it something like
+   `test_chat_always_sends_configured_max_tokens_across_model_branches`.
+3. Settings page capability display (web/app.js, `#/settings` section
+   ONLY — `renderSettings`, `providerCapabilities`, `providerHint` and the
+   markup they produce):
+   - Extend `providerCapabilities(capabilities)` (or the row template in
+     `renderSettings`) to keep showing `models: <count or —>` exactly as
+     today (`Array.isArray(values.models) ? values.models.length : "—"` —
+     this is unchanged for claude/codex since their `capabilities.models`
+     stays `None`/non-array, so it still renders "—", which is correct and
+     honest — do not fake a count).
+   - For rows where `provider.id === "claude"` or `provider.id === "codex"`,
+     add a small hint string/badge next to the capabilities cell — something
+     like "pass model in chat: sonnet / opus / haiku" for claude and
+     "pass model in chat: gpt-5 / gpt-5-mini" for codex (exact alias names
+     are illustrative — do not hardcode a list you haven't verified; word it
+     generically if you're unsure of the live alias set, e.g. "model alias
+     supported — set in chat request" is acceptable and safer than inventing
+     specific names that might not match what the CLI actually accepts).
+     This is purely informational UI text pointing at the task-1 capability,
+     it does not call any new endpoint.
+   - Do not add a model-picker input to the Settings page — that's out of
+     scope here (research doc action #1 mentions a chat-pane model picker for
+     CLI providers as a related follow-up, but that touches workspace.js/
+     chat composer, not Settings, and is not part of this brief).
+
+PARALLEL-WORK NOTE (read before touching app.js): C3-run-view-ui.txt is
+running IN PARALLEL against the same app.js file, adding new `#/workflows`
+pages and a `route()` branch. To avoid a merge collision:
+- Touch ONLY `renderSettings`, `providerCapabilities`, `providerHint`, and
+  their immediate call sites (~line 3450-3486). Do not edit `route()` — your
+  existing `parts[0] === "settings"` branch there already works and needs no
+  change.
+- Do NOT add any nav items to index.html — C3 owns the nav edit
+  (adding "Workflows" to CONTROL); Cx-extras must not touch index.html at
+  all.
+- Do NOT touch styles-hub.css unless a genuinely new class is needed for the
+  hint badge (prefer reusing an existing `.badge`/`.muted` class first).
+
+RUN gate:
+.ih\Scripts\python.exe -m pytest harness/hub/tests/test_providers.py harness/hub/tests/test_chat.py -q
+(green) — then `node --check harness/hub/web/app.js` (syntax only). Do not
+run the full suite (C3 may be mid-edit on app.js in another worktree/session
+at the same time; scoping the pytest run to these two files avoids
+false-failing on unrelated in-flight work).
+Scope whitelist: harness/hub/services/providers/claude_cli.py,
+harness/hub/services/providers/codex_cli.py, harness/hub/tests/
+test_providers.py, harness/hub/tests/test_chat.py, harness/hub/web/app.js
+(renderSettings/providerCapabilities/providerHint cluster only, ~line
+3450-3486 — nothing else in the file). Do NOT touch: server.py, config.py,
+runtime_*.py, workflow*.py, web/index.html, web/workspace.js, web/
+styles-hub.css (unless justified per the note above), any other web/app.js
+function. Do NOT commit.
+FINAL MESSAGE: files changed, pytest result (scoped, both test files), node
+--check result, the exact flag arrangement you produced for `codex_cli.
+_build_cmd`'s resume branch (so a reviewer can eyeball the clap-grammar
+ordering without re-deriving it), and confirmation you did not touch
+route()/index.html/any other app.js function.

@@ -1,0 +1,10 @@
+id: drafter
+provider: cheap
+model: null
+system_prompt: |
+  Draft or summarise quickly in plain prose. Give a useful first pass with no filler.
+  Admit uncertainty instead of inventing facts.
+skills: []
+permission: read_only
+budget: {seconds: 600, max_calls: 4}
+risk_tier: read_only

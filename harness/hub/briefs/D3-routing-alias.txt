@@ -1,0 +1,69 @@
+STEP D3 — Routing policy alias cheap/code/smart (BD-hub-v2-phaseD.md §D3). BACKEND ONLY. Model: gpt-5.6-luna.
+No frontend (do NOT touch web/ or web-v3/). No new deps. Do NOT commit.
+
+WHY (token-cost routing): let an agent declare WHAT CLASS of work it is instead of hardcoding a vendor —
+volume/cheap work to NVIDIA (free), code to Codex, hard reasoning to Claude. Swapping the policy in one place
+then re-routes every agent that uses a class.
+
+READ FIRST (exact current shapes):
+1. services/runtime_agents.py:36-38 — validate_agent_profile rejects any provider not in the provider `registry`.
+   This is what blocks `provider: cheap` today.
+2. services/workflow_exec.py — the ONLY two agent provider resolution points:
+   line ~100 (child run) and line ~264 (main node): `provider = get_provider(str(agent["provider"]))`.
+   NOTE server.py:165 get_provider() is the CHAT endpoint (provider id comes from the user payload, not an
+   agent) — DO NOT route that through the class map.
+3. config.py — where constants live.
+
+SCOPE:
+
+A. config.py — add:
+     MODEL_CLASS_ROUTING = {
+         "cheap": {"provider": "nvidia", "model": None},   # default catalog model
+         "code":  {"provider": "codex",  "model": None},
+         "smart": {"provider": "claude", "model": None},
+     }
+
+B. services/runtime_agents.py:
+   1. validate_agent_profile: accept provider that is EITHER a real id in `registry` (unchanged behavior) OR a
+      key of config.MODEL_CLASS_ROUTING. An unknown value must still raise a CLEAR error naming both options,
+      e.g. f"Unknown provider: {provider}" -> extend to mention valid classes. Existing agents keep working
+      (backward compatible — this is the hard requirement).
+   2. Add a pure resolver:
+        def resolve_provider(agent: dict) -> dict
+      returning {"provider": <real registry id>, "model": <model to use>, "class": <class name or None>}.
+      Rules: if agent["provider"] is a class key -> real provider from MODEL_CLASS_ROUTING; the effective model =
+      the agent's own explicit `model` if set, else the class's "model" (may be None = provider default).
+      If it is a real id -> pass through unchanged with "class": None.
+   3. DO NOT mutate or rewrite the stored agent dict / yaml. list_agents() and get_agent() must keep returning the
+      provider AS AUTHORED (the class name), because the Agents UI POSTs the same dict back to save — resolving at
+      load would silently persist the resolved vendor and destroy the class. This is important, do not shortcut it.
+
+C. services/workflow_exec.py — at BOTH call sites (~100 and ~264) resolve before calling get_provider:
+     routed = runtime_agents.resolve_provider(agent)
+     provider = get_provider(routed["provider"])
+     ... pass model=routed["model"] where the code currently passes agent.get("model")
+   Keep everything else identical (budget accounting still keyed on agent id, not provider).
+
+D. server.py — one small read endpoint so the UI can later show a "cheap→nvidia" badge:
+     GET /api/model-classes -> config.MODEL_CLASS_ROUTING  (plain dict, no auth beyond existing middleware)
+   Do NOT add resolved fields to /api/agents rows (that dict is POSTed back to save — extra keys would be
+   persisted into the yaml).
+
+E. Tests — extend harness/hub/tests/test_runtime_agents.py (or add tests/test_routing_alias.py; FAKE provider only):
+   1. resolve_provider maps each class -> correct real provider; explicit agent model overrides the class model.
+   2. A real provider id passes through unchanged with class None (backward compatibility).
+   3. validate_agent_profile ACCEPTS an agent whose provider is a class, still REJECTS a genuinely unknown value
+      with a clear message, and every pre-existing agent profile still validates.
+   4. Executor: a workflow whose agent uses `provider: cheap` calls the routed provider (assert via the fake
+      registry which provider id was requested) — no change to budget bookkeeping.
+   5. GET /api/model-classes returns the three classes.
+   6. CARRY-OVER (D2 review LOW — untested branch): add ONE test covering the validate node's artifact-missing
+      fallback in workflow_exec — i.e. the target's artifacts/<target>.md is absent so it falls back to
+      metadata.node_outputs[target]. Assert the checks run against that fallback text (not against an empty
+      string). Every existing exec test hits the artifact-present path, so this branch is currently unexercised.
+
+VERIFY (from repo root C:\Users\HUY\workspace\ai-project-opus):
+  .ih\Scripts\python.exe -m pytest harness/hub/tests -q
+  Must be GREEN — all existing + new. Existing agent/workflow tests MUST still pass unchanged.
+
+DONE = print: files changed, the routing map, pytest result line, test names.

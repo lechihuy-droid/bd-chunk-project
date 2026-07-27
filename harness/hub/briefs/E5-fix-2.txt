@@ -1,0 +1,22 @@
+STEP E5-fix-2 — một mục còn thiếu từ E5-fix-1. FRONTEND ONLY. Model: gpt-5.6-luna.
+File: web-v3/src/pages/ChatPage.tsx. Zero Python. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH: E5-fix-1 mục 2 yêu cầu HAI lớp, ghi rõ "hai lớp, không chọn một". Lớp (b) đã làm:
+chỗ render nay có `isArtifact(selectedPane.messages[artifact.index])` trước khi hiện panel — giữ nguyên.
+Lớp (a) BỊ BỎ SÓT. ChatPage.tsx dòng ~48 vẫn là:
+    onClear={() => update(p.id, { messages: [] })}
+Không hề reset state `artifact`.
+
+LỖI CÒN LẠI: mở panel ở message index N -> bấm "Xoá" pane đó (mảng messages về rỗng, panel biến mất
+nhưng `artifact` vẫn giữ {paneId, index: N}, và không còn nút nào để tắt nó) -> chat tiếp trong pane đó ->
+mảng dài lại quá N -> nếu message rơi trúng index N tình cờ LÀ artifact thì lớp (b) cho qua ->
+**panel tự bật lên**, hiện một tài liệu KHÁC hẳn cái người dùng đã mở. Người dùng không bấm gì cả.
+
+SỬA: `onClear` phải reset artifact khi nó đang trỏ vào chính pane đó, đúng như đường `onClose` đang làm
+(`if (artifact?.paneId === p.id) setArtifact(null)`). Đặt cạnh nhau cho khớp.
+
+KHÔNG đụng gì khác. Không sửa lib/artifact.ts, không sửa index.css, không sửa lớp (b) ở chỗ render.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = một hunk + kết quả tsc.

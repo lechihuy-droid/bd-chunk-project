@@ -1,0 +1,41 @@
+STEP F2 — Token meter trong chat (SD-chat-control-plane.md §4). Model: gpt-5.6-luna.
+FRONTEND ONLY (web-v3). Zero Python. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH: review ChatGPT xếp "Token meter và context usage" là P0, utility 5/5, cost 2/5.
+Rẻ vì DỮ LIỆU ĐÃ CÓ SẴN — không cần endpoint mới, không cần backend.
+
+DỮ LIỆU: sự kiện SSE `done` mang `usage`, ChatPage đã lưu vào `message.usage`. Hình dạng thật:
+    { input_tokens: number, output_tokens: number, total_tokens: number }
+Một số provider có thể thiếu trường hoặc trả null — phải chịu được điều đó.
+⚠️ Sau F1b, lượt HỎNG không còn `usage` (message thành `role: 'system'`). Meter vì thế chỉ đếm lượt thật.
+KHÔNG được tự bịa usage cho lượt hỏng.
+
+PHẠM VI — src/pages/ChatPage.tsx (tách hàm thuần sang src/lib/ nếu gọn hơn):
+
+1. HÀM THUẦN cộng dồn usage của một pane:
+   Duyệt `pane.messages`, cộng `input_tokens` / `output_tokens` / `total_tokens` của những message CÓ usage.
+   Đếm luôn số lượt có usage (= số lần gọi thành công).
+   Trường thiếu/null/không phải số -> coi như 0, KHÔNG để ra NaN.
+   `total_tokens` thiếu nhưng có in/out -> lấy in + out. Có `total_tokens` thì tin nó, đừng tự cộng lại.
+
+2. HEADER PANE — thêm một dòng nhỏ (mono, --faint, 10px), không làm vỡ bố cục hiện có:
+       12.4k token · 3 lượt
+   Định dạng số gọn: <1000 giữ nguyên; >=1000 -> "12.4k"; >=1e6 -> "1.2M".
+   Hover (title) hiện chi tiết: "8.1k vào · 4.3k ra · 3 lượt".
+   Chưa có lượt nào -> KHÔNG hiện gì cả, đừng hiện "0 token" gây nhiễu.
+
+3. THANH HỘI THOẠI (hàng nút trên cùng, cạnh "+ Cửa sổ") — tổng của MỌI pane:
+       Tổng: 31.2k token · 7 lượt · 3 cửa sổ
+   Cũng ẩn khi chưa có lượt nào.
+
+4. KHÔNG hiện tiền ở đây. Trang Usage đã có ước tính chi phí kèm nhãn "không thực trả" và độ phủ giá;
+   nhét một con số $ vào chat mà không mang theo cảnh báo đó là gây hiểu nhầm. Chỉ token và số lượt.
+
+RÀNG BUỘC: đọc từ `panes` đang có, KHÔNG thêm state trùng lặp, KHÔNG ghi gì mới vào localStorage
+`hub-v3-chat`, KHÔNG đụng `send()` / parseSse / `patchMessage`. Tính bằng `useMemo` theo `panes` —
+đừng tính lại trong thân render mỗi lần (đã từng gây vòng lặp fetch vô hạn ở trang Usage).
+Nhãn tiếng Việt, token màu + Tailwind sẵn có, không thêm dep.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = file tạo/sửa, cách xử lý trường thiếu, kết quả tsc.

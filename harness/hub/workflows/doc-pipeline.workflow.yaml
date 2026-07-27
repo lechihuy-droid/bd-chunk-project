@@ -1,0 +1,19 @@
+# Dùng khi: Tóm tắt tài liệu rồi tổng hợp thành đầu ra có thể dùng được.
+# Luồng: summarize -> check_summary -> synthesize
+id: doc-pipeline
+nodes:
+  - id: summarize
+    agent: drafter
+    prompt: "Summarize the source material for {{objective}} in clear, useful prose. Capture decisions, evidence, open questions, and important details without placeholders."
+    gate: none
+  - id: check_summary
+    type: validate
+    target: summarize
+    checks: [{kind: min_length, value: 120}, {kind: must_not_include, values: ["PLACEHOLDER"]}]
+    on_fail: interrupt
+  - id: synthesize
+    agent: thinker
+    prompt: "Synthesize a polished deliverable for {{objective}} from this summary. Preserve important nuance and flag anything not verified: {{summarize_output}}"
+    gate: approval
+edges: [[summarize, check_summary], [check_summary, synthesize]]
+stop: {max_nodes: 10, max_seconds: 1800}

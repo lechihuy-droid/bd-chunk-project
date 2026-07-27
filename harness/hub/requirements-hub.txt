@@ -1,0 +1,4 @@
+pytest
+openai  # NVIDIA integrate.api.nvidia.com OpenAI-compatible chat streaming
+pyyaml
+python-dotenv  # loads NVIDIA_API_KEY etc. from the repo-root .env at startup

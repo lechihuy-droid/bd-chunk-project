@@ -1,0 +1,93 @@
+STEP E4 — Canvas kéo-thả SỬA ĐƯỢC (SD-usage-cost-canvas.md §4-bis, §5.3). Model: gpt-5.6-luna.
+Backend nhỏ + frontend. KHÔNG thêm npm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+✅ ĐIỀU KIỆN TIÊN QUYẾT ĐÃ XONG (commit 819d79f). Helper guard đã tồn tại:
+    services/workflow.py::workflow_path(workflow_id) -> boundary.resolve_in_root(..., base=WORKFLOWS_DIR)
+Mọi đường dẫn file workflow trong brief này PHẢI đi qua `workflow_path()`.
+TUYỆT ĐỐI KHÔNG ghép `WORKFLOWS_DIR / f"{id}..."` bằng tay — đó chính là lỗi 819d79f vừa vá.
+
+════ NHẮC LẠI RÀNG BUỘC LÕI ════
+services/workflow.py:181 -> "Edges must form exactly one linear chain covering every node once".
+in_degree <= 1, out_degree <= 1, đúng 1 node đầu, đúng 1 node cuối. KHÔNG nhánh.
+Người dùng được đặt node ở toạ độ tuỳ ý, NHƯNG edges vẫn phải là một chuỗi thẳng.
+Nối tạo ra nhánh phải bị chặn NGAY LÚC NỐI kèm lý do, không đợi tới lúc bấm Lưu.
+
+════ A. BACKEND ════
+
+A1. Lưu toạ độ — sidecar, KHÔNG nhét vào workflow YAML.
+    `GET /api/workflows/{id}/layout`  -> {"nodes": {"<node_id>": {"x": <num>, "y": <num>}}}  (thiếu file -> {})
+    `PUT /api/workflows/{id}/layout`  body cùng dạng -> ghi `workflows/{id}.layout.json`
+    - Vì sao sidecar: ghi toạ độ vào YAML thì mỗi lần kéo chuột sẽ chạy `save_workflow()`, mà hàm đó đẻ một
+      file `*.workflow.yaml.bak-<timestamp>` mỗi lần ghi, và mỗi lần ghi là một lần đe doạ khối comment đầu file.
+    - Lọc bỏ khoá không khớp node id nào đang có (giống `ensureUi` của web/canvas.js cũ). Toạ độ không phải
+      số hữu hạn -> bỏ qua, không lưu.
+    - Đường dẫn đi qua helper guard (điều kiện tiên quyết ở trên).
+
+A2. `PUT /api/workflows/{id}/model` — nhận JSON model, server sinh YAML.
+    body: {"model": {"id":..., "nodes":[...], "edges":[[a,b],...], "stop":{...}}}
+    Các bước, đúng thứ tự:
+      1. Đọc file hiện tại. Tách **khối comment dẫn đầu** = mọi dòng `#` hoặc dòng trống TỪ ĐẦU FILE cho
+         tới dòng YAML thực đầu tiên. Giữ nguyên văn, kể cả dấu cách.
+      2. `yaml.safe_dump(model, sort_keys=False, allow_unicode=True, default_flow_style=False)`.
+         `allow_unicode=True` là BẮT BUỘC — prompt và comment có tiếng Việt, thiếu nó sẽ thành `\uXXXX`.
+      3. Ghép: khối comment + YAML mới.
+      4. Đưa chuỗi đó qua `workflow.save_workflow(id, yaml_text)` — KHÔNG tự ghi file. save_workflow đã lo
+         parse + validate + kiểm id khớp + backup.
+      5. Validate lỗi -> 400 kèm danh sách lỗi, KHÔNG ghi gì cả.
+    - Vì sao sinh YAML ở server: prompt nhiều dòng cần block scalar, escape, quote. Tự sinh bằng TS dễ sai
+      âm thầm. PyYAML đã đúng sẵn.
+    - Test bắt buộc: lưu lại `code-task` (4 dòng comment đầu file, có tiếng Việt) rồi đọc lại ->
+      **4 dòng comment còn nguyên**, tiếng Việt không bị escape, và workflow vẫn validate xanh.
+    - Test: model có nhánh (một node 2 cạnh đi ra) -> 400, file trên đĩa KHÔNG đổi.
+
+════ B. FRONTEND — src/pages/WorkflowsPage.tsx ════
+Nền có sẵn từ E3: chainOrder (dựng từ edges), referenceErrors, Inspector, thẻ node, hình thoi gate.
+GIỮ NGUYÊN mấy thứ đó, đừng viết lại.
+
+B1. Canvas 2D thay cho danh sách dọc:
+    - Vùng canvas có lưới chấm, node đặt tuyệt đối theo (x,y) lấy từ /layout. Node chưa có toạ độ ->
+      tự xếp theo thứ tự chuỗi (x = 40 + i*220, y = 60), giống fallback của web/canvas.js cũ.
+    - Kéo node bằng pointer event (pointerdown/move/up). x,y không âm. Thả xong mới PUT /layout (debounce),
+      đừng gọi mỗi pixel.
+    - Cạnh vẽ bằng SVG nằm dưới node, có mũi tên. Toạ độ cạnh tính từ vị trí node.
+    - ⚠️ **Vị trí và thứ tự chạy là HAI thứ khác nhau** — người dùng kéo node ③ lên trên node ① thì mắt
+      đọc một đằng máy chạy một nẻo. Bắt buộc: giữ số thứ tự ①②③ trên mỗi thẻ theo THỨ TỰ CHẠY, và có
+      nút "Xếp theo thứ tự chạy" để dọn lại. Đây là điều kiện để phương án này an toàn, không phải tuỳ chọn.
+
+B2. Palette trái: `GET /api/agents` (đã có). Kéo một agent thả vào canvas -> tạo node mới tại chỗ thả,
+    id tự sinh không trùng (`node-1`, `node-2`, …), prompt mặc định `{{objective}}` nếu là node đầu,
+    ngược lại `{{<node trước>_output>}}`, gate `none`. Nối vào CUỐI chuỗi.
+    Thêm mục "validate" tạo node type validate (target = node liền trước, checks rỗng, on_fail `stop`).
+
+B3. Nối cạnh tay: kéo từ chấm handle mép node này sang node khác.
+    CHẶN NGAY, kèm lý do hiện lên, khi: nguồn đã có cạnh đi ra · đích đã có cạnh đi vào · nối vào chính nó ·
+    tạo thành chu trình. Không cho thả, không tạo trạng thái sai rồi mới báo.
+
+B4. Xoá node: nối lại hai đầu (prev -> next) để chuỗi không đứt. Node đầu/cuối thì chỉ bỏ cạnh tương ứng.
+    Sau khi xoá, chạy lại referenceErrors — prompt còn trỏ tới node vừa xoá phải hiện đỏ ngay.
+
+B5. Inspector cho SỬA (E3 đang chỉ đọc):
+    - node agent: agent (select từ /api/agents), prompt (textarea), gate (none/approval).
+    - node validate: target (select trong các node ĐỨNG TRƯỚC), on_fail, checks sửa bằng textarea JSON —
+      JSON hỏng thì báo tại chỗ, không cho lưu.
+    - Đổi `id`: cho phép, NHƯNG phải tự viết lại mọi tham chiếu `{{<id cũ>_output}}` / `{{<id cũ>_claims}}`
+      và mọi `validate.target` đang trỏ tới nó. Bỏ sót = workflow hỏng âm thầm. Có test cho việc này.
+
+B6. Trạng thái chưa lưu + Lưu:
+    - Model sửa trong state cục bộ; hiện rõ "có thay đổi chưa lưu".
+    - "Kiểm tra" -> POST /api/workflows/validate với `yaml_text`? KHÔNG — gửi model hiện tại qua endpoint
+      model là được, nhưng kiểm tra thì vẫn dùng /validate với yaml_text do server sinh. Đơn giản nhất:
+      "Kiểm tra" gọi PUT model với cờ dry-run nếu bạn thêm, hoặc chỉ chạy referenceErrors cục bộ + báo rõ
+      "kiểm tra đầy đủ chạy khi Lưu". Chọn một, nói rõ đã chọn cách nào.
+    - "Lưu" -> PUT /model. Thành công -> nạp lại danh sách. Lỗi 400 -> hiện từng lỗi, GIỮ NGUYÊN thay đổi
+      của người dùng, tuyệt đối không vứt bỏ công sức họ vừa làm.
+    - Toạ độ lưu riêng qua /layout, không phụ thuộc nút Lưu.
+
+RÀNG BUỘC: dùng lại lib/api.ts, token màu + Tailwind, nhãn tiếng Việt, không dangerouslySetInnerHTML,
+không thêm dep, không đổi schema workflow.
+
+VERIFY: cd /c/Users/HUY/workspace/ai-project-opus && .ih/Scripts/python.exe -m pytest harness/hub/tests -q
+        cd harness/hub/web-v3 && pnpm exec tsc -b     # EPERM .tsbuildinfo -> chạy --noEmit, nói rõ
+DONE = file tạo/sửa, kết quả pytest + tsc, và dán output test chứng minh comment đầu file của code-task
+       sống sót qua một vòng lưu.

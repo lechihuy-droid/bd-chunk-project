@@ -1,0 +1,57 @@
+STEP G1-fix-6 — primitive phải SỞ HỮU trạng thái, chấm dứt kiểu chỗ gọi đánh nhau với variant.
+FRONTEND ONLY. Model: gpt-5.6-luna. Không thêm dep. Không chạy pnpm build. Không commit.
+Cấm sửa file cấu hình thật để thử.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+════ LỖI ĐANG CÒN, ĐO TRÊN TRÌNH DUYỆT ════
+ChatPage.tsx viết:
+    selected ? 'border-accent bg-accent-subtle text-primary' : 'border-border-subtle text-muted opacity-60'
+Nhưng computed style của chip ĐANG CHỌN trên /#/chat:
+    borderTopColor = rgb(38,45,57)   (= border-subtle, KHÔNG phải accent)
+    backgroundColor = rgba(0,0,0,0)  (KHÔNG có accent-subtle)
+=> Trạng thái chọn gần như không nhìn thấy, chỉ còn khác nhau ở opacity và màu chữ.
+
+NGUYÊN NHÂN GỐC — ĐÃ TÁI DIỄN BA LẦN, ĐỌC KỸ:
+Chip là `<Button variant="ghost" className="...">`. Variant `ghost` cũng đặt class nền/viền.
+Khi hai class cùng thuộc tính cùng tồn tại, CSS quyết định theo THỨ TỰ TRONG STYLESHEET, không theo thứ tự
+trong thuộc tính `class`. Nên class của variant thắng class ở chỗ gọi.
+Ba lần trước cùng một cơ chế: (1) `bg-[var(--hub-accent)]` vs `bg-panel2`; (2) vá bằng `!important`;
+(3) bỏ `!important` xong thì đến lượt chỗ gọi thua.
+Vá tiếp bằng cách đổi class ở chỗ gọi sẽ hỏng lần thứ tư. PHẢI đổi cách phân chia trách nhiệm.
+
+════ VIỆC ════
+
+A. ĐƯA TRẠNG THÁI VÀO PRIMITIVE (lib/ui.tsx). Thêm prop, không thêm class ở chỗ gọi:
+   - `Button` và `Chip`: thêm prop `selected?: boolean`.
+     `selected` -> viền accent + nền accent-subtle + chữ primary.
+     không selected -> giữ nguyên style của variant.
+   - `Chip`: thêm prop `muted?: boolean` (hoặc dùng luôn `selected === false`) cho trạng thái mờ.
+   - Trong ui.tsx, gộp class bằng cách để nhánh trạng thái đứng SAU nhánh variant trong cùng một chuỗi,
+     và bảo đảm hai nhánh KHÔNG cùng đặt một thuộc tính. Nghĩa là: nếu `selected` đặt `bg-*` thì nhánh
+     variant KHÔNG được đặt `bg-*` nữa cho trường hợp đó — chọn một, đừng để hai class cùng tranh.
+   - TUYỆT ĐỐI KHÔNG dùng `!important` để thắng.
+
+B. CHỖ GỌI CHỈ TRUYỀN Ý ĐỊNH, KHÔNG TRUYỀN HÌNH THỨC.
+   ChatPage.tsx chip đích: bỏ toàn bộ chuỗi điều kiện class ở trên, thay bằng `selected={selected}`.
+   Rà nốt các chỗ khác đang biểu đạt trạng thái bằng class ở chỗ gọi (workflow node đang chọn, workflow
+   đang chọn ở sidebar, chip khoảng thời gian ở UsagePage đang dùng
+   `range === id ? 'border-[var(--hub-accent)] bg-[var(--hub-accent)] text-app' : ...`) — chuyển hết sang
+   prop `selected`.
+
+C. NGHIỆM THU BẮT BUỘC — ĐO COMPUTED STYLE, KHÔNG ĐỌC CODE RỒI KẾT LUẬN:
+   Lần trước đã báo "đã chuyển selected chip sang accent" trong khi trên trình duyệt nó vẫn là
+   border-subtle. Lần này phải tự đo:
+   1. /#/chat: chip đích ĐANG CHỌN phải có `borderTopColor` = rgb(139,124,246) HOẶC
+      `backgroundColor` = màu accent-subtle. Chip KHÔNG chọn phải khác rõ rệt.
+   2. /#/usage: chip khoảng thời gian đang chọn phải khác chip không chọn ở computed style.
+   3. /#/chat vẫn: 0 phần tử viền rgb(238,242,248); ĐÚNG MỘT nút nền rgb(139,124,246);
+      4 pane -> scrollHeight ≈ innerHeight.
+   Không chạy được trình duyệt thì NÓI RÕ chưa kiểm được mục nào, đừng khẳng định suông.
+
+D. Kiểm lại mục 3 của G1-fix-5: canvas workflow có thật sự dùng biến thể `handle` chưa?
+   `grep "handle" src/lib/ui.tsx` hiện không thấy. Nếu chưa làm thì làm, nếu làm bằng cách khác thì nói rõ.
+
+KHÔNG ĐỔI HÀNH VI. Không đụng `send()`, parseSse, `patchMessage`, localStorage, luồng SSE.
+Giữ nguyên: panel artifact, canvas (cạnh `<line>` có mũi tên, số thứ tự chạy, "Xếp theo thứ tự chạy").
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b
+DONE = prop đã thêm, số chỗ gọi đã chuyển sang prop, KẾT QUẢ ĐO computed style ở mục C, `tsc -b`.

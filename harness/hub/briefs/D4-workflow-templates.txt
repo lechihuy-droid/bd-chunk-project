@@ -1,0 +1,86 @@
+STEP D4 — Workflow template library (BD-hub-v2-phaseD.md §D4). BACKEND/CONFIG ONLY. Model: gpt-5.6-luna.
+No frontend. No service-code changes expected (these are declarative files + one guard test). Do NOT commit.
+
+WHY: three ready-to-run workflows for daily use that actually exercise the harness's own features —
+D3 routing classes (cheap/code/smart) and D2 validate nodes — instead of hardcoding vendors.
+
+EXACT SCHEMAS (copy these shapes; do not invent fields):
+  Agent  (harness/hub/agents/<id>.agent.yaml):
+    id: <id>
+    provider: cheap | code | smart        # D3 class alias (or a real id)
+    model: null
+    system_prompt: |
+      ...
+    skills: []                            # must be KNOWN skill names; [] is safest
+    permission: read_only | workspace_write
+    budget: {seconds: <int>0>, max_calls: <int>0>}
+    risk_tier: read_only | write | execute | network | destructive
+  Workflow (harness/hub/workflows/<id>.workflow.yaml):
+    id: <id>
+    nodes:
+      - id: <node>            # agent node
+        agent: <agent id>
+        prompt: "... {{objective}} ... {{<earlier_node>_output}}"
+        gate: none | approval
+      - id: <check>           # validate node (D2)
+        type: validate
+        target: <earlier node id>
+        checks: [{kind: min_length, value: 200}, ...]
+        on_fail: interrupt | fail
+    edges: [[a, b], [b, c]]
+    stop: {max_nodes: <int>, max_seconds: <int>}
+  Template refs available in prompts: {{objective}}, {{<node>_output}} (also {{<node>}}).
+
+SCOPE:
+
+A. Three agents (harness/hub/agents/) — reuse them across all templates, one per routing class:
+   1. drafter.agent.yaml   — provider: cheap,  permission: read_only, risk_tier: read_only,
+      budget {seconds: 600, max_calls: 4}. system_prompt: fast first-pass drafting/summarising, plain prose,
+      no filler, admits uncertainty rather than inventing.
+   2. thinker.agent.yaml   — provider: smart,  permission: read_only, risk_tier: read_only,
+      budget {seconds: 900, max_calls: 4}. system_prompt: careful synthesis/refinement, fixes weak reasoning,
+      keeps the author's intent, flags what it could not verify.
+   3. coder.agent.yaml     — provider: code,   permission: workspace_write, risk_tier: write,
+      budget {seconds: 1800, max_calls: 6}. system_prompt: implement exactly the approved brief, surgical
+      changes only, no scope creep, report what changed.
+   All with skills: [] and model: null.
+
+B. Three workflow templates (harness/hub/workflows/). Each file STARTS with a comment header:
+   "# Dùng khi: <one line>" + "# Luồng: <node chain>".
+   1. research-draft-review.workflow.yaml
+        draft (drafter, gate none)  -> check_draft (validate, target draft,
+          checks: [{kind: min_length, value: 200}, {kind: must_not_include, values: ["TODO", "PLACEHOLDER"]}],
+          on_fail: interrupt)
+        -> refine (thinker, gate approval)
+      stop: {max_nodes: 10, max_seconds: 1800}
+   2. code-task.workflow.yaml
+        brief (thinker, gate approval)   # human approves the brief BEFORE any code is written
+        -> implement (coder, gate none)
+        -> review (thinker, gate approval)
+      stop: {max_nodes: 10, max_seconds: 3600}
+   3. doc-pipeline.workflow.yaml
+        summarize (drafter, gate none)
+        -> check_summary (validate, target summarize,
+             checks: [{kind: min_length, value: 120}, {kind: must_not_include, values: ["PLACEHOLDER"]}],
+             on_fail: interrupt)
+        -> synthesize (thinker, gate approval)
+      stop: {max_nodes: 10, max_seconds: 1800}
+   Write real, useful prompts (Vietnamese or English, be consistent per file) that thread {{objective}} and the
+   upstream {{<node>_output}} correctly. Every node id referenced by edges/targets must exist; chains must be
+   linear and complete.
+
+C. Test — NEW harness/hub/tests/test_workflow_templates.py (pytest, FAKE provider only — never call a real CLI):
+   1. GUARD: every *.workflow.yaml in harness/hub/workflows/ parses, validate_workflow returns ZERO errors, and
+      build_ir succeeds. (This also regression-guards the pre-existing review-ui workflow.)
+   2. Every *.agent.yaml in harness/hub/agents/ passes runtime_agents.validate_agent_profile.
+   3. The three new agents resolve to the expected real providers via runtime_agents.resolve_provider
+      (drafter->nvidia, thinker->claude, coder->codex).
+   4. End-to-end with a fake provider: run research-draft-review to completion where the draft output SATISFIES
+      the checks -> run succeeds and the validate node emits validation_pass; and a second run where the draft is
+      too short -> the validate node raises the interrupt (status interrupted, violations present).
+
+VERIFY (from repo root C:\Users\HUY\workspace\ai-project-opus):
+  .ih\Scripts\python.exe -m pytest harness/hub/tests -q
+  Must be GREEN — all existing (191) + new. Existing tests must not change behavior.
+
+DONE = print: files created, the three chains, pytest result line, test names.

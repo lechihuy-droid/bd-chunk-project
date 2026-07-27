@@ -1,0 +1,21 @@
+STEP U3-fix-1 — two review fixes. FRONTEND ONLY. Model: gpt-5.6-luna. No Python, no build, no commit.
+Files: harness/hub/web-v3/src/pages/AgentsPage.tsx + delete harness/hub/web-v3/src/components/Table.tsx.
+
+1. MED — new agent with a colliding id silently overwrites the existing agent (data loss).
+   POST /api/agents is an upsert keyed on id. Today the id input only disables when the typed id already
+   matches an existing agent, but Save still POSTs and overwrites with no warning. FIX AgentsPage.tsx:
+   - Track which agent is being edited: keep an `editingId` (the id loaded when the user clicks an existing
+     agent row; null when the form was opened via "+ Agent mới").
+   - In the save handler, BEFORE the POST: if the target id already exists in the loaded agents list AND
+     it is NOT the same record being edited (editingId !== agent.id — i.e. creating new, or renaming onto
+     another agent's id), require confirmation:
+        if (!window.confirm(`Đã có agent "${id}" — ghi đè?`)) return
+     Only proceed to POST on confirm. Editing an existing agent in place (editingId === agent.id) must NOT
+     prompt. Set editingId when loading an existing agent; reset to null on "+ Agent mới".
+   Keep everything else (tabs, fields, validation-error display, delete-with-confirm) unchanged.
+
+2. LOW — dead file. After U3 swapped tables to src/lib/Table.tsx, the old src/components/Table.tsx is
+   unreferenced (grep to confirm zero imports) — DELETE it. Do not touch lib/Table.tsx.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b (if EPERM on .tsbuildinfo, run the no-emit check and say so).
+DONE = changed hunks + the deleted file + tsc result line.

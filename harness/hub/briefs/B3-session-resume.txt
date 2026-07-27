@@ -1,0 +1,33 @@
+STEP B3 — Durable session resume (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md Step B3. Read it + SD §3.2/3.3.
+Study: harness/hub/web/workspace.js (chat state: provider/sessionId per chat,
+streamChatResponse, done handler), harness/hub/services/providers/claude_cli.py,
+codex_cli.py, harness/hub/tests/test_providers.py.
+
+CONTEXT DONE ALREADY: workspace chats store sessionId from done.session_id and
+send session_id in POST /api/chat. claude_cli builds ["-r", session_id]. codex_cli
+builds ["exec","resume",session_id,...] (UNVERIFIED against real CLI — comment
+in code says so).
+
+TASK:
+1. codex_cli.py: make resume robust. codex exec resume syntax on 0.144.3:
+   verify offline by reading `codex exec resume --help` output IF you can run it
+   (you have terminal access; codex binary: C:\Users\HUY\AppData\Local\pnpm\codex,
+   run with stdin closed e.g. `codex exec resume --help < NUL` timeout ~15s).
+   - If syntax confirmed: keep resume path, ensure --json + -s read-only +
+     --skip-git-repo-check flags valid in resume form (adjust order per help).
+   - If cannot confirm: implement fallback = no resume; build prompt as
+     transcript concat (last messages, cap 4000 chars, format "User: ...\nAssistant: ...")
+     and set capabilities.resume=False. Leave clear comment.
+2. workspace.js UI: active chat with sessionId shows small chip "session <first 8 chars>"
+   near provider badge; "New Chat" already creates fresh chat (sessionId null) — verify;
+   also add: when provider changes on empty chat, sessionId cleared (should already be null).
+3. Tests (fake CLI): claude second turn includes ["-r", sid]; codex second turn
+   matches whichever path you implemented (resume args OR transcript-concat prompt).
+   Extend harness/hub/tests/test_providers.py.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_providers.py -q (green)
++ node --check harness/hub/web/workspace.js.
+Do NOT touch app.js, server.py, other services. Do NOT commit.
+FINAL MESSAGE: resume syntax verdict (verified/fallback + evidence), files changed,
+pytest + node results.

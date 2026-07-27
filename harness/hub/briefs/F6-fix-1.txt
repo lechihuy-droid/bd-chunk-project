@@ -1,0 +1,54 @@
+STEP F6-fix-1 — hai lỗi HIGH, cả hai đo trên server thật. Model: gpt-5.6-luna.
+BACKEND + FRONTEND. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+──────────────────────────────────────────────────────────────────────
+1. HIGH — MỘT LỖI PROVIDER THOÁNG QUA LÀM HỎNG VĨNH VIỄN CẢ PANE.
+   ĐO THẬT: chặn `fetch` rồi gửi từ một pane đã từng gặp lỗi. Body request:
+       messages roles = ["user", "system", "user", "system", "user"]
+   Server trả 400 "message role must be user or assistant" (server.py:112), và câu đó lại được lưu
+   thành một message `role: 'system'` nữa -> lần gửi sau còn nhiều system hơn. Pane chết hẳn,
+   không cách nào tự thoát ngoài bấm "Xoá".
+   NGUYÊN NHÂN: message lỗi được lưu với `role: 'system'` (đó là cách F1 nhận diện để hiện error card),
+   nhưng `send()` gửi NGUYÊN lịch sử pane lên `/api/chat`, kể cả các message system đó.
+   ⚠️ Trước F1b lỗi provider về dưới dạng text `assistant` nên không ai thấy; F1b sửa cho đúng
+   (lỗi thành `role: 'system'`) và ĐỒNG THỜI làm lỗi tiềm ẩn này nổ ra. Không phải F1b sai — nó phơi ra
+   chỗ hỏng sẵn có.
+   SỬA (frontend, ChatPage.tsx): khi dựng `messages` gửi đi, LỌC BỎ mọi message `role === 'system'`.
+   Chúng là dấu hiệu lỗi của giao diện, không phải lượt hội thoại. Giữ nguyên chúng trong state/hiển thị.
+   Áp dụng cho CẢ hai nhánh: nhánh gửi full history (nvidia / chưa có session) và nhánh chỉ gửi message
+   mới (CLI đã có `cliSessionId`).
+   KIỂM CHỨNG: pane đang có error card, gửi lại -> body request KHÔNG còn role `system` nào, và request
+   không còn 400.
+
+2. HIGH — PICKER SKILL DÙNG MỘT KHÔNG GIAN ID, BACKEND VALIDATE BẰNG KHÔNG GIAN KHÁC.
+   ĐO THẬT:
+     - `skill_library.list_skill_names()` (thứ server.py:132 dùng để validate) trả 14 TÊN THẬT:
+       ['caveman-help','caveman-review','caveman-compress','agentic-engineering','caveman',
+        'caveman-commit','plan-review','skillspector', ...]
+     - `GET /api/skills` (thứ picker `#` của frontend đang nạp) trả **67 mục**, id dạng
+       `skill-0fb642eca1cf`, title "Untitled skill". Kiểm bằng script: số id KHÔNG bắt đầu bằng
+       "skill-" là **0**; `'agentic-engineering' in ids` là **False**.
+   HỆ QUẢ: mọi id picker sinh ra đều bị backend từ chối 400 "Unknown skill". Tính năng F6 không dùng được
+   dù test xanh — test dùng id tự chế nên không chạm vào mâu thuẫn này.
+   SỬA: cho picker và validator dùng CHUNG một nguồn.
+     - Thêm endpoint nhẹ, ví dụ `GET /api/skills/names` -> trả danh sách tên từ `list_skill_names()`
+       (đã có cache; TUYỆT ĐỐI không gọi `list_skills()` — hàm đó quét session log, từng làm treo 55 giây).
+     - Frontend `#` picker nạp từ endpoint mới này, KHÔNG nạp từ `/api/skills`.
+     - GIỮ NGUYÊN validator hiện tại. Nó đúng và nhanh.
+     - GIỮ NGUYÊN `/api/skills` cho trang Skills — đừng đổi hợp đồng của nó trong brief này.
+   KIỂM CHỨNG: chọn một skill có thật từ picker rồi gửi -> KHÔNG 400.
+
+3. TEST:
+   - backend: endpoint mới trả đúng tập tên mà validator chấp nhận; nếu validator từ chối một tên do
+     endpoint trả ra thì test phải ĐỎ (đây chính là lỗi #2 — hãy viết test bắt được nó).
+   - backend: đường chat vẫn KHÔNG gọi `list_skills()` (monkeypatch cho nó raise, chat vẫn chạy).
+   - frontend không có test runner; mô tả cách đã tự kiểm mục 1.
+
+GHI NHẬN, KHÔNG SỬA TRONG BRIEF NÀY: `/api/skills` trả 67 mục toàn "Untitled skill" với id băm —
+trông như bản liệt kê hỏng (nó gom cả skill trong cache plugin của Codex). Đó là chuyện của trang Skills,
+ghi lại để xử riêng.
+
+KIỂM TRA: cd /c/Users/HUY/workspace/ai-project-opus && .ih/Scripts/python.exe -m pytest harness/hub/tests -q
+          cd harness/hub/web-v3 && pnpm exec tsc -b
+DONE = hunk từng mục, tên endpoint mới, dòng pytest, kết quả tsc.

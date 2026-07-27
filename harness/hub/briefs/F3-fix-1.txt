@@ -1,0 +1,40 @@
+STEP F3-fix-1 — composer đáy bị đẩy ra ngoài màn hình. FRONTEND ONLY. Model: gpt-5.6-luna.
+File: web-v3/src/pages/ChatPage.tsx và/hoặc web-v3/src/index.css. Zero Python. Không thêm dep.
+Không chạy pnpm build. Không commit. (Lệnh này áp cho Codex; kiến trúc sư lo build và commit.)
+
+LỖI — ĐO TRÊN TRÌNH DUYỆT THẬT, 3 pane, viewport 1280x720:
+    document.scrollHeight = 1373      innerHeight = 720
+    main height           = 1372      main overflow-y = visible
+    .chat-grid height     = 1084      (3 pane xếp thành 2 hàng)
+    đáy ô nhập chung      = 1331      -> NẰM NGOÀI MÀN HÌNH
+Người dùng phải cuộn cả trang mới thấy composer. Composer là control center của chat (đó là toàn bộ lý do
+F3 tồn tại) — khuất là hỏng mục đích. Với 4 pane còn tệ hơn.
+
+NGUYÊN NHÂN: trang chat không bị ghim theo chiều cao viewport. Lưới pane nở ra theo nội dung thay vì tự
+cuộn bên trong, nên nó đẩy composer xuống dưới đáy tài liệu.
+
+SỬA — dựng trang chat thành cột dọc cao đúng bằng viewport:
+  1. Vùng chứa ngoài cùng của trang: cao đúng phần khung nội dung (đã có `h-full min-h-0` ở nơi khác trong
+     app — xem các trang khác dùng mẫu nào rồi theo cho khớp), `display: flex; flex-direction: column`.
+  2. Hàng đầu (chọn provider, + Cửa sổ, trạng thái provider, tổng token): chiều cao tự nhiên, không co giãn.
+  3. Lưới pane: `flex: 1` + `min-height: 0` + tự CUỘN BÊN TRONG khi nhiều pane.
+     `min-height: 0` là bắt buộc — thiếu nó thì flex item không co lại được và vẫn tràn.
+  4. Composer đáy: chiều cao tự nhiên, LUÔN nhìn thấy, không cần cuộn trang.
+  5. Mỗi pane: danh sách message vẫn cuộn riêng bên trong pane như hiện nay (`min-h-0` trên pane).
+
+KIỂM CHỨNG BẮT BUỘC (tự chạy, ghi số vào DONE):
+  - Với 4 pane, ở viewport 1280x720: `document.documentElement.scrollHeight` phải XẤP XỈ `innerHeight`
+    (không được là 1373 như hiện tại), và đáy ô nhập chung phải NHỎ HƠN `innerHeight`.
+  - Lưới pane phải cuộn được bên trong khi 4 pane.
+  - Ô nhập riêng của từng pane vẫn dùng được.
+
+⚠️ Panel artifact (E5) chiếm cột phải khi mở — mở panel rồi kiểm lại, composer vẫn phải nhìn thấy và
+không bị panel đè.
+⚠️ Ở màn hẹp (<1024px) index.css đang xếp panel artifact xuống dưới lưới chat. Kiểm luôn trường hợp đó,
+composer vẫn phải với tới được.
+
+KHÔNG ĐỤNG: logic target selector, "Dừng tất cả", `send()`, parseSse, `patchMessage`, token meter,
+error card, menu `…`, lib/artifact.ts. Đây là sửa BỐ CỤC.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = hunk, các số đo sau khi sửa (scrollHeight, innerHeight, đáy composer, với 4 pane), kết quả tsc.

@@ -1,0 +1,112 @@
+/**
+ * tokens.css — single source of truth for design tokens (Harness Hub web-v3).
+ *
+ * Every new component MUST reference these custom properties instead of
+ * literal colour, radius, or spacing values. Do not hardcode hex codes,
+ * px radii, or ad-hoc spacing in className strings or inline styles —
+ * always go through a `--hub-*` variable defined here.
+ *
+ * Namespacing: every token below is prefixed `--hub-` specifically so it
+ * cannot collide with the existing `--color-*` / `--font-*` custom
+ * properties defined in `src/index.css`'s `@theme` block. This file is
+ * additive: importing it alongside index.css does not redefine or shadow
+ * any existing name, so current rendering is unaffected until components
+ * are migrated on purpose. See DESIGN.md for the old -> new token map and
+ * the file-by-file migration checklist.
+ *
+ * This file is NOT wired into main.tsx/index.css yet (see HARD CONSTRAINT
+ * in the task that produced it) — import it explicitly once migration
+ * begins, e.g. `import './styles/tokens.css'` near the top of main.tsx,
+ * after `./index.css`.
+ */
+
+:root {
+  /* ---- Surfaces (4 levels, dark technical workbench) ---- */
+  --hub-bg-app: #0d1016;       /* page/app background */
+  --hub-bg-sidebar: #141821;   /* sidebar + topbar */
+  --hub-bg-surface: #11151c;   /* pane / card body */
+  --hub-bg-elevated: #1a202b;  /* modal, dropdown, menu, input fill */
+  --hub-bg-hover: #202734;     /* hover state on rows/items/buttons */
+  --hub-border-subtle: #262d39;
+  --hub-border-strong: #343d4c;
+
+  /* ---- Text ---- */
+  --hub-text-primary: #eef2f8;
+  --hub-text-secondary: #9ba7b8;
+  --hub-text-muted: #667085;
+
+  /* ---- Brand accent (violet) — selection, focus rings, primary actions ---- */
+  --hub-accent: #8b7cf6;
+  --hub-accent-hover: #9a8df7;
+  --hub-accent-subtle: rgba(139, 124, 246, 0.12);
+
+  /* ---- Semantic status colours ---- */
+  --hub-success: #3ecf8e;
+  --hub-warning: #f5b942;
+  --hub-warning-subtle: rgba(245, 185, 66, 0.12);
+  --hub-error: #f26d6d;
+  --hub-error-subtle: rgba(242, 109, 109, 0.12);
+  --hub-info: #63a4ff;
+
+  /* ---- Workflow canvas semantics ---- */
+  --hub-node-agent: #8b7cf6;
+  --hub-node-validate: #63a4ff;
+  --hub-edge-normal: #8b7cf6;
+  --hub-edge-selected: #eef2f8;
+
+  /* ---- Radius — four tokens only, nothing else ---- */
+  --hub-radius-sm: 6px;   /* small affordances: inline code, checkbox, tight badges */
+  --hub-radius-md: 8px;   /* input / button / menu item */
+  --hub-radius-lg: 12px;  /* pane / card / modal */
+  --hub-radius-full: 999px; /* status + provider chips, pills, dots */
+
+  /* ---- Spacing — 4px grid ---- */
+  --hub-space-1: 4px;
+  --hub-space-2: 8px;
+  --hub-space-3: 12px;
+  --hub-space-4: 16px;
+  --hub-space-6: 24px;
+  --hub-space-8: 32px;
+
+  /* ---- Fixed component sizes ---- */
+  --hub-size-sidebar-item: 40px;
+  --hub-size-context-strip: 32px; /* summary line; the full context lives in a drawer */
+  --hub-size-pane-header: 52px;
+  --hub-size-toolbar: 48px;
+  --hub-size-input: 40px;
+  --hub-size-composer-min: 56px;
+  --hub-card-padding: 16px;
+  --hub-pane-gap: 12px;
+  --hub-size-drawer: 360px;
+
+  /* ---- Typography scale ----
+     Font families are already exposed by index.css's @theme as
+     --font-sans / --font-mono (Tailwind `font-sans` / `font-mono`
+     utilities) — reused here, not redefined. Mono is reserved for model
+     ids, CLI versions, token counts, commands and technical identifiers;
+     never for provider names used as navigation labels. */
+  --hub-display-size: 20px;
+  --hub-display-line: 28px;
+  --hub-display-weight: 600;
+
+  --hub-title-size: 16px;
+  --hub-title-line: 24px;
+  --hub-title-weight: 600;
+
+  --hub-section-size: 12px;
+  --hub-section-line: 16px;
+  --hub-section-weight: 600;
+  --hub-section-tracking: 0.08em;
+
+  --hub-body-size: 14px;
+  --hub-body-line: 20px;
+  --hub-body-weight: 400;
+
+  --hub-label-size: 13px;
+  --hub-label-line: 18px;
+  --hub-label-weight: 500;
+
+  --hub-caption-size: 12px;
+  --hub-caption-line: 16px;
+  --hub-caption-weight: 400;
+}

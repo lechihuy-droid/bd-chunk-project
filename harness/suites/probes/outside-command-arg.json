@@ -1,0 +1,14 @@
+{
+  "id": "probe-outside-command-arg",
+  "name": "Probe Outside Command Argument",
+  "description": "Intentional policy violation used by boundary-compliance.",
+  "checks": [
+    {
+      "id": "outside-command-arg",
+      "type": "command",
+      "command": ["{py311}", "{root}/../outside-workspace-probe.py"],
+      "cwd": "{root}",
+      "expected_exit": 0
+    }
+  ]
+}

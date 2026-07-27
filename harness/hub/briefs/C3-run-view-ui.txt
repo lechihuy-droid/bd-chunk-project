@@ -1,0 +1,223 @@
+STEP C3 — Workflow run view UI (Hub v2 Phase C, size M). Depends on C2b
+(services/workflow_exec.py + its two routes) already landed. Spec:
+harness/hub/BD-hub-v2-phaseC.md Step C3. Read it first.
+
+Study: harness/hub/briefs/C2b-workflow-executor.txt (read in full — it is the
+CONTRACT reference for every route/event name below; C3 must match it exactly,
+not the BD prose, wherever the two disagree). harness/hub/services/
+workflow_exec.py (the REAL landed file, not just the brief — confirm the
+brief's design survived code review; in particular re-read
+`create_workflow_run_stream`, `resume_workflow_run_stream`, and the exact
+metadata keys `run_workflow` persists: `node_index`, `completed_nodes`,
+`node_outputs`, `run_started_at`, `agent_calls`, `agent_elapsed_seconds` — you
+will render progress from these). harness/hub/services/workflow.py
+(`list_workflows` — returns full parsed workflow dicts {id, nodes, edges,
+stop}, not a slim summary; `nodes` is the ordered node list with {id, agent,
+prompt, gate}). harness/hub/services/runtime_events.py (`to_sse` — event
+frames are `event: <type>\ndata: <json>\n\n`, one JSON object per frame,
+identical wire format to the existing chat SSE). harness/hub/web/app.js:
+- `streamChatResponse` + `handleChatSseBlock` (~line 2295-2382) — THE pattern
+  to copy for a fetch+reader SSE consumer (`response.body.getReader()`,
+  buffer split on `/\r?\n\r?\n/`, `parseSseBlock` for `event:`/`data:` lines).
+  Chat uses `fetch` (not `EventSource`) specifically because the request is a
+  POST with a JSON body — workflow runs are POST too, so reuse fetch+reader,
+  NOT `EventSource` (job streaming's `EventSource` pattern at `streamJob`
+  works only because that endpoint is a GET).
+- `renderBudget(data)` / `updateBudgetView(data)` (~line 588-616) — the budget
+  bar component; shape is `{steps_total, steps_done, step_cap, kind: "steps"|
+  "time", warn, tokens_used, token_cap}` — pass `tokens_used`/`token_cap` as
+  `null` to hide the token segment (there is no single token cap for a
+  workflow run, only per-agent `budget.seconds`/`budget.max_calls`).
+- `renderJobs`/`renderJob` (~line 1390-1443) and `renderRuns`/`renderRun`
+  (~line 1347-1389) — the list-page + detail-page pair to mirror structurally
+  (setActiveNav, setLoading, app.innerHTML template, wire-up function called
+  after render, back-link to the list page).
+- `route()` (~line 3488-3550) — hash router; add your two new branches here
+  in the same if/else-if chain style (`parts[0] === "workflows"` variants).
+harness/hub/web/workspace.js — READ ONLY, to confirm you are not touching it
+(a different area of the app; C3's scope is app.js/styles-hub.css/index.html
+only). harness/hub/web/index.html (nav structure — CONTROL section currently
+has Jobs/Governance/Violations). harness/hub/web/DESIGN.md (HUD chrome design
+contract — dark sidebar/topbar, light content pages, `--hud-*` tokens,
+monospace for numeric metrics, `.badge`/`.link-button`/`.card` conventions —
+follow it, do not invent a new visual language for this page).
+
+CONTRACT NOTES (resolve these against the ACTUAL workflow_exec.py before
+coding, since C2b lands first — do not guess):
+- Routes (per C2b brief): `POST /api/workflows/{workflow_id}/runs` body
+  `{"objective": str}`, response is an SSE stream (`text/event-stream`), NOT a
+  JSON body — do not `await response.json()` on it, start the fetch+reader
+  loop immediately and navigate to the run view as soon as the first event
+  (or the initial `state_snapshot`) gives you the `run_id`. If no event
+  reliably carries `run_id` before you need to navigate, read it from
+  `GET /api/agent/runs` (poll or diff) or from the `state_snapshot` event's
+  `state.run_id` field — check `runtime_state.create_run`'s return shape in
+  services/runtime_state.py if unsure what the run dict contains.
+- On 404 (unknown workflow_id) or 400 (`{"errors": [...]}` validation
+  failure) from the runs POST: show the error inline on the #/workflows list
+  page (toast/inline text near the Run button), do not navigate.
+- Resume route: `POST /api/workflows/runs/{run_id}/interrupts/{interrupt_id}/
+  resume` — DISTINCT path from the existing pipeline's
+  `/api/agent/runs/{run_id}/interrupts/{interrupt_id}/resume` (do not call the
+  pipeline route for workflow runs — see C2b brief's "ROUTE CONTRACT GAP").
+  Body shape: mirror `runtime_pipeline.resume_run_stream`'s convention —
+  `{"action": "resume"|"reject", "payload": {...edited fields...}}` — but
+  VERIFY this against the landed `resume_workflow_run_stream(run_id,
+  interrupt_id, payload)` signature/body in workflow_exec.py before wiring it
+  up; if it destructures differently, follow the code, not this note.
+- KNOWN GAP — Reject is not a hard stop: `runtime_interrupts.resolve_interrupt`
+  records whatever `action` string you send (default "resume") but neither
+  `runtime_pipeline.resume_run_stream` nor (per the C2b brief's design)
+  `resume_workflow_run_stream` branches on it — both simply mark the
+  interrupt resolved and re-enter the SAME node, which then proceeds to call
+  the provider regardless of action value. This means clicking "Reject" as
+  specified cannot currently skip/abort the gated node — it can only be
+  recorded for audit. Implement it honestly: send `action: "reject"` when the
+  user clicks Reject (so it's in the interrupt/event log), but do NOT word
+  the button or any status text as "node skipped" or "run stopped" — the run
+  will still execute that node's provider call. If you want to soften this,
+  you may show a confirm dialog on Reject ("this will still run the node —
+  continue?") before calling resume. Do not attempt to add real
+  reject-aborts-node logic yourself — that would require a workflow_exec.py
+  change, out of C3's scope whitelist.
+- Interrupt event payload shape (per C2b brief step 1.b): `{"node": <id>,
+  "prompt": <rendered prompt text>, "objective": <str>}` inside the
+  `interrupt` event's `payload` field (top-level event fields also include
+  `interrupt_id`, `reason`, `node`). Show `payload.prompt` in the gate panel
+  so the user can see exactly what will be sent to the provider before
+  approving — this is the HITL review surface, do not just show a bare
+  "approve?" with no content.
+- Event types you will see on the run stream (all via `to_sse`, `event: <type>
+  \ndata: {...}`): `assistant_delta` ({node, text} plus message_id — append
+  `text` to that node's streaming output area), `node_update` ({node, goto} —
+  `goto: null` means that was the last node), `state_snapshot` ({state} — the
+  full run state dict, use it to redraw the node timeline/badges and the
+  budget bar after every event since it's the cheapest source of truth),
+  `interrupt` ({interrupt_id, reason, node, payload} — show the HITL gate
+  panel, stop appending to the timeline until resolved), `done` ({state} or
+  final usage — run finished, stop the stream reader), `error` ({message} —
+  show inline, stop the stream reader). Treat unknown event types as no-ops
+  (forward-compatible), do not throw.
+- Read/backfill endpoints (reuse as-is, no new backend routes): `GET
+  /api/agent/runs/{run_id}` (generic run state reader — works for workflow
+  runs too since C2b uses the same `runtime_state`/`runtime_events` storage)
+  and `GET /api/agent/runs/{run_id}/events` (full event history — use this to
+  reconstruct the run view if the user navigates directly to
+  `#/workflows/runs/{run_id}` via URL/refresh instead of arriving from a live
+  stream: replay the events list once through the same event-handling
+  function you use for live SSE, then only open a live stream if the run's
+  `status` is still "running").
+
+TASK (web/app.js, web/styles-hub.css append-only, web/index.html nav only —
+see PARALLEL-WORK note at the end before touching app.js):
+1. `#/workflows` list page (`renderWorkflows()`):
+   - `GET /api/workflows` → table/cards: workflow id, node count
+     (`workflow.nodes.length`), a "Run" button per row.
+   - Run button → `window.prompt("Objective for this workflow:")` (or an
+     inline input, your call, but keep it a single required text field) →
+     `POST /api/workflows/{id}/runs` with `{"objective": ...}` → start
+     consuming the SSE response body immediately (fetch+reader, per the
+     contract notes above) → as soon as you have a `run_id`, set
+     `location.hash = "#/workflows/runs/{run_id}"` and hand the in-flight
+     reader/state off to the run-view render function (module-level state
+     var, same pattern as `chatAbortController`/`jobEventSource` — add e.g.
+     `let workflowRunReader = null;` and a `clearWorkflowRunStream()` cleanup
+     called from `route()` alongside the existing `clearChatStream()`/
+     `clearJobStream()` calls).
+2. `#/workflows/runs/{run_id}` detail page (`renderWorkflowRun(runId)`):
+   - Node timeline: one badge per node from the workflow's `nodes` list (you
+     need the workflow definition too — either stash it in memory when the
+     user clicks Run, or if the user navigated directly to the run URL,
+     fetch `GET /api/agent/runs/{run_id}` first and read `workflow_id` back
+     out of its `metadata`, then `GET /api/workflows` and find it by id).
+     Badge states derived from `state_snapshot.state.metadata`:
+     `completed_nodes` → done, `node_index`'s current target → running
+     (or interrupted, if there's a pending unresolved interrupt for it),
+     everything after → pending. Reuse `statusBadge`-style badge markup but
+     you'll need your own small status→class mapping (done/running/
+     interrupted/pending), it doesn't match the existing pass/fail/running
+     vocabulary exactly — add a local helper, do not repurpose
+     `statusBadge` incorrectly.
+   - Streaming output area: one region per node (or a single scrolling
+     region with node-id headers inline — your call), appending
+     `assistant_delta.text` as it arrives, same auto-scroll-if-near-bottom
+     feel as the chat pane (`userNearBottom` concept) or the simpler
+     always-scroll-to-bottom used by `appendStreamLine`/`appendJobStreamLine`
+     — the simpler one is fine here, this page doesn't need the chat
+     pane's full scroll-lock complexity.
+   - HITL gate panel: appears when an `interrupt` event arrives for the
+     current node. Show `payload.node`, `payload.objective`, and
+     `payload.prompt` (this is what the provider is about to receive).
+     Approve button → POST resume with `{"action": "resume", "payload": {}}`
+     (or whatever edited payload the optional textarea contains — parse it
+     as the resume `payload` if the textarea is non-empty and valid JSON,
+     show an inline error and do not submit if it's invalid JSON). Reject
+     button → per the KNOWN GAP note above: confirm, then POST resume with
+     `{"action": "reject", "payload": {}}`. Both buttons resume the SSE
+     consumption loop against the resume route's streamed response exactly
+     like the initial run stream (same event handler function — factor it
+     out so both the create-run stream and the resume stream feed the same
+     `handleWorkflowRunSseBlock`-style function, do not duplicate the
+     event-type switch).
+   - Budget bar: reuse `renderBudget`/`updateBudgetView` twice — one "steps"
+     bar (`steps_done: completed_nodes.length, step_cap: workflow.stop.
+     max_nodes`), one "time" bar (`steps_done: <elapsed seconds since
+     run_started_at>, step_cap: workflow.stop.max_seconds`) — compute elapsed
+     client-side from the ISO timestamp in `state.metadata.run_started_at`,
+     refresh it on every `state_snapshot` event (not on a client-side
+     timer — no polling loop, this page is push-driven by SSE).
+   - Artifact/claims list: if any `artifact` events arrive (same shape as
+     runtime_pipeline's `_artifact_events`: `{artifact: {...}}`), render them
+     as a simple list (reuse `renderTextList` or a small bespoke list, your
+     call) — do not build a full artifact viewer, this is C4/canvas territory
+     if it grows further; keep it to "here's what got produced, links if the
+     artifact has a `path`".
+3. Nav: add `<a href="#/workflows" data-route="/workflows">Workflows</a>`
+   inside the existing CONTROL section in index.html (after Jobs, before
+   Governance — or after Violations, either order is fine, just keep it in
+   CONTROL, not a new section).
+4. `route()`: add two branches — `parts[0] === "workflows" && parts[1] ===
+   "runs" && parts[2]` → `renderWorkflowRun(parts[2])`; `parts[0] ===
+   "workflows"` → `renderWorkflows()`. Add `clearWorkflowRunStream()` to the
+   cleanup block at the top of `route()` alongside `clearChatStream()`/
+   `clearJobStream()`.
+5. web/DESIGN.md: add a short section documenting the run-view page (node
+   timeline badge states, gate panel, budget bar reuse) so the next agent
+   editing this page doesn't reinvent conventions — follow the file's
+   existing section style (see "## N. ..." headers), do not restructure the
+   rest of the file.
+
+PARALLEL-WORK NOTE (read before touching app.js): Cx-extras.txt is running
+IN PARALLEL against the same app.js file, editing ONLY the `#/settings`
+render path (`renderSettings`, `providerCapabilities`, and the settings-page
+DOM wiring near line 3450-3486). To avoid a merge collision:
+- Keep every function you add or touch physically clustered in a NEW block
+  (e.g. right after the Jobs section, or at the end of the file before
+  `route()`) — do not scatter workflow-page edits between existing unrelated
+  functions.
+- Do NOT touch `renderSettings`, `providerCapabilities`, `providerHint`, or
+  anything under the "settings" heading — that is Cx-extras' exclusive
+  territory in this file.
+- You DO own `route()` (add your two branches) and the top-of-file
+  module-level state/cleanup vars — Cx-extras does not touch `route()` or
+  add new streams, so no collision there, but keep your route() edit as a
+  minimal, clearly-diffable insertion (two new `else if` branches + one
+  cleanup call), not a reformat of the whole function.
+
+VERIFY: `node --check harness/hub/web/app.js` must pass (syntax gate only —
+no automated backend test touches this brief's scope). Manual smoke check is
+NOT required from you; Claude main will browser-verify per the BD's DoD
+("chạy workflow mẫu, gate hiện panel, approve → chạy tiếp, artifact xem
+được") after both C3 and Cx-extras land.
+Scope whitelist: harness/hub/web/app.js, harness/hub/web/styles-hub.css
+(append only — do not edit/reorder existing rules), harness/hub/web/
+index.html (nav line only), harness/hub/web/DESIGN.md (append a section).
+Do NOT touch: any file under harness/hub/services/, harness/hub/server.py,
+harness/hub/web/workspace.js, harness/hub/web/styles-workspace.css, any
+tests/ file. Do NOT commit.
+FINAL MESSAGE: files changed, `node --check` result, the exact hash routes
+you wired (`#/workflows`, `#/workflows/runs/{run_id}`), the exact request/
+response shape you ended up using for the resume call (in case it differed
+from this brief's assumption), and explicit confirmation you did not modify
+`renderSettings`/`providerCapabilities`/`route()`'s existing branches (only
+additions).

@@ -1,0 +1,73 @@
+STEP E5-fix-1 — 6 lỗi (3 HIGH). FRONTEND ONLY. Model: gpt-5.6-luna.
+File: web-v3/src/lib/artifact.ts, web-v3/src/pages/ChatPage.tsx, web-v3/src/index.css.
+Zero Python. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+──────────────────────────────────────────────────────────────────────
+1. HIGH — TOÀN BỘ TÍNH NĂNG CHẾT SAU MỖI LẦN RELOAD TRANG.
+   ĐÃ XÁC NHẬN TRÊN TRÌNH DUYỆT THẬT, hai lượt đối chứng:
+     - message có `streaming: false` -> thu gọn đúng: "937 ký tự · 4 mục · 1 khối code · Mở"
+     - cùng message đó, sau khi app tự ghi lại localStorage -> khoá còn ["role","content"], reload -> hiện
+       nguyên văn markdown, KHÔNG có thẻ tóm tắt, KHÔNG có nút "Mở".
+   Nguyên nhân, lib/artifact.ts:15:
+       if (message.role !== 'assistant' || message.streaming !== false) return false
+   Effect ghi localStorage ở ChatPage.tsx:19 XOÁ HẲN khoá `streaming`:
+       p.messages.map(({ streaming, ...m }) => m)
+   -> sau reload `streaming === undefined`, mà `undefined !== false` là true -> luôn bail out.
+   Đây là vòng tự huỷ: đúng một lần lúc vừa stream xong, rồi lần ghi kế tiếp xoá cờ, reload là hỏng.
+   Và reload chính là lúc người ta quay lại đọc tài liệu dài.
+   SỬA: điều kiện phải là "KHÔNG đang stream", tức `message.streaming !== true` (thiếu khoá = không stream).
+   KHÔNG dùng `=== false`. Kiểm chứng: reload lại trang, thẻ tóm tắt vẫn còn.
+
+2. HIGH — tham chiếu artifact treo sau khi bấm "Xoá", panel TỰ MỞ LẠI với message khác.
+   ChatPage.tsx:18 giữ `{paneId, index}`. `onClose` của pane có reset (`setArtifact(null)`) — đúng rồi,
+   giữ nguyên. Nhưng `onClear` (`update(p.id, { messages: [] })`) KHÔNG reset.
+   Kịch bản hỏng: mở panel ở message index 1 -> bấm "Xoá" pane đó (panel biến mất, nhưng state vẫn còn,
+   và không còn nút nào để tắt) -> chat tiếp trong pane đó -> mảng messages dài lại quá index 1 ->
+   `selectedPane.messages[1]` lại truthy -> **panel tự bật lên**, hiện message vừa tới.
+   Nặng hơn: `ArtifactPanel` không kiểm `message.role` cũng không chạy lại `isArtifact`, nên nó có thể
+   hiện nguyên một message của NGƯỜI DÙNG, kèm tiêu đề và mục lục bịa ra từ nội dung đó.
+   SỬA: (a) `onClear` phải reset artifact nếu đang trỏ vào pane đó; (b) phòng thủ thêm ở chỗ render:
+   chỉ hiện panel khi message tồn tại VÀ `isArtifact(message)` vẫn đúng. Hai lớp, không chọn một.
+
+3. HIGH — mục lục đếm heading bằng regex KHÔNG BIẾT code fence, còn bộ render thì BIẾT -> lệch chỉ số.
+   lib/artifact.ts:10-11 quét thẳng `^#{1,3}\s+` trên chuỗi thô. lib/markdown.tsx:18-23 khi gặp ``` thì
+   NUỐT mọi dòng sau đó làm code, kể cả dòng bắt đầu bằng `#`, tới khi gặp ``` đóng.
+   -> khối code chứa comment kiểu `# setup` (bash/python/yaml — cực kỳ thường gặp) bị tính là heading,
+   nhưng KHÔNG sinh ra thẻ h1/h2/h3 nào.
+   ChatPage.tsx:64 cuộn bằng `querySelectorAll('h1,h2,h3')[index]` -> lệch một nấc:
+   bấm mục thật thì cuộn nhầm chỗ, hoặc `node?.scrollIntoView` im lặng không làm gì.
+   Kéo theo: `titlePattern` có thể lấy comment trong code làm TIÊU ĐỀ artifact, và `items` bị thổi phồng —
+   mà `items >= 2` lại là một trong ba điều kiện nhận diện artifact.
+   SỬA: bỏ vùng code fence RA KHỎI nội dung trước khi dò heading, theo ĐÚNG luật của markdown.tsx
+   (gặp ``` mở thì bỏ tới ``` đóng; KHÔNG có ``` đóng thì bỏ tới hết chuỗi).
+   Dùng chung một hàm cho `artifactHeadings`, `titlePattern` và phần đếm `items` — đừng lặp lại luật ở ba chỗ.
+   Sau khi sửa, số phần tử mục lục PHẢI bằng số thẻ h1/h2/h3 mà Markdown render ra. Viết một hàm thuần
+   để chỗ khác kiểm chứng được.
+
+4. MED — code fence chưa đóng thì không nhận ra là có code.
+   lib/artifact.ts:12: `codePattern = /```[\s\S]*?```/g` đòi phải có fence đóng.
+   Bấm "Dừng" giữa lúc đang in khối code -> nội dung cụt, fence không bao giờ đóng -> `hasCode` false ->
+   nếu text lại ngắn hơn 1200 và dưới 2 heading thì KHÔNG thành artifact, dù nhìn rõ ràng là có code.
+   SỬA: đếm fence MỞ (dòng bắt đầu bằng ```), không đòi phải có cặp. Nhất quán với luật ở mục 3.
+
+5. MED — `ArtifactPanel` không có key, trạng thái mục lục rò từ artifact này sang artifact khác.
+   ChatPage.tsx:48 mount một instance duy nhất. `tocOpen` (useState) sống sót khi đổi sang message khác:
+   mở mục lục ở A, rồi mở B -> B hiện ra với mục lục đang bung sẵn.
+   SỬA: thêm `key={`${artifact.paneId}-${artifact.index}`}` để React dựng lại panel cho mỗi artifact.
+
+6. LOW — index.css: trong media query `<1024px`, selector `.chat-layout, .chat-layout.has-artifact`
+   có vế thứ hai thừa (đã bị vế đầu bao hết). Bỏ đi.
+   Và `.chat-layout > .chat-grid { overflow: visible }` đang đè lên utility `overflow-hidden` của Tailwind
+   bằng độ ưu tiên selector. Nếu cố ý thì giữ, nhưng thêm một dòng ghi rõ vì sao, đừng để nó âm thầm vô hiệu
+   hoá một class đang được ghi trên JSX.
+
+──────────────────────────────────────────────────────────────────────
+KHÔNG ĐỤNG (review xác nhận sạch): `send()`, parseSse, `patchMessage`, broadcast "Gửi tất cả",
+giới hạn 4 pane, abort từng pane, lược đồ localStorage `hub-v3-chat`, đường đóng pane (× đã reset đúng),
+và việc thu gọn KHÔNG xảy ra giữa lúc stream (đã đúng).
+KHÔNG sửa chuyện 3 pane tràn quá chiều cao màn hình — đã đo, đó là hành vi có sẵn từ trước
+(đáy pane 948px khi panel đóng, 996px khi mở, viewport 720), không phải do E5 gây ra.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = hunk từng mục 1-6, kết quả tsc, và nói rõ mục 3 nay dùng chung hàm nào để tách code fence.

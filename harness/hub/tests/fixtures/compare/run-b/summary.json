@@ -1,0 +1,25 @@
+{
+  "run_id": "run-b",
+  "suite": "suite-x",
+  "suite_name": "Suite X",
+  "started_at": "2026-06-27T10:01:00+00:00",
+  "finished_at": "2026-06-27T10:01:01+00:00",
+  "status": "fail",
+  "passed": 1,
+  "failed": 1,
+  "total": 2,
+  "results": [
+    {
+      "id": "check-one",
+      "type": "path_exists",
+      "status": "fail",
+      "message": "missing"
+    },
+    {
+      "id": "check-three",
+      "type": "command",
+      "status": "pass",
+      "message": "new"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Dùng khi: Tạo bản nháp nghiên cứu rồi tinh chỉnh sau kiểm tra chất lượng.
+# Luồng: draft -> check_draft -> refine
+id: research-draft-review
+nodes:
+  - id: draft
+    agent: drafter
+    prompt: "Draft a concise research brief for {{objective}}. State the key findings, supporting reasoning, and uncertainties in useful plain prose."
+    gate: none
+  - id: check_draft
+    type: validate
+    target: draft
+    checks: [{kind: min_length, value: 200}, {kind: must_not_include, values: ["TODO", "PLACEHOLDER"]}]
+    on_fail: interrupt
+  - id: refine
+    agent: thinker
+    prompt: "Refine the draft for {{objective}}. Preserve its intent, improve weak reasoning, and clearly flag claims that could not be verified. Draft to refine: {{draft_output}}"
+    gate: approval
+edges: [[draft, check_draft], [check_draft, refine]]
+stop: {max_nodes: 10, max_seconds: 1800}

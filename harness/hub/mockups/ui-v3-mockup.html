@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harness Hub v3 — UI Mockup</title>
+<style>
+  :root{
+    --ink:#14161B; --panel:#1B1E25; --panel2:#20242D; --line:#2B303B;
+    --text:#E8EAF0; --dim:#8B92A3; --faint:#5A6172;
+    --claude:#D97757; --codex:#A78BFA; --nvidia:#76B900; --gemini:#5B9CF5;
+    --gate:#E4B15E; --ok:#5FBF77; --err:#E06C75;
+    --sans:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+    --mono:"Cascadia Code","Consolas",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--ink);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5}
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+  .app{display:grid;grid-template-columns:236px 1fr;height:100vh}
+
+  /* ── Sidebar ───────────────────────────── */
+  .side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;gap:2px;overflow-y:auto}
+  .agent-row{display:flex;align-items:center;gap:10px;padding:8px 10px 16px}
+  .agent-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--claude),var(--codex));display:grid;place-items:center;font-weight:700;font-size:15px;color:#14161B}
+  .agent-name{font-weight:650;font-size:14px}
+  .agent-sub{font-size:11px;color:var(--ok);display:flex;align-items:center;gap:5px}
+  .agent-sub::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  .zone{font-size:10px;letter-spacing:.14em;color:var(--faint);padding:14px 10px 5px;font-weight:600}
+  .nav{display:flex;align-items:center;gap:9px;width:100%;padding:7px 10px;border-radius:8px;color:var(--dim);text-align:left}
+  .nav:hover{background:var(--panel2);color:var(--text)}
+  .nav.on{background:var(--panel2);color:var(--text);font-weight:600}
+  .nav .ic{width:16px;text-align:center;opacity:.85}
+  .nav .badge{margin-left:auto;font-size:10px;font-family:var(--mono);background:#2E241A;color:var(--gate);border-radius:20px;padding:1px 7px}
+  .side-foot{margin-top:auto;padding:12px 10px 4px;font-size:11px;color:var(--faint);border-top:1px solid var(--line)}
+
+  /* ── Main column ───────────────────────── */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .crumb{font-size:13px;color:var(--dim)}
+  .crumb b{color:var(--text);font-weight:600}
+  .runstate{font-size:11px;font-family:var(--mono);padding:2px 9px;border-radius:20px;background:#2E241A;color:var(--gate);border:1px solid #4A3A20}
+  .quota{margin-left:auto;display:flex;gap:8px}
+  .chip{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:3px 10px}
+  .dot{width:7px;height:7px;border-radius:50%}
+
+  /* ── Run workspace: spine + rail ───────── */
+  .work{display:grid;grid-template-columns:minmax(430px,1fr) minmax(360px,42%);min-height:0;flex:1}
+  .spine{overflow-y:auto;padding:22px 26px;border-right:1px solid var(--line)}
+  .spine h1{font-size:17px;font-weight:650;margin-bottom:2px}
+  .objective{color:var(--dim);font-size:13px;margin-bottom:22px}
+
+  .node{position:relative;padding:0 0 26px 34px}
+  .node::before{content:"";position:absolute;left:10px;top:22px;bottom:-2px;width:2px;background:var(--line)}
+  .node:last-child::before{display:none}
+  .knot{position:absolute;left:2px;top:3px;width:18px;height:18px;border-radius:50%;border:2px solid var(--faint);background:var(--ink);display:grid;place-items:center;font-size:9px}
+  .node.done .knot{border-color:var(--ok);color:var(--ok)}
+  .node.live .knot{border-color:var(--claude)}
+  .node.live .knot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--claude);animation:pulse 1.4s ease-in-out infinite}
+  .node.queued{opacity:.45}
+  .node.gate .knot{border-radius:3px;transform:rotate(45deg);border-color:var(--gate);color:var(--gate)}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  @media (prefers-reduced-motion: reduce){.node.live .knot::after{animation:none}}
+
+  .node-head{display:flex;align-items:baseline;gap:9px;margin-bottom:6px}
+  .node-title{font-weight:600;font-size:14px}
+  .prov{font-family:var(--mono);font-size:10px;padding:1px 8px;border-radius:20px;border:1px solid}
+  .prov.claude{color:var(--claude);border-color:#4A2E24}
+  .prov.codex{color:var(--codex);border-color:#3A3354}
+  .prov.nvidia{color:var(--nvidia);border-color:#2E4214}
+  .node-meta{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .node-body{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--dim)}
+  .node.live .node-body{border-left:2px solid var(--claude)}
+  .node-body .stream{font-family:var(--mono);font-size:12px;white-space:pre-wrap;color:var(--text)}
+  .caret{display:inline-block;width:7px;height:13px;background:var(--claude);vertical-align:-2px;animation:pulse 1s step-end infinite}
+
+  .gate-card{background:linear-gradient(180deg,#221C12,var(--panel));border:1px solid #4A3A20;border-radius:10px;padding:14px}
+  .gate-card p{font-size:13px;color:var(--dim);margin:4px 0 12px}
+  .gate-card .why{font-family:var(--mono);font-size:11px;color:var(--gate)}
+  .btn{padding:7px 16px;border-radius:8px;font-weight:600;font-size:13px}
+  .btn.ok{background:var(--gate);color:#1A1508}
+  .btn.no{border:1px solid var(--line);color:var(--dim);margin-left:8px}
+  .btn.ok:hover{filter:brightness(1.1)} .btn.no:hover{color:var(--err);border-color:var(--err)}
+  .btn:focus-visible,.nav:focus-visible,.tab:focus-visible{outline:2px solid var(--gemini);outline-offset:2px}
+
+  /* ── Artifact rail ─────────────────────── */
+  .rail{display:flex;flex-direction:column;min-width:0;background:#181B21}
+  .tabs{display:flex;gap:2px;padding:10px 14px 0;border-bottom:1px solid var(--line)}
+  .tab{padding:7px 14px;font-size:12px;color:var(--dim);border-radius:8px 8px 0 0;border:1px solid transparent}
+  .tab.on{color:var(--text);background:var(--panel);border-color:var(--line);border-bottom-color:var(--panel);font-weight:600}
+  .rail-body{overflow-y:auto;padding:18px 20px;font-size:13px}
+  .art-file{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:12px}
+  .art-file b{color:var(--dim);font-weight:500}
+  .md h2{font-size:15px;margin:14px 0 6px;color:var(--text)}
+  .md p{color:var(--dim);margin:6px 0}
+  .md li{color:var(--dim);margin:3px 0 3px 18px}
+  .md code{font-family:var(--mono);font-size:12px;background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--codex)}
+
+  /* ── Chat screen (thu gọn) ─────────────── */
+  .chatwrap{display:none;flex:1;min-height:0;grid-template-columns:1fr 1fr;gap:0}
+  .pane{display:flex;flex-direction:column;border-right:1px solid var(--line);min-width:0}
+  .pane:last-child{border-right:none}
+  .pane-head{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--panel);font-size:12px}
+  .ro{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--faint);border:1px solid var(--line);border-radius:20px;padding:1px 7px}
+  .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .m{max-width:88%;padding:9px 13px;border-radius:10px;font-size:13px}
+  .m.u{align-self:flex-end;background:var(--panel2);border:1px solid var(--line)}
+  .m.a{align-self:flex-start;background:var(--panel);border:1px solid var(--line);color:var(--dim)}
+  .composer{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+  .composer input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;color:var(--text);font:inherit}
+  .composer input:focus{outline:2px solid var(--gemini);outline-offset:0}
+  .send{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:0 14px}
+  body[data-screen="chat"] .work{display:none}
+  body[data-screen="chat"] .chatwrap{display:grid}
+</style>
+</head>
+<body data-screen="run">
+
+<div class="app">
+  <!-- Sidebar: khung OpenClaw — agent-centric, zone rõ -->
+  <aside class="side">
+    <div class="agent-row">
+      <div class="agent-avatar">H</div>
+      <div>
+        <div class="agent-name">Harness Hub</div>
+        <div class="agent-sub">3 provider online</div>
+      </div>
+    </div>
+
+    <div class="zone">TRÒ CHUYỆN</div>
+    <button class="nav" data-go="chat"><span class="ic">◧</span> Chat đa cửa sổ</button>
+    <button class="nav"><span class="ic">↺</span> Phiên đã lưu</button>
+
+    <div class="zone">ĐIỀU PHỐI</div>
+    <button class="nav"><span class="ic">⧉</span> Workflows</button>
+    <button class="nav on" data-go="run"><span class="ic">▶</span> Runs <span class="badge">1 gate</span></button>
+    <button class="nav"><span class="ic">✦</span> Agents</button>
+    <button class="nav"><span class="ic">▤</span> Skills</button>
+
+    <div class="zone">GIÁM SÁT</div>
+    <button class="nav"><span class="ic">◈</span> Chờ duyệt <span class="badge">2</span></button>
+    <button class="nav"><span class="ic">▥</span> Usage &amp; quota</button>
+
+    <div class="zone">HỆ THỐNG</div>
+    <button class="nav"><span class="ic">⚙</span> Cài đặt</button>
+
+    <div class="side-foot">Hub v3 · localhost:8799</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="crumb">Runs / <b>research-draft-review</b> · run-0720-a41c</span>
+      <span class="runstate">ĐANG CHỜ DUYỆT</span>
+      <div class="quota">
+        <span class="chip"><span class="dot" style="background:var(--claude)"></span>claude 42/100</span>
+        <span class="chip"><span class="dot" style="background:var(--codex)"></span>codex 18/50</span>
+        <span class="chip"><span class="dot" style="background:var(--nvidia)"></span>nvidia free</span>
+      </div>
+    </div>
+
+    <!-- Màn hình 1: Run workspace — spine DeerFlow-style + artifact rail -->
+    <div class="work">
+      <div class="spine">
+        <h1>So sánh 3 hướng backup NAS cho ảnh gia đình</h1>
+        <p class="objective">Mục tiêu: NVIDIA draft thô → kiểm tra tự động → Claude tinh chỉnh → chờ duyệt → xuất artifact.</p>
+
+        <div class="node done">
+          <span class="knot">✓</span>
+          <div class="node-head">
+            <span class="node-title">draft — nháp thô</span>
+            <span class="prov nvidia">nvidia · nemotron-3</span>
+            <span class="node-meta">28s · 4.1k token</span>
+          </div>
+          <div class="node-body">Đã sinh nháp 1.800 từ, 3 phương án kèm chi phí. Artifact: <code style="font-family:var(--mono);font-size:11px">draft.md</code></div>
+        </div>
+
+        <div class="node done">
+          <span class="knot">✓</span>
+          <div class="node-head">
+            <span class="node-title">check_draft — kiểm tra tự động</span>
+            <span class="node-meta">0.1s · validate</span>
+          </div>
+          <div class="node-body">4/4 đạt: đủ dài · có "## Kết luận" · có nguồn · không còn TODO.</div>
+        </div>
+
+        <div class="node live">
+          <span class="knot"></span>
+          <div class="node-head">
+            <span class="node-title">refine — tinh chỉnh</span>
+            <span class="prov claude">claude · smart</span>
+            <span class="node-meta">đang chạy · 41s</span>
+          </div>
+          <div class="node-body"><span class="stream">So sánh chi phí 5 năm giữa RAID-1 tự dựng và cloud storage: phương án Synology 2-bay hoà vốn sau ~22 tháng nếu<span class="caret"></span></span></div>
+        </div>
+
+        <div class="node gate">
+          <span class="knot">◆</span>
+          <div class="node-head">
+            <span class="node-title">Cổng duyệt — trước khi xuất</span>
+            <span class="node-meta">chờ bạn quyết định</span>
+          </div>
+          <div class="gate-card">
+            <div class="why">GATE · workflow yêu cầu người duyệt trước khi ghi artifact cuối</div>
+            <p>Đọc bản tinh chỉnh ở khung phải. Duyệt để xuất <span style="font-family:var(--mono);font-size:12px">final.md</span>, hoặc từ chối kèm ghi chú để chạy lại bước refine.</p>
+            <button class="btn ok">Duyệt và xuất</button>
+            <button class="btn no">Từ chối…</button>
+          </div>
+        </div>
+
+        <div class="node queued">
+          <span class="knot">4</span>
+          <div class="node-head"><span class="node-title">export — xuất kết quả</span><span class="node-meta">chờ gate</span></div>
+        </div>
+      </div>
+
+      <!-- Rail phải: OpenClaw workspace rail -->
+      <div class="rail">
+        <div class="tabs">
+          <button class="tab on">Artifact</button>
+          <button class="tab">Trạng thái</button>
+          <button class="tab">Sự kiện</button>
+        </div>
+        <div class="rail-body">
+          <div class="art-file">▤ <b>refine.md</b> · cập nhật 3s trước · node refine</div>
+          <div class="md">
+            <h2>Backup ảnh gia đình: 3 phương án</h2>
+            <p>Đánh giá theo chi phí 5 năm, độ bền dữ liệu và công sức duy trì cho ~800GB ảnh, tăng ~120GB/năm.</p>
+            <h2>1. NAS 2-bay (Synology)</h2>
+            <li>Chi phí đầu: ~¥58.000 kèm 2 ổ 4TB</li>
+            <li>RAID-1, snapshot, truy cập từ điện thoại</li>
+            <li>Hoà vốn so với cloud sau ~22 tháng</li>
+            <h2>2. Cloud thuần (iCloud 2TB)</h2>
+            <li>¥1.500/tháng — rẻ lúc đầu, đắt về dài</li>
+            <p>… <code>3. Hybrid</code> đang được viết tiếp bởi node refine.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Màn hình 2: Chat đa cửa sổ (giữ tính năng v2, da mới) -->
+    <div class="chatwrap">
+      <div class="pane">
+        <div class="pane-head"><span class="dot" style="background:var(--claude)"></span> claude · sess-b21 <span class="ro">READ-ONLY</span></div>
+        <div class="msgs">
+          <div class="m u">Tóm tắt khác biệt NISA与特定口座 khi bán lỗ?</div>
+          <div class="m a">NISA không được bù trừ lỗ với lãi ở tài khoản khác — đây là điểm bất lợi chính khi bán lỗ trong NISA…</div>
+        </div>
+        <div class="composer"><input placeholder="Nhắn claude…"><button class="send">↑</button></div>
+      </div>
+      <div class="pane">
+        <div class="pane-head"><span class="dot" style="background:var(--nvidia)"></span> nvidia · nemotron-3 <span class="ro">FREE</span></div>
+        <div class="msgs">
+          <div class="m u">Tóm tắt khác biệt NISA与特定口座 khi bán lỗ?</div>
+          <div class="m a">Điểm chính: 特定口座 cho phép 損益通算 và khấu trừ 3 năm, NISA thì không…</div>
+        </div>
+        <div class="composer"><input placeholder="Nhắn nvidia…"><button class="send">↑</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll("[data-go]").forEach(b=>{
+    b.addEventListener("click",()=>{
+      document.body.dataset.screen=b.dataset.go;
+      document.querySelectorAll(".nav").forEach(n=>n.classList.remove("on"));
+      b.classList.add("on");
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+STEP U1 — UI v3: Chat đa cửa sổ + Phiên đã lưu (SD-ui-v3-rebuild.md §5 Phase U1)
+
+READ FIRST:
+1. harness/hub/SD-ui-v3-rebuild.md §3 tokens, §4 page map
+2. harness/hub/mockups/ui-v3-mockup.html — chat screen reference (2 panes side by side,
+   pane head with provider dot + session id + READ-ONLY/FREE badge, bubbles, composer)
+3. harness/hub/server.py lines 144-196 — the ONLY chat API you use:
+   GET /api/chat/models -> {models, default, catalog}   (NVIDIA catalog)
+   GET /api/providers   -> [{id, available, version, detail, capabilities}]
+   POST /api/chat {provider, messages:[{role,content}], model?, session_id?}
+     -> SSE stream, events: reasoning|delta|done|error
+     done payload: {usage, model, session_id}  (session_id = CLI resume handle)
+   CSRF middleware: every POST MUST send header X-Hub-Client: harness-hub
+   (same-origin; see _CSRF_SAFE_METHODS in server.py).
+4. harness/hub/web-v3/src/* — existing shell, tokens, router (U0, committed).
+
+GOAL: implement pages /chat and /sessions in web-v3 (React). NO backend change at all
+(server.py, services/, tests/ except NOTHING — zero Python edits this step).
+
+SCOPE — /chat (Chat đa cửa sổ):
+1. Pane model: array of panes in React state, persisted to localStorage key
+   "hub-v3-chat" (panes: id, provider, model, title, messages[], cliSessionId).
+   Buttons: "+ Cửa sổ" (add pane, pick provider from GET /api/providers — show
+   unavailable providers disabled with detail tooltip), "×" close pane.
+   Layout: CSS grid, 1 pane = full, 2 = 1x2, 3-4 = 2x2. Max 4 panes.
+2. Pane head: provider color dot (token colors --claude/--codex/--nvidia/--gemini),
+   provider id + model short name, cliSessionId tail (last 8 chars) when present,
+   badge: "READ-ONLY" for claude/codex/gemini, "FREE" for nvidia (mono 10px pill).
+3. NVIDIA panes: model selector <select> from /api/chat/models catalog (group by
+   category, default from payload.default). claude/codex panes: model field free-text
+   optional (placeholder "mặc định").
+4. Send flow: POST /api/chat via fetch + ReadableStream SSE parse (write a small
+   src/lib/sse.ts parser: split on double newline, "event:"/"data:" lines, JSON data).
+   Stream: reasoning text -> collapsible dim "thinking" block (hidden by default,
+   toggle per message); delta -> append to live plain-text bubble; done -> finalize
+   message, store session_id into pane.cliSessionId (next send passes it back =
+   multi-turn CLI resume), record usage line under message (mono 10px: model ·
+   tokens if present); error -> red inline system bubble with message.
+   Stop button while streaming (AbortController.abort()).
+5. Multi-turn payload rule: for nvidia send FULL messages history each time;
+   for claude/codex when cliSessionId exists send ONLY the new user message
+   (CLI resumes context) — else full history. Comment this rule in code.
+6. Markdown render ON DONE ONLY (streaming shows plain text): write
+   src/lib/markdown.tsx that builds React elements directly (NO raw HTML, NO
+   dangerouslySetInnerHTML, no new deps): support #/##/### headings, **bold**,
+   *italic*, `inline code`, ``` fenced code blocks (mono, panel bg, Copy button),
+   -/* lists, [text](http/https links only, target_blank rel noopener), paragraphs.
+   Everything else = plain text. Escape-first mindset: unknown syntax renders literally.
+7. Broadcast: checkbox "Gửi tất cả" next to a shared composer at top; when on,
+   the shared composer sends the same prompt to every pane in parallel (each pane
+   keeps its own per-pane composer too).
+8. Per-pane actions: "Xuất .md" (download transcript as markdown file via blob),
+   "Xoá" (clear messages, keep provider), copy button per message.
+
+SCOPE — /sessions (Phiên đã lưu):
+1. GET /api/sessions -> table (reuse a simple shared Table component you create):
+   columns: session/id, agent/source, time, size/steps (adapt to actual JSON shape —
+   inspect response shape by reading harness/hub/services/replay.py list function
+   BEFORE coding; do not guess fields).
+2. Row click -> detail panel (right side or below): GET /api/sessions/{id}/replay,
+   render steps list (role/tool/text per step, mono, collapsible long text).
+   Read-only. No delete/edit.
+3. Empty/error states: dim text "Chưa có phiên nào" / error line with retry button.
+
+SHARED:
+- All fetches through one src/lib/api.ts helper: baseURL same-origin, adds
+  X-Hub-Client header on non-GET, throws typed error with status.
+- Vietnamese UI labels, sentence case, match mockup tone. Active-voice button labels.
+- Keep U0 file structure: pages/ChatPage.tsx, pages/SessionsPage.tsx, components/,
+  lib/. Update pages/index.tsx routing only for these two routes (placeholders for
+  the rest stay).
+- Styling: Tailwind utilities + tokens from U0. No new npm deps AT ALL.
+- Do NOT run pnpm build (architect builds). Do NOT commit. Do NOT touch any Python.
+
+VERIFY YOURSELF (no build): tsc must pass: cd harness/hub/web-v3 && pnpm exec tsc -b.
+DONE = summary: files created/changed, tsc result, list of UI behaviors implemented.

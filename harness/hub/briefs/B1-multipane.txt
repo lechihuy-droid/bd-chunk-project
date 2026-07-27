@@ -1,0 +1,31 @@
+STEP B1 — Chat multi-pane grid (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md (Step B1) + SD-hub-v2-command-center.md §6. Read both first.
+Study current code: harness/hub/web/app.js (chatState + all chat* functions),
+web/styles-hub.css (chat + cockpit sections), web/index.html.
+
+TASK — edit ONLY harness/hub/web/app.js, web/styles-hub.css (append), web/DESIGN.md (document new pattern):
+1. Refactor single global chatState into chatPanes: array of pane objects.
+   Pane = current chatState shape + {id, provider, sessionId}. Max 3 panes.
+   Every chat function becomes per-pane (send/stream/render/persistence/export/
+   abort). Per-pane AbortController. DOM ids suffixed with pane id.
+2. localStorage: new key "harness-hub-chat-v2" storing {panes:[...]}.
+   Migration: if old key "harness-hub-chat" exists -> becomes panes[0]
+   (keep provider/sessionId fields already stored there), then remove old key.
+3. Layout: panes grid `repeat(auto-fit, minmax(360px, 1fr))`; "+ Pane" button
+   (disabled at 3), close button per pane (min 1 pane). Mobile (<720px): 1 column.
+4. Per-pane toolbar: provider select (existing renderChatProviderSelect,
+   parameterize per pane), model picker only for nvidia pane (existing
+   component, parameterize), read-only badge for CLI providers, New chat,
+   Export MD/JSON, Copy transcript — all existing v1 features preserved per pane.
+5. POST /api/chat per pane: {provider, messages, model? (nvidia only),
+   session_id?} with header X-Hub-Client: harness-hub (HUB_CLIENT_HEADERS
+   const exists). done event may carry session_id -> store on that pane.
+6. Do NOT change backend, do NOT change SSE contract, do NOT touch styles.css.
+
+VERIFY: node --check harness/hub/web/app.js && node --check harness/hub/web/charts.js
+Then start server (NVIDIA_API_KEY=dummy .ih\Scripts\python.exe harness\hub\server.py,
+background), curl -s -H "X-Hub-Client: harness-hub" http://127.0.0.1:8799/ returns 200,
+kill server. No browser available — Claude verifies visually after.
+Do NOT commit.
+FINAL MESSAGE: files changed, node --check results, summary of pane state design,
+any behavior intentionally changed from v1.

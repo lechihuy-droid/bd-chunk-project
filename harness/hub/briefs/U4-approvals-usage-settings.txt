@@ -1,0 +1,78 @@
+STEP U4 — GIÁM SÁT + HỆ THỐNG zones: Chờ duyệt · Usage & quota · Cài đặt (SD-ui-v3-rebuild.md §4, §5 U4).
+FRONTEND ONLY (web-v3 React). Model: gpt-5.6-luna. NO backend change (zero Python). Do NOT touch web/ (legacy).
+Do NOT remove /legacy or change server.py — the cutover is a SEPARATE step gated on user OK, NOT part of U4.
+Do NOT run pnpm build (architect builds). Do NOT commit.
+
+READ FIRST:
+1. SD-ui-v3-rebuild.md §4 — Chờ duyệt = MỘT chỗ cho mọi thứ cần quyết (git-job + HITL gate);
+   Usage & quota = quota chip per provider + rollup, suites/inspect thu thành section phụ;
+   Cài đặt = provider health, model catalog, config.
+2. web-v3/src/lib/{api.ts, markdown.tsx, Table.tsx} + existing pages for style/tokens. REUSE.
+3. Backend service shapes — INSPECT before coding, do not guess:
+   - services/gitjobs.py: list_jobs() row shape + the status field values (which statuses need approve vs
+     accept vs are done); diff(), approve/accept/reject/rollback semantics.
+   - services/usage.py: cockpit_stats() and rollup(events) shapes.
+   - services/providers (list_providers): each = {id, available, version?, detail?, capabilities?}.
+
+BACKEND API (all EXISTS — use exactly, change none):
+  Approvals:
+   GET  /api/jobs                    -> [job] (git-jobs; inspect status field)
+   GET  /api/jobs/{id}               -> job (+ inline diff when present)
+   GET  /api/jobs/{id}/diff          -> text/plain unified diff
+   POST /api/jobs/{id}/approve       -> run the job (agent produces a diff)
+   POST /api/jobs/{id}/accept        -> apply the diff
+   POST /api/jobs/{id}/reject        -> discard
+   POST /api/jobs/{id}/rollback      -> undo an applied job
+   GET  /api/jobs/{id}/stream        -> SSE progress (event/data; reuse lib/sse.ts if you show live progress)
+   GET  /api/agent/runs              -> for HITL gates: runs with status 'interrupted' + pending interrupts.
+  Usage:
+   GET  /api/usage/cockpit           -> cockpit stats + providers_online
+   GET  /api/usage/rollup            -> rollup by source/model
+   GET  /api/tools                   -> tool usage rollup (secondary)
+   GET  /api/suites                  -> suites list (secondary)
+   GET  /api/inspect/logs            -> inspect eval logs (secondary)
+  Settings:
+   GET  /api/providers               -> provider health rows
+   GET  /api/chat/models             -> {models, default, catalog} (NVIDIA catalog)
+   GET  /api/health                  -> {ok, root, runs_dir, port}
+
+SCOPE — three pages under web-v3/src/pages, wired into pages/index.tsx (replace the U4 placeholders):
+
+1. ApprovalsPage.tsx (/approvals) — one place for everything awaiting a decision:
+   a. Section "Git-job" — list from GET /api/jobs (Table): id · agent · status · created. Row select -> detail:
+      show the unified diff (GET /api/jobs/{id}/diff) in a mono <pre> (overflow-x auto), and the action buttons
+      VALID FOR THAT STATUS (inspect gitjobs status machine — e.g. pending->Duyệt(approve); ready/awaiting->
+      Chấp nhận(accept)/Từ chối(reject); applied->Hoàn tác(rollback)). Each action POSTs the matching endpoint,
+      shows 400/{detail} errors inline, and refreshes the list. Confirm before accept/rollback (apply/undo).
+   b. Section "HITL gate" — GET /api/agent/runs, filter status==='interrupted' (or has a pending interrupt);
+      list objective + run_id + "Mở" link that navigates to #/runs?wf=... no — to the run: set the recent-run
+      reopen. Simplest: link to #/runs and let the user reopen it there. (Do NOT duplicate gate resume UI here;
+      the Runs spine already resolves gates. This section is just the queue + a jump.)
+   c. Empty states: "Không có việc chờ duyệt".
+
+2. UsagePage.tsx (/usage):
+   a. Top: per-provider quota — from GET /api/usage/cockpit (use providers_online + the cockpit stat fields;
+      inspect the shape). Provider chips with token/tù color per provider (--claude/--codex/--nvidia/--gemini).
+   b. Rollup table: GET /api/usage/rollup -> Table by source/model with token totals (render actual fields).
+   c. Secondary collapsible sections (SD "thu thành section phụ"), each a <details> collapsed by default:
+      "Công cụ" (GET /api/tools), "Suites" (GET /api/suites), "Inspect" (GET /api/inspect/logs). Render each as a
+      small table of whatever fields the response has. Keep light; no charts.
+
+3. SettingsPage.tsx (/settings):
+   a. Provider health cards: GET /api/providers — one card per provider: color dot, id, available (ok/err color),
+      version, detail. Read-only.
+   b. Model catalog: GET /api/chat/models — list the NVIDIA catalog grouped/flat (models + default marked).
+   c. Hệ thống: GET /api/health -> root, runs_dir, port (mono, read-only).
+   (No config write — there is no such endpoint. Keep Settings read-only.)
+
+SHARED:
+- All fetches via api.ts (X-Hub-Client on POST). Reuse lib/Table.tsx + markdown.tsx. No new npm deps.
+- Vietnamese labels, sentence case, active-voice buttons. Tokens + Tailwind utilities. No dangerouslySetInnerHTML.
+- pages/index.tsx: route /approvals -> ApprovalsPage, /usage -> UsagePage, /settings -> SettingsPage
+  (remove those 3 placeholders — that leaves ZERO placeholders; PlaceholderPage may become unused, that's fine,
+  do not delete it unless it's truly unreferenced and trivial).
+- Topbar quota chips are still static — leave them; wiring them live is optional, skip if not trivial.
+
+VERIFY YOURSELF: cd harness/hub/web-v3 && pnpm exec tsc -b must pass (if EPERM on .tsbuildinfo, no-emit check + say so).
+DONE = summary: files created/changed, tsc result, per-page behaviors wired (Approvals git-job actions + HITL queue,
+Usage quota+rollup+secondary, Settings provider health+catalog+system).

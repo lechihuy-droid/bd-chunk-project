@@ -1,0 +1,75 @@
+STEP D1 — Artifact workspace per run (BD-hub-v2-phaseD.md §D1). BACKEND ONLY. Model: gpt-5.6-luna.
+
+WHY: U2 "Runs workspace" (SD-ui-v3-rebuild.md) needs an artifact rail — list + read the full
+output of each workflow node. Today a main LLM node's full text lives only inside state.json
+metadata (node_outputs); there is no per-node artifact file to render. D1 writes each node output
+to a file and exposes read endpoints. Frontend (U2) is a LATER step — do NOT touch web/ or web-v3/.
+
+READ FIRST (understand current shape, do not guess):
+1. harness/hub/services/workflow_exec.py — the main node loop. Locate the line
+   `node_outputs[node_id] = "".join(output)` (after the provider stream_chat loop). That string is
+   the full LLM output for the node. Note `runtime_state.runtime_path("run", run_id, "artifacts", ...)`
+   is already used for child runs (output.txt, claims.jsonl), and the run's artifacts/ dir is already
+   created at run start (runtime_state.py ~line 197 `(path / "artifacts").mkdir(...)`). So the dir EXISTS.
+2. harness/hub/services/boundary.py — `resolve_in_root(p, base)` = the traversal-safe path resolver. Reuse it.
+3. harness/hub/services/runs.py lines 183-269 — reference pattern for `_list_artifacts` / `read_artifact`
+   (that module serves CI-verify runs under config.RUNS_DIR — a DIFFERENT run type; do NOT reuse its
+   endpoints, only mirror the safety pattern).
+4. harness/hub/server.py lines 612-673 — existing /api/workflows and /api/workflows/runs endpoints.
+   Add the two new routes next to these, same style (Depends/response, CSRF is handled globally).
+5. harness/hub/services/runtime_events.py — `append_event(run_id, type, **fields)`; events go to events.jsonl.
+
+SCOPE (surgical — 3 files + 1 new):
+
+A. NEW file harness/hub/services/runtime_artifacts.py — small, pure I/O over a runtime run's artifacts/ dir:
+   - def write_node_artifact(run_id: str, node_id: str, text: str) -> str
+       path = runtime_state.runtime_path("run", run_id, "artifacts", f"{node_id}.md")
+       path.write_text(text, encoding="utf-8"); return relative posix "artifacts/{node_id}.md".
+       node_id may contain only [A-Za-z0-9_-]; if not, sanitize (replace other chars with "_") BEFORE
+       building the path so a malicious node id can't escape. Assert the resolved path stays under the
+       run's artifacts dir using boundary.resolve_in_root (raise on escape).
+   - def list_artifacts(run_id: str) -> list[dict]  → for each *.md file directly under the run's
+       artifacts/ dir: {"name": filename, "chars": len(text)} sorted by name. (Only top-level *.md; skip
+       child-run subdirs / output.txt / claims.jsonl — the rail shows node artifacts.) Empty list if none.
+   - def read_artifact(run_id: str, name: str) -> str  → resolve name under artifacts/ via
+       resolve_in_root; reject any name containing "/" "\\" ".." (raise FileNotFoundError); read text
+       (encoding utf-8, errors="replace"). Traversal MUST be impossible.
+   Validate run_id with runtime_state.validate_id("run", run_id) at the top of list/read so a bad id 404s.
+
+B. harness/hub/services/workflow_exec.py — ONE insertion, right AFTER `node_outputs[node_id] = "".join(output)`:
+   full = node_outputs[node_id]
+   rel = runtime_artifacts.write_node_artifact(run_id, node_id, full)
+   then emit an event so the spine/rail can react:
+   _event(run_id, "artifact_written", node=node_id, path=rel, chars=len(full))
+   (use the existing _event helper; do NOT yield it as SSE unless the surrounding code already yields —
+   appending to events.jsonl is enough for the rail's later /events read). DO NOT change node_outputs
+   shape, DO NOT change _context, DO NOT truncate state — keeping full text in state is intentional for
+   this step (downstream prompt templating {{node}} relies on it). State-size optimization is OUT OF SCOPE
+   for D1 (would ripple into _context + tests); revisit only if state.json actually grows painful.
+
+C. harness/hub/server.py — two GET routes (place after the existing /api/workflows/runs block ~673):
+   @app.get("/api/workflows/runs/{run_id}/artifacts")
+       -> {"artifacts": runtime_artifacts.list_artifacts(run_id)}   (404 via validate_id on bad id)
+   @app.get("/api/workflows/runs/{run_id}/artifacts/{name}")
+       -> {"name": name, "text": runtime_artifacts.read_artifact(run_id, name)}   (404 on missing/traversal)
+   Catch FileNotFoundError -> HTTPException(status_code=404). Match how nearby workflow-run routes raise/return.
+
+D. Tests — NEW file harness/hub/tests/test_runtime_artifacts.py (pytest, reuse fixtures from
+   tests/test_workflow_exec.py / tests/test_api.py; use the FAKE provider path — no real claude/codex/NVIDIA):
+   1. Run a small fake-provider workflow (or call write_node_artifact directly) → artifacts/<node>.md exists
+      with the full node text; list_artifacts returns it with correct chars.
+   2. After a real fake run through run_workflow, an "artifact_written" event is present in events.jsonl.
+   3. GET /api/workflows/runs/{id}/artifacts lists the node artifact; GET .../artifacts/{name} returns text.
+   4. Traversal: GET .../artifacts/..%2f..%2frun.json  and name "../run.json" → 404, never leaks file content.
+   5. Bad run_id → 404.
+
+HARD CONSTRAINTS:
+- Do NOT modify web/ or web-v3/ (frontend). No SSE contract change. No new Python deps.
+- Do NOT change node_outputs shape, _context, or state truncation (explicit non-goal above).
+- Surgical: only the 4 files listed. Preserve existing style (from __future__ import annotations, typing).
+
+VERIFY (run from repo root C:\Users\HUY\workspace\ai-project-opus):
+  .ih\Scripts\python.exe -m pytest harness/hub/tests -q
+  Must be GREEN — all existing (165) + your new tests. Fix your own breakage; touch no unrelated test.
+
+DONE = print: files created/changed, the new endpoints, pytest result line, and the 5 test names.

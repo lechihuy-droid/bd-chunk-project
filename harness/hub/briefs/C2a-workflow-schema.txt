@@ -1,0 +1,144 @@
+STEP C2a — Workflow schema + validate + IR (Hub v2 Phase C, runs in PARALLEL
+with C1 — read the parallelism note in TASK 1 and RUN before starting).
+Spec: harness/hub/BD-hub-v2-phaseC.md Step C2a. Read it + ARCHITECTURE.md §9
+(config-first: YAML is truth, canvas/UI is just an editor — no runtime
+mutation of workflow semantics outside the yaml file) + RD FR-121→124.
+Study: harness/hub/services/runtime_agents.py (current stub — you depend on
+`list_agents()` returning `list[dict]` where each dict has an "id" key; do
+NOT depend on any other field, C1 is changing this file in parallel and the
+only contract both sides agreed on is the "id" key being present on every
+entry, in both the old stub and the new yaml-backed version), harness/hub/
+server.py (route patterns, _http_error, the `from services import (...)`
+tuple import block at the top — you will add `workflow` to it), harness/hub/
+tests/test_runtime.py (test style: TestClient with headers=
+{"x-hub-client": "harness-hub"}, monkeypatch via pytest fixtures,
+pytest.raises for validation errors).
+
+Schema `<id>.workflow.yaml` (all fields required):
+  id: review-ui
+  nodes:
+    - id: plan
+      agent: reviewer          # ref to an agent profile id
+      prompt: "Plan review for: {{objective}}"
+      gate: none               # none|approval
+    - id: act
+      agent: reviewer
+      prompt: "Execute: {{plan_output}}"
+      gate: approval
+  edges: [[plan, act]]          # sequential, no branching (not in scope)
+  stop: {max_nodes: 10, max_seconds: 1800}
+
+TASK:
+1. PARALLELISM NOTE: C1 is rewriting services/runtime_agents.py at the same
+   time you are writing services/workflow.py — both land, then get merged.
+   Only depend on `runtime_agents.list_agents()` existing and returning
+   dicts with an "id" key (true today, true after C1 lands). In your own
+   tests, monkeypatch `workflow.runtime_agents.list_agents` (however you
+   import it) to a fixed fake list — do NOT depend on real agent yaml files
+   on disk or on C1's validation internals, so your test suite is green
+   regardless of merge order.
+2. Create services/workflow.py (NEW):
+   - `WORKFLOWS_DIR = config.HUB_DIR / "workflows"` as a module-level
+     constant (import `config`; do NOT add a new variable to config.py,
+     it's out of scope — same pattern C1 uses for AGENTS_DIR).
+   - `parse_workflow(yaml_text: str) -> dict`: yaml.safe_load, raise
+     ValueError on malformed YAML or missing top-level fields (id, nodes,
+     edges, stop).
+   - `validate_workflow(data: dict) -> list[str]`: returns a list of error
+     message strings (empty list = valid). Do NOT raise for content
+     validation failures — the API needs per-case error messages, see
+     TASK 4. Checks, in order, collecting ALL applicable errors (don't
+     stop at the first):
+       a. every node has id/agent/prompt/gate; gate ∈ {none, approval};
+          no duplicate node ids.
+       b. every node's `agent` is in `{a["id"] for a in
+          runtime_agents.list_agents()}`.
+       c. edges reference only node ids that exist in nodes.
+       d. edges form exactly one linear chain covering every node exactly
+          once: compute in-degree/out-degree per node from edges; valid
+          iff (i) every node has out-degree <= 1 and in-degree <= 1, (ii)
+          exactly one node has in-degree 0 (the start; if zero edges and
+          exactly one node total, that node is trivially the start), (iii)
+          exactly one node has out-degree 0 (the end), (iv) walking
+          start→end via edges visits every node in `nodes` exactly once
+          (this single check catches cycles, disconnected nodes, and
+          branching in one pass — a cycle means no node has in-degree 0,
+          or the walk revisits a node before covering all of them).
+       e. stop.max_nodes present, int, > 0; stop.max_seconds present,
+          int or float, > 0. Missing or <= 0 → error naming which field.
+       f. template refs: for every node's prompt string, extract all
+          `{{...}}` tokens. Each must be exactly "objective" or match
+          `<node_id>_output` where node_id is a node that appears strictly
+          earlier than the current node in the walk order established in
+          (d) (forward references and unknown node ids are both errors).
+          If the chain itself is invalid (d failed), skip this check
+          (can't establish order) and note that in the returned errors
+          instead of crashing.
+   - `build_ir(data: dict) -> list[dict]`: only call after validate_workflow
+     returns []. Returns the ordered node list (start→end per the walk in
+     (d)) with each entry `{"id": ..., "agent": <resolved agent profile
+     dict from runtime_agents.list_agents()>, "prompt": ..., "gate": ...,
+     "order": <int index>}`.
+   - `list_workflows() -> list[dict]`: scan WORKFLOWS_DIR for
+     `*.workflow.yaml`, parse + validate each; valid ones included in the
+     returned list (raw parsed dict, not IR); invalid ones skipped with a
+     `logging.getLogger(__name__).warning(...)` call, same pattern as C1's
+     agent loader — do not raise, do not include invalid entries in the
+     API response body.
+3. server.py: add `workflow` to the existing `from services import (...)`
+   tuple (alphabetical position). Then, in a clearly marked block placed
+   after the skill-library routes (do not interleave with C1's agent-route
+   block, which sits near the existing GET /api/agents route):
+   # --- C2a workflow routes ---
+   GET /api/workflows              → workflow.list_workflows()
+   POST /api/workflows/validate    → body is {"yaml_text": str} OR
+                                       {"id": str}; if neither present →
+                                       HTTPException 400 "yaml_text or id
+                                       is required"; if "id", read
+                                       WORKFLOWS_DIR/{id}.workflow.yaml
+                                       (FileNotFoundError → _http_error/404
+                                       if missing) and use its text; else
+                                       use yaml_text directly. Always
+                                       returns 200 with
+                                       {"ok": bool, "errors": list[str],
+                                       "ir": list|null} — malformed YAML
+                                       (parse_workflow raises) is reported
+                                       as {"ok": false, "errors": [str(exc)],
+                                       "ir": null}, NOT a 400 — the whole
+                                       point of this endpoint is to hand
+                                       back specific validation feedback,
+                                       not to bounce the caller.
+   # --- end C2a workflow routes ---
+4. Create harness/hub/workflows/review-ui.workflow.yaml matching the schema
+   example above exactly (references agent id "reviewer" — same id as C1's
+   sample agent profile; this cross-reference only matters for the live
+   end-to-end DoD demo, not for your unit tests, which use a monkeypatched
+   fake agent list per TASK 1).
+5. Tests in harness/hub/tests/test_workflow.py (new file), per BD: valid,
+   cycle, missing agent, missing stop caps, bad template ref. Concretely:
+   - valid: the review-ui example → validate_workflow returns [];
+     build_ir returns 2 ordered entries, plan before act.
+   - cycle: edges [[plan, act], [act, plan]] → validate_workflow returns a
+     non-empty list mentioning the chain/cycle problem.
+   - missing agent: node references an agent id not in the (monkeypatched)
+     fake agent list → error mentions the unknown agent id.
+   - missing stop caps: omit stop, or stop.max_seconds = 0 → error names
+     the missing/invalid field.
+   - bad template ref: act's prompt uses `{{nonexistent_output}}` or
+     `{{act_output}}` (self/forward-reference) → error mentions the bad
+     token.
+   - TestClient: POST /api/workflows/validate with yaml_text for each of
+     the above → 200 always, "ok" and "errors" reflect the case. POST with
+     neither yaml_text nor id → 400.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_workflow.py -q
+(green) — then .ih\Scripts\python.exe -m pytest harness/hub/tests -q as a
+full-suite regression check (note: if C1 hasn't landed in your working copy
+yet, that's fine — your tests don't depend on its files per TASK 1).
+Do NOT touch: services/runtime_agents.py, harness/hub/agents/, tests/
+test_runtime_agents.py, web/*.js, config.py (add WORKFLOWS_DIR as a local
+constant in workflow.py, not in config.py). Do NOT commit.
+FINAL MESSAGE: files changed, pytest result (both the scoped file and the
+full-suite run), the exact wording of each validation error message, and the
+walk/chain algorithm you implemented for check (d) in case it differs from
+what's described above.

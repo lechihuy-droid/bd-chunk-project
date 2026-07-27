@@ -1,0 +1,42 @@
+STEP D4-fix-1 — HIGH safety fix in one template. Model: gpt-5.6-luna. Config + test only. No service code.
+No frontend. Do NOT commit.
+
+THE BUG (confirmed empirically by review): `gate: approval` fires BEFORE the gated node executes, and the
+interrupt payload carries that node's ALREADY-RENDERED prompt. In harness/hub/workflows/code-task.workflow.yaml
+the gate is on `brief` (the FIRST node), whose prompt contains only {{objective}} — so:
+  - the human is asked to approve before any brief text exists (payload has no brief content), and
+  - after resuming that one interrupt, BOTH `brief` AND `implement` run in the same pass —
+    `implement` uses the `coder` agent (permission: workspace_write), so code gets written with no human
+    ever seeing the actual brief.
+This contradicts the file's own header comment and is the exact failure the gate was meant to prevent.
+
+FIX harness/hub/workflows/code-task.workflow.yaml:
+1. Move the approval gate OFF `brief` (set `gate: none`) and ONTO `implement` (`gate: approval`).
+   Rationale: `implement`'s prompt embeds {{brief_output}}, so the interrupt payload shows the human the REAL
+   brief before the write-capable coder runs. Keep `review`'s existing `gate: approval` as is.
+   Resulting chain/gates: brief(none) -> implement(APPROVAL) -> review(APPROVAL).
+2. Update the header comment so it matches actual behavior, e.g.:
+     # Dùng khi: Chuyển objective thành brief, duyệt brief rồi mới cho code chạy.
+     # Luồng: brief -> implement (gate: duyệt brief) -> review (gate: duyệt kết quả)
+   Do not claim a protection the file does not implement.
+3. Add a short comment line in this file recording the gate semantics so future templates don't repeat the
+   mistake, e.g.:
+     # Lưu ý: gate:approval dừng TRƯỚC khi node đó chạy và hiển thị prompt đã render của chính node đó
+     #        -> đặt gate lên node TIÊU THỤ output cần duyệt, không phải node sinh ra nó.
+
+VERIFY the fix actually protects (extend harness/hub/tests/test_workflow_templates.py):
+4. Add a test asserting that in code-task, no node whose agent has permission == "workspace_write" can execute
+   before a human approval — concretely: run code-task with a FAKE provider (monkeypatch registry + the relevant
+   MODEL_CLASS_ROUTING entries, exactly like the existing end-to-end test; never call a real CLI) and assert that
+   at the first stop, completed_nodes does NOT contain "implement" and a pending interrupt exists for node
+   "implement". Then resolve it and assert the run proceeds.
+   Keep the existing 4 tests passing unchanged.
+
+Also re-check (report, do not change unless broken): research-draft-review and doc-pipeline place their approval
+gates on nodes whose prompts embed the upstream {{*_output}} — those are correct, leave them alone.
+
+VERIFY (from repo root C:\Users\HUY\workspace\ai-project-opus):
+  .ih\Scripts\python.exe -m pytest harness/hub/tests -q
+  Must be GREEN (195 + your new test).
+
+DONE = print: the changed file + new gate layout, the new test name, pytest result line.

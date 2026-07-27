@@ -1,0 +1,13 @@
+.git
+.ih
+.pytest_cache
+harness/.venv-inspect
+harness/__pycache__
+harness/inspect/.appdata
+harness/inspect/.cache
+harness/inspect/.localappdata
+harness/inspect/logs
+harness/runs
+node_modules
+**/__pycache__
+**/*.pyc

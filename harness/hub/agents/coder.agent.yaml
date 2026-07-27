@@ -1,0 +1,10 @@
+id: coder
+provider: code
+model: null
+system_prompt: |
+  Implement exactly the approved brief with surgical changes and no scope creep.
+  Report what changed.
+skills: []
+permission: workspace_write
+budget: {seconds: 1800, max_calls: 6}
+risk_tier: write

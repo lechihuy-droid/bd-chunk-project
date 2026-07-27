@@ -1,0 +1,52 @@
+STEP F3 — Global composer + target selector (SD-chat-control-plane.md §4). Model: gpt-5.6-luna.
+FRONTEND ONLY (web-v3). Zero Python. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH — review ChatGPT §2 và §5.2 chê đúng:
+"`Gửi tất cả` nằm xa composer, chưa cho biết prompt sẽ đi tới model nào và dùng context nào."
+Hiện tại: một checkbox "Gửi tất cả" + ô nhập dùng chung nằm TRÊN CÙNG, cách xa các pane; mỗi pane lại có
+ô nhập riêng ở dưới. Người dùng gõ ở trên mà không biết prompt rơi vào đâu.
+
+PHẠM VI — src/pages/ChatPage.tsx:
+
+1. CHUYỂN composer dùng chung XUỐNG ĐÁY trang, thành một thanh cố định dưới lưới pane.
+   Bỏ hẳn checkbox "Gửi tất cả" và ô nhập dùng chung ở trên cùng.
+   Hàng nút trên cùng chỉ còn: chọn provider cho cửa sổ mới, nút "+ Cửa sổ", trạng thái provider,
+   và số liệu tổng của F2. KHÔNG để sót ô nhập cũ ở đó.
+
+2. TARGET SELECTOR nằm NGAY TRÊN ô nhập của composer, không giấu trong menu:
+   - Mỗi pane một chip: chấm màu provider + tên provider + model rút gọn. Bấm để bật/tắt.
+   - Chip bật = viền sáng; tắt = mờ. Mặc định: BẬT HẾT.
+   - Nút "Tất cả" / "Bỏ chọn" để đảo nhanh.
+   - Bên phải hiện đích thực tế: "Gửi tới 2/3 cửa sổ".
+   - Chọn 0 đích -> nút Gửi vô hiệu hoá, kèm câu giải thích ngắn. KHÔNG âm thầm gửi đi đâu cả.
+   - Pane đang stream -> chip đó hiện trạng thái bận và BỊ BỎ QUA khi gửi (giữ đúng hành vi hiện tại của
+     `sendAll`: bỏ qua pane có message cuối đang `streaming`). Nói rõ trên UI là đã bỏ qua, đừng im lặng.
+
+3. HÀNH VI GỬI: Enter hoặc nút Gửi -> gửi cùng một prompt tới mọi pane đang được chọn, dùng lại đúng
+   hàm `send(paneId, text)` hiện có. KHÔNG viết đường gửi mới, KHÔNG đụng vào `send()`.
+   Gửi xong thì xoá ô nhập.
+   Thêm nút "Dừng tất cả" chỉ hiện khi có ít nhất một pane đang stream; nó gọi abort của từng pane đang
+   stream (dùng lại `controllers` sẵn có).
+
+4. Ô NHẬP RIÊNG TỪNG PANE: GIỮ NGUYÊN. Nó dùng để hỏi tiếp riêng một model. Không bỏ.
+
+5. GHI NHỚ lựa chọn đích: pane bị đóng thì phải rơi khỏi danh sách đích; pane mới thêm thì mặc định BẬT.
+   Đích lưu theo `pane.id`, KHÔNG lưu theo chỉ số mảng (chỉ số lệch khi đóng pane giữa chừng).
+   Có thể giữ trong state React, KHÔNG cần ghi vào localStorage.
+
+BỐ CỤC: composer ở đáy không được che ô nhập của pane. Trên màn hẹp (<1024px) composer vẫn phải với tới
+được — nếu cần thì cho lưới pane cuộn, đừng đẩy composer ra ngoài màn hình.
+⚠️ Panel artifact (E5) đang chiếm cột phải khi mở. Composer đáy phải sống chung được với nó, không đè lên.
+
+6. SỬA KÈM (nhỏ, phát hiện khi verify F2): token meter đang đếm cả message `role: 'system'` nếu message đó
+   còn sót `usage`. Quan sát thật: pane claude hiện "0 token · 1 lượt" trong khi lượt đó là lượt HỎNG.
+   Dữ liệu mới đã sạch nhờ F1b, nhưng message cũ trong localStorage vẫn còn.
+   SỬA: hàm cộng dồn chỉ tính message `role === 'assistant'` VÀ có usage. Message system/user bỏ qua.
+
+RÀNG BUỘC: không đụng `send()`, parseSse, `patchMessage`, lược đồ localStorage `hub-v3-chat`, giới hạn
+4 pane, panel artifact và lib/artifact.ts, phần token meter của F2, error card + menu `…` của F1.
+Nhãn tiếng Việt, token màu + Tailwind sẵn có, không thêm dep, không dangerouslySetInnerHTML.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = file sửa, mô tả hành vi mục 1-5, kết quả tsc.

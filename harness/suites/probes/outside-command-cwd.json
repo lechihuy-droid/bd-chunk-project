@@ -1,0 +1,14 @@
+{
+  "id": "probe-outside-command-cwd",
+  "name": "Probe Outside Command CWD",
+  "description": "Intentional policy violation used by boundary-compliance.",
+  "checks": [
+    {
+      "id": "outside-command-cwd",
+      "type": "command",
+      "command": ["{py311}", "--version"],
+      "cwd": "{root}/..",
+      "expected_exit": 0
+    }
+  ]
+}

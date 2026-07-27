@@ -1,0 +1,26 @@
+STEP B4b — Skills page tabs UI (frontend remainder of B4).
+Backend ALREADY DONE (do not touch): GET /api/skill-library/deploy-log returns
+[{ts, id, target, path}] newest-first (see server.py:548, skill_library.deploy_log).
+
+Study: harness/hub/web/app.js functions renderSkillLibrary + renderSkillDetail,
+helpers getJson/postJson (X-Hub-Client header built in), escapeHtml, formatNumber.
+
+TASK — edit ONLY harness/hub/web/app.js and append-only harness/hub/web/styles-hub.css:
+1. #/skills-lib page: client-side tab bar "Skills | Drift | Deploy log"
+   (no route change, state in a module-level variable, default Skills).
+   - Skills tab: existing table unchanged.
+   - Drift tab: GET /api/skill-library/drift -> table: name, in_sync badge
+     (green in-sync / red drift), variants list per row (source, content_hash
+     first 8 chars, mtime). Per variant button "Deploy this version →": dropdown
+     or prompt to pick target source among {claude_user, claude_project,
+     codex_user} minus variant's own source; window.confirm("Deploy <name> from
+     <src> to <target>? Existing target will be backed up.") then
+     postJson(`/api/skill-library/${encodeURIComponent-per-segment id}/deploy`, {target}),
+     re-render tab, show status text.
+   - Deploy log tab: GET /api/skill-library/deploy-log -> table ts / skill id / target.
+2. Tab styles: reuse existing badge/table classes; add minimal .skill-tabs styles
+   appended to styles-hub.css.
+3. Do NOT touch workspace.js, server.py, services, tests.
+
+VERIFY: node --check harness/hub/web/app.js. Do NOT commit.
+FINAL MESSAGE: files changed + node --check result + how tab state stored.

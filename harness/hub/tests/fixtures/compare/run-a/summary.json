@@ -1,0 +1,25 @@
+{
+  "run_id": "run-a",
+  "suite": "suite-x",
+  "suite_name": "Suite X",
+  "started_at": "2026-06-27T10:00:00+00:00",
+  "finished_at": "2026-06-27T10:00:01+00:00",
+  "status": "pass",
+  "passed": 2,
+  "failed": 0,
+  "total": 2,
+  "results": [
+    {
+      "id": "check-one",
+      "type": "path_exists",
+      "status": "pass",
+      "message": "ok"
+    },
+    {
+      "id": "check-two",
+      "type": "json_load",
+      "status": "pass",
+      "message": "ok"
+    }
+  ]
+}

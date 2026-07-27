@@ -1,0 +1,61 @@
+STEP G1-fix-3 — TOÀN BỘ token của design system đang TRƠ. FRONTEND ONLY. Model: gpt-5.6-luna.
+Không thêm dep. Không chạy pnpm build. Không commit. Cấm sửa file cấu hình thật để thử.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+════ BẰNG CHỨNG ĐO TRÊN TRÌNH DUYỆT THẬT (trang /#/chat, bản build hiện tại) ════
+1. `getComputedStyle(document.documentElement).getPropertyValue('--hub-accent')` -> `#8b7cf6`.
+   Biến CSS CÓ tồn tại.
+2. Nút primary duy nhất (nút Gửi của composer) có className chứa `bg-[var(--hub-accent)]`,
+   `disabled === false`, nhưng `backgroundColor` là `rgb(32, 36, 45)` — KHÔNG phải violet.
+3. Duyệt MỌI stylesheet: số rule có `--hub-` trong `selectorText` là **0**.
+   => Tailwind KHÔNG sinh ra rule nào cho các class dạng `[var(--hub-*)]`. Chúng nằm trơ trong DOM.
+4. Cũng nút đó mang ĐỒNG THỜI hai class nền: `bg-[var(--hub-accent)]` (trơ) và `bg-panel2` (class cũ,
+   có rule thật). Nên nó hiển thị theo class cũ.
+5. Toàn trang: 58 nút, 0 nút có nền violet.
+
+════ NGUYÊN NHÂN ════
+`src/index.css` khai token qua `@theme { --color-ink, --color-panel2, ... }` của Tailwind v4 -> Tailwind
+sinh utility thật (`bg-panel2`, `text-dim`, `border-line`…).
+`src/styles/tokens.css` chỉ là CSS thường, được `import './styles/tokens.css'` trong `src/main.tsx`.
+Biến `--hub-*` vì thế CÓ giá trị lúc chạy, nhưng KHÔNG đi vào hệ thống theme của Tailwind, và các utility
+`[var(--hub-*)]` không được sinh ra.
+HỆ QUẢ: phần lớn công của G0/G1 đang không có tác dụng thị giác. Giao diện hiện tại vẫn chạy bằng bảng
+màu CŨ trong `@theme`.
+
+════ VIỆC ════
+
+A. ĐƯA TOKEN VÀO ĐÚNG HỆ THỐNG THEME. Chọn MỘT hướng, làm dứt khoát, nói rõ đã chọn hướng nào:
+   Hướng 1 (khuyến nghị): chuyển các token của tokens.css vào khối `@theme` trong `src/index.css` theo
+   đúng quy ước đặt tên của Tailwind v4 (`--color-*` cho màu, `--radius-*` cho bo góc, `--spacing-*`…),
+   để Tailwind sinh utility thật (`bg-accent`, `rounded-md`, …). Sau đó primitive dùng utility đó, KHÔNG
+   dùng cú pháp `[var(--hub-*)]` nữa.
+   Hướng 2: giữ tokens.css nhưng nạp nó qua đường Tailwind xử lý được, và xác minh utility được sinh ra.
+   ⚠️ Dù chọn hướng nào, TIÊU CHÍ NGHIỆM THU không đổi: phải TỒN TẠI rule CSS thật cho class mà primitive
+   dùng. Đừng chỉ đổi cách viết rồi cho là xong.
+
+B. XOÁ VA CHẠM CLASS CŨ Ở CHỖ GỌI.
+   Nút primary đang mang cả `bg-[var(--hub-accent)]` lẫn `bg-panel2`. Rà toàn bộ chỗ gọi primitive:
+   nếu vẫn truyền class nền/viền/chữ cũ (`bg-panel`, `bg-panel2`, `bg-ink`, `border-line`, `text-dim`,
+   `text-faint`, `text-text`) qua `className` thì BỎ, để variant của primitive tự lo.
+   Chỉ giữ class bố cục (flex, grid, w-, h-, gap-, p-, m-, truncate…).
+
+C. GIỮ HAY BỎ BẢNG MÀU CŨ — quyết định rõ ràng:
+   Sau khi A xong, các token cũ trong `@theme` (`--color-ink`, `--color-panel`, `--color-panel2`,
+   `--color-line`, `--color-text`, `--color-dim`, `--color-faint`, `--color-gate`, `--color-ok`,
+   `--color-err`) sẽ trùng vai với token mới. Hợp nhất chúng để CHỈ CÒN MỘT bảng.
+   GIỮ NGUYÊN `--color-claude/codex/nvidia/gemini` — chúng vẫn cần cho `ProviderDot`.
+
+D. NGHIỆM THU BẮT BUỘC — tự kiểm bằng cách đọc CSS đã build, đừng kết luận suông:
+   1. Tồn tại rule CSS thật cho class nền của Button variant primary.
+   2. Không còn phần tử nào mang hai class nền mâu thuẫn.
+   3. Nếu chạy được trình duyệt: trang /#/chat, gõ chữ vào composer -> ĐÚNG MỘT nút có
+      `backgroundColor === rgb(139, 124, 246)`. Không chạy được trình duyệt thì nói rõ là chưa kiểm,
+      ĐỪNG khẳng định suông (lần trước đã khẳng định `tsc` pass trong khi `pnpm build` gãy).
+
+KHÔNG ĐỔI HÀNH VI. Không đụng `send()`, parseSse, `patchMessage`, localStorage, luồng SSE.
+KHÔNG làm hỏng: trang chat ghim theo viewport (4 pane -> scrollHeight ≈ innerHeight, lưới cuộn nội bộ),
+panel artifact, canvas workflow (cạnh `<line>` có mũi tên, số thứ tự chạy).
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b, không phải --noEmit
+DONE = hướng đã chọn ở mục A và lý do, số chỗ gỡ class cũ ở mục B, kết quả 3 mục nghiệm thu ở D,
+       kết quả `tsc -b`.

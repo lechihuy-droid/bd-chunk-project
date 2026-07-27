@@ -1,0 +1,26 @@
+STEP U0-fix-1 — three surgical fixes from review. Do NOT run pnpm build (blocked in
+your sandbox; the architect builds after you). Do NOT commit.
+
+1. harness/hub/web-v3/index.html: <title>web-v3</title> -> <title>Harness Hub</title>
+   (existing test test_api.py::test_spa_index asserts "Harness Hub" in GET / body).
+
+2. Single vite config, Tailwind ALWAYS on:
+   - Delete harness/hub/web-v3/vite.config.mjs.
+   - Rewrite harness/hub/web-v3/vite.config.ts to plain synchronous config:
+       import { defineConfig } from 'vite'
+       import react from '@vitejs/plugin-react'
+       import tailwindcss from '@tailwindcss/vite'
+       export default defineConfig({
+         base: '/',
+         plugins: [react(), tailwindcss()],
+         server: { proxy: { '/api': 'http://127.0.0.1:8799' } },
+       })
+   - package.json build script -> "tsc -b && vite build" (default config resolution).
+   - Ensure src/index.css first line has @import "tailwindcss"; before the @theme block
+     (Tailwind v4 requirement) and that the @theme token names allow utilities like
+     bg-panel2 / text-dim / from-claude used in components. Keep the existing
+     hand-written structural CSS below — it complements utilities.
+
+3. Delete harness/hub/web-v3/public/favicon.svg and public/icons.svg (unreferenced).
+
+Touch NOTHING else. Done = list changed/deleted files.

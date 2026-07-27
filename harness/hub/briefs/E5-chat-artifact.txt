@@ -1,0 +1,51 @@
+STEP E5 — Panel artifact cho trang Chat (SD-usage-cost-canvas.md §6, E5). Model: gpt-5.6-luna.
+FRONTEND ONLY (web-v3). Zero Python. KHÔNG thêm npm dep. Không chạy pnpm build. Không commit.
+File chính: src/pages/ChatPage.tsx (+ src/lib/artifact.ts mới nếu cần tách logic thuần).
+
+════ BỐI CẢNH ════
+Hub cũ có `web/workspace.js` với panel artifact (mục lục, phiên bản, xuất file). NHƯNG nội dung ở đó là
+MOCKUP lorem-ipsum cứng (`ARTIFACT_TEMPLATE()` dòng 48, "Q3 go-to-market plan"). Đừng port nó.
+Lấy MÔ HÌNH TƯƠNG TÁC, nhồi NỘI DUNG THẬT từ stream `/api/chat` mà ChatPage đã nhận sẵn.
+Không thêm endpoint, không ghi file, không gọi backend mới. Toàn bộ nằm trong state có sẵn.
+
+════ HÀNH VI ════
+
+1. NHẬN DIỆN ARTIFACT — hàm thuần, dễ test:
+   Một message `role === 'assistant'` và `streaming === false` là artifact khi thoả BẤT KỲ:
+   a. chứa >= 1 khối code ```...``` , HOẶC
+   b. content.length >= 1200, HOẶC
+   c. có >= 2 heading markdown (`^#{1,3} `).
+   Không thoả -> hiển thị y như hiện tại, không đổi gì.
+
+2. THU GỌN TRONG BONG BÓNG (chỉ khi ĐÃ stream xong):
+   - ĐANG stream: giữ nguyên hành vi hiện tại, chữ chảy trong bong bóng. TUYỆT ĐỐI không nhảy layout
+     giữa chừng.
+   - Stream xong + là artifact -> thay phần thân bằng thẻ tóm tắt:
+       tiêu đề (heading `#`/`##` đầu tiên; không có thì lấy ~60 ký tự đầu dòng đầu; vẫn không có thì
+       "Tài liệu") · số ký tự · số mục · số khối code · nút "Mở".
+   - Vẫn phải có nút "Hiện toàn văn" để bung lại nội dung ngay trong bong bóng. Người dùng không được
+     mất quyền đọc thẳng.
+   - Nút Copy / khối reasoning ("Hiện suy nghĩ") / dòng usage GIỮ NGUYÊN như hiện tại.
+
+3. PANEL BÊN PHẢI (cấp trang, KHÔNG lồng trong pane):
+   - Mở panel -> vùng lưới chat co lại, panel chiếm ~40% bề ngang (tối thiểu 320px). Panel đóng ->
+     lưới trở lại đúng như bây giờ. Không dùng overlay che chat: người dùng cần vừa đọc vừa hỏi tiếp.
+   - Đầu panel: tiêu đề artifact · chấm màu provider + tên pane nguồn (`colors[provider]` đã có) · nút đóng.
+   - Thanh công cụ: [Mục lục] [Copy] [Xuất .md]. Xuất .md dùng lại y hệt cách `download()` trong PaneView
+     đang làm (Blob + URL.revokeObjectURL) — đừng viết cách khác.
+   - Thân: render bằng `<Markdown>` của lib/markdown.tsx. KHÔNG viết bộ render mới.
+   - Mục lục: sinh từ heading `^#{1,3} `, click cuộn tới. Ít hơn 2 heading -> ẩn nút Mục lục.
+   - Mỗi lúc chỉ mở MỘT artifact. Bấm "Mở" ở message khác thì thay nội dung panel.
+   - Panel mở mà pane nguồn bị đóng (nút ×) -> panel phải tự đóng, không trỏ vào state đã chết.
+
+4. BỀ NGANG HẸP (< 1024px): panel xếp XUỐNG DƯỚI lưới chat thay vì cạnh bên. Không được đè mất ô nhập.
+
+════ RÀNG BUỘC ════
+- KHÔNG đổi logic `send()` / parseSse / patchMessage / lược đồ localStorage `hub-v3-chat`.
+  Panel chỉ ĐỌC từ `panes`. Nếu cần state thì thêm state RIÊNG ở ChatPage (vd `{paneId, index}`),
+  đừng nhét cờ vào Message rồi ghi xuống localStorage.
+- Không dangerouslySetInnerHTML. Không thêm dep. Nhãn tiếng Việt. Dùng token màu + Tailwind sẵn có.
+- Broadcast (Gửi tất cả) và tối đa 4 pane phải chạy y như cũ.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b phải pass (EPERM .tsbuildinfo -> chạy --noEmit và nói rõ).
+DONE = file tạo/sửa, ngưỡng nhận diện đã dùng, kết quả tsc, mô tả ngắn từng mục 1-4 đã nối.

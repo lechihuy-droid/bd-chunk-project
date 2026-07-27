@@ -1,0 +1,32 @@
+STEP U2-fix-2 — one-issue polish: failed run leaves the failing node showing "pending" on the spine.
+FRONTEND ONLY. Model: gpt-5.6-luna. File: harness/hub/web-v3/src/pages/RunsPage.tsx only.
+No Python, no build, no commit.
+
+CONTEXT (verified live): after a run fails (e.g. gate Reject → backend _fail "rejected at gate:act"),
+run.status correctly becomes 'failed' (spine header + error banner show it), BUT the node that failed
+still renders state 'pending'. Root cause: applyState's per-node derivation (the setNodes map, ~line 39)
+has no branch for state.status === 'failed', so the current node falls through to 'pending'. The error
+handler's separate "mark failed node" attempt no-ops because applyState already cleared the 'running'
+state before it scans for a running node, and the backend error event carries no `node` field.
+
+FIX (make the node reflect failure directly from state — correct on both live stream AND reopen):
+
+1. In applyState (the `setNodes(currentNodes => currentNodes.map(node => ({ ...node, state: ... })))`),
+   ADD a failed branch for the current node. New precedence:
+     done.has(node.id)                                              -> 'done'
+     current === node.id && state.status === 'failed'               -> 'failed'   // NEW
+     current === node.id && ['running','interrupted'].includes(status) -> 'running'
+     node.state === 'failed'                                        -> 'failed'   // keep (preserves prior)
+     else                                                           -> 'pending'
+   (current = meta.current_node. If meta.current_node is empty on a failed state, fall back to the node at
+    meta.node_index so the right node is marked — check whether current_node is populated on _fail; if not,
+    use node_index.)
+
+2. In the `error` event handler: set the failing node's error text using the node id from
+   data.state.metadata.current_node (or node_index) instead of scanning for a 'running' node (which is gone
+   by then). Keep applyState(data.state) and setError(message). The node.error inline text (rendered red by
+   RunSpine when node.error is set) should attach to the same node that #1 marks 'failed'.
+
+Do NOT touch anything else. Keep the success/gate paths identical.
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b (must pass).
+DONE = the 2 changed hunks + tsc result line.

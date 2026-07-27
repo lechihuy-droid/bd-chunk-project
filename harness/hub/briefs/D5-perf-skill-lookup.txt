@@ -1,0 +1,56 @@
+STEP perf-1 — /api/workflows takes ~55s (page hangs). BACKEND ONLY. Model: gpt-5.6-luna.
+No frontend. Do NOT commit.
+
+MEASURED ON THE REAL WORKSPACE (not fixtures):
+  skill_library.list_skills()      21.98s   (16 skills)
+  list_skills() again              25.75s   <- effectively NOT cached
+  runtime_agents.list_agents()     37.94s   (4 agents)
+  workflow.list_workflows()        54.66s   (4 workflows)  -> /api/workflows times out in the browser
+
+ROOT CAUSE:
+1. services/runtime_agents.py validate_agent_profile() builds its known-skill set with
+   `skill_library.list_skills()`. That call also collects TELEMETRY by parsing claude/codex session logs
+   (see skill_library._safe_collect_skill_tool_events / _telemetry) — the expensive part — but validation
+   only needs skill NAMES.
+2. validate_agent_profile runs PER AGENT inside list_agents(), so the expensive scan repeats per agent.
+3. services/workflow.py validate_workflow() calls runtime_agents.list_agents(), and list_workflows()
+   validates every workflow — so the cost multiplies again (agents x workflows).
+D4 (agents 1->4, workflows 1->4) turned an already-slow path into an unusable one.
+
+FIX (surgical, no behavior change other than speed):
+
+A. services/skill_library.py — add a cheap NAMES-ONLY accessor, cached:
+     def list_skill_names() -> set[str] (or list[str])
+   It must scan the skill sources for names ONLY and must NOT call the telemetry collector
+   (_safe_collect_skill_tool_events/_telemetry). Reuse the existing source-scan path (_scan_all_sources /
+   _fingerprint_sources) and cache the result, invalidating on the existing source fingerprint so newly added
+   skills are still picked up. Do NOT change list_skills() — the Skills UI still needs telemetry.
+
+B. services/runtime_agents.py:
+   1. validate_agent_profile(): get known skills from skill_library.list_skill_names() instead of list_skills().
+   2. list_agents(): resolve the known-skill set ONCE per call and reuse it for every agent (e.g. an optional
+      `known_skills` parameter on validate_agent_profile defaulting to None -> looked up when not supplied).
+      Public behavior of validate_agent_profile(data) with one argument must stay identical.
+
+C. services/workflow.py: validate_workflow() currently calls runtime_agents.list_agents() itself, so
+   list_workflows() pays it per workflow. Compute the available-agent id set ONCE in list_workflows() and reuse
+   it across all workflows (e.g. an optional parameter on validate_workflow defaulting to None -> look it up).
+   validate_workflow(data) called with one argument must behave exactly as today (the API endpoint uses it).
+
+D. Tests — add harness/hub/tests/test_perf_skill_lookup.py (fast, no real CLIs, no sleeping):
+   1. validate_agent_profile still REJECTS an unknown skill and ACCEPTS a known one (behavior preserved).
+   2. Call-count regression: monkeypatch/spy the EXPENSIVE collector (the telemetry function) and assert
+      list_agents() over several agent files does NOT invoke it at all, and that the cheap name scan is invoked
+      at most once per list_agents() call. This is the actual guard — assert on call counts, not wall time.
+   3. list_workflows() over several workflows resolves agents once (spy runtime_agents.list_agents or the name
+      scan and assert it is not called per-workflow).
+   4. Existing behavior intact: list_workflows() still skips invalid workflows, validate_workflow(data) still
+      returns the same errors for the known bad cases.
+
+VERIFY (from repo root C:\Users\HUY\workspace\ai-project-opus):
+  .ih\Scripts\python.exe -m pytest harness/hub/tests -q      # must be GREEN (196 + new)
+Then measure the real thing and PRINT the numbers:
+  .ih\Scripts\python.exe -c "import sys,time; sys.path.insert(0,'harness/hub'); from services import workflow, runtime_agents; t=time.time(); workflow.list_workflows(); print('list_workflows', round(time.time()-t,2)); t=time.time(); runtime_agents.list_agents(); print('list_agents', round(time.time()-t,2))"
+  Target: list_workflows well under 2s (it was 54.66s).
+
+DONE = print: files changed, pytest result line, and the BEFORE/AFTER timing numbers.

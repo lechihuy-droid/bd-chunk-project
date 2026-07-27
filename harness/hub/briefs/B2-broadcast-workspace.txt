@@ -1,0 +1,34 @@
+STEP B2 — Broadcast chat in Workspace + retire #/chat (Hub v2 Phase B).
+Spec: harness/hub/BD-hub-v2-phaseB.md Step B2 (rewritten 2026-07-17 — read it).
+Study: harness/hub/web/workspace.js (chat state incl. provider/sessionId from
+B1v2/B3, streamChatResponse, renderChatPanel, renderMessages, composer),
+web/index.html (nav), web/app.js (route() switch — only the "#/chat" case).
+
+TASK:
+1. workspace.js — broadcast chats:
+   - Chat object may have providers: [id,...] (>=2 -> broadcast) instead of
+     single provider; sessionId becomes sessionIds: {provider: sid} for
+     broadcast chats (keep single-provider path exactly as-is — do NOT break it).
+   - "Broadcast" button next to New Chat: creates broadcast chat; provider
+     checkboxes (from state.providers, default = all available), stored on chat.
+   - Send: fire POST /api/chat per provider in parallel (independent fetch/
+     reader per provider, header X-Hub-Client). Assistant turn renders as a
+     grid row of columns `repeat(auto-fit,minmax(200px,1fr))`: column header =
+     provider label + status dot (streaming/ok/error) + usage tokens when done;
+     column body streams text independently; error in one column does not stop
+     others.
+   - done.session_id per provider -> sessionIds[provider]; next user turn
+     broadcasts again with each provider's own session_id.
+   - Stop all button aborts every in-flight reader (AbortController per provider).
+   - Sidebar chat row: badge "N⚡" for broadcast chats.
+2. Retire #/chat:
+   - index.html: remove the Chat nav link (keep Skills etc.).
+   - app.js route(): case "chat" -> { location.hash = "#/workspace"; return; }
+     Do NOT delete the old chat functions (dead code stays; cleanup is a later
+     step). Do not touch anything else in app.js.
+3. styles-workspace.css: broadcast column styles (reuse existing ws- tokens).
+
+VERIFY: node --check workspace.js && node --check app.js. Server boot + GET /
+200 with header. Do NOT commit. Do NOT touch backend/services/tests.
+FINAL MESSAGE: files changed, node results, state shape for broadcast chats,
+how Stop all works.

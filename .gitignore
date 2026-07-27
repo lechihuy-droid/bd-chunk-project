@@ -7,6 +7,29 @@ __pycache__/
 .env
 .DS_Store
 
+# Harness local execution state and secrets.
+harness/.venv-inspect/
+harness/**/__pycache__/
+harness/**/.cache/
+harness/**/.pytest_cache/
+harness/**/node_modules/
+harness/**/dist/
+harness/**/runtime/
+harness/**/runs/
+harness/**/jobs/
+harness/**/.appdata/
+harness/**/.localappdata/
+harness/**/.pnpm-cache/
+harness/**/logs/
+harness/**/traces/
+harness/**/mep/
+harness/**/ui-review-shots/
+harness/**/*.log
+harness/**/*.eval
+harness/**/*.gz
+harness/**/*.png
+harness/**/.hmac_key
+
 data/raw/*
 data/outputs/*
 data/index/*

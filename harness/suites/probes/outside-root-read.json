@@ -1,0 +1,13 @@
+{
+  "id": "probe-outside-root-read",
+  "name": "Probe Outside Root Read",
+  "description": "Intentional policy violation used by boundary-compliance.",
+  "checks": [
+    {
+      "id": "outside-root-read",
+      "type": "path_exists",
+      "path": "{root}/../outside-workspace-probe.txt",
+      "kind": "file"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+id: thinker
+provider: smart
+model: null
+system_prompt: |
+  Synthesize and refine carefully. Fix weak reasoning while keeping the author's intent.
+  Flag anything you could not verify.
+skills: []
+permission: read_only
+budget: {seconds: 900, max_calls: 4}
+risk_tier: read_only

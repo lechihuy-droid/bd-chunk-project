@@ -1,0 +1,84 @@
+STEP U3 — ĐIỀU PHỐI zone UI: Workflows · Agents · Skills (SD-ui-v3-rebuild.md §4 + §5 Phase U3).
+FRONTEND ONLY (web-v3 React). Model: gpt-5.6-luna. NO backend change (zero Python). Do NOT touch web/ (legacy).
+Do NOT run pnpm build (architect builds). Do NOT commit.
+
+READ FIRST:
+1. SD-ui-v3-rebuild.md §3 tokens, §4 page map (Workflows: list + YAML detail + Run; Agents: CRUD, tabs
+   Overview/Skills/Budget kiểu OpenClaw; Skills: index + detail + drift/deploy).
+2. harness/hub/web-v3/src/lib/{api.ts, markdown.tsx} — REUSE. api.ts: api<T>() for JSON GET/POST, apiRequest()
+   for streams, adds X-Hub-Client on non-GET. markdown.tsx renders SKILL.md safely (React elements only).
+3. harness/hub/web-v3/src/pages/{RunsPage,SessionsPage,ChatPage}.tsx — match their structure/styling/tokens.
+4. Backend services for exact response shapes — INSPECT before coding, do not guess fields:
+   - services/runtime_agents.py: REQUIRED_FIELDS=("id","provider","system_prompt","skills","permission",
+     "budget","risk_tier"); PERMISSIONS={"read_only","workspace_write"}; budget={seconds:int>0,max_calls:int>0};
+     skills = list of skill NAMES (must match skill_library names); provider must be a known provider id.
+   - services/skill_library.py: list_skills(), get_skill(id), drift(), deploy_log(), deploy(id,target).
+   - services/workflow.py: list_workflows() row shape (id, nodes[{id,agent,prompt,gate}], edges, stop).
+
+BACKEND API (all EXISTS — use exactly, change none):
+  Workflows:
+   GET  /api/workflows                 -> [{id, nodes, edges, stop}]
+   POST /api/workflows/validate {id} OR {yaml_text} -> {ok, errors[], ir}
+   PUT  /api/workflows/{id} {yaml_text} -> saved workflow (400 {detail} on invalid yaml/schema)
+   (Run: reuse /runs page — a "Chạy" button navigates to #/runs?wf=<id> and RunsPage preselects it; see task 1d)
+  Agents:
+   GET    /api/agents                  -> [agent yaml dict] (id, provider, model?, system_prompt, skills[],
+                                          permission, risk_tier, budget{seconds,max_calls})
+   POST   /api/agents {full agent dict} -> upsert (create OR update); 400 {detail} on validation error
+   DELETE /api/agents/{id}             -> {ok:true}
+   GET    /api/providers               -> [{id, available, ...}] (provider options for the form)
+  Skills (use the richer skill-library surface):
+   GET  /api/skill-library             -> skill index rows
+   GET  /api/skill-library/{id}        -> skill detail (SKILL.md content + metadata)
+   GET  /api/skill-library/drift       -> drift rows
+   GET  /api/skill-library/deploy-log  -> deploy history
+   POST /api/skill-library/{id}/deploy {target} -> deploy result (400 on bad target)
+
+SCOPE — three pages under web-v3/src/pages, wired into pages/index.tsx (replace the U3 placeholders):
+
+1. WorkflowsPage.tsx (/workflows):
+   a. Left: list of workflows (GET /api/workflows) — id + node count + a gate badge if any node.gate==='approval'.
+   b. Right (on select): YAML editor — a <textarea> mono showing the workflow's yaml. Since the list endpoint
+      returns parsed JSON not raw yaml, load raw via POST /api/workflows/validate {id} to get {ir} and also fetch
+      the yaml: there is no GET-raw-yaml endpoint, so render an editable view built from the JSON is NOT required —
+      instead show the parsed structure read-only (nodes list: id · agent · gate · prompt) PLUS an editable
+      <textarea> seeded from the current yaml IF you can obtain it; if raw yaml is not retrievable via existing
+      endpoints, make the textarea empty with a note and only enable "Lưu" (PUT) when the user pastes yaml.
+      Keep it honest: do not fabricate yaml round-trip. Primary value = view nodes + Validate + Run.
+   c. "Kiểm tra" (Validate) button -> POST /api/workflows/validate {yaml_text from textarea} -> show ok/errors inline.
+   d. "Chạy" (Run) button -> navigate to #/runs and preselect this workflow. Implement by RunsPage reading a
+      query/hash param (e.g. #/runs?wf=<id>): add minimal support in RunsPage to preselect the workflow from that
+      param on mount (small, additive; do not break existing RunsPage behavior). If simpler, store the chosen id in
+      sessionStorage key "hub-v3-run-wf" and have RunsPage read+clear it on mount.
+   e. Canvas is OUT OF SCOPE (SD: "canvas về sau").
+
+2. AgentsPage.tsx (/agents):
+   a. Left: list of agents (GET /api/agents) — id + provider color dot (tokens --claude/--codex/--nvidia/--gemini)
+      + permission badge. "+ Agent mới" button (blank form).
+   b. Right: detail/edit with 3 tabs (OpenClaw style): Overview (id, provider <select> from /api/providers,
+      model text, risk_tier <select>, system_prompt <textarea>), Skills (multi-check from skill names via
+      GET /api/skill-library — only known skills; agent.skills is a list of names), Budget (seconds + max_calls
+      number inputs, positive ints). Build the full agent dict and POST /api/agents to save (upsert). Show the
+      400 {detail} validation message inline on failure. "Xoá" -> DELETE /api/agents/{id} with a confirm.
+   c. id is immutable when editing an existing agent (POST is upsert keyed on id); for a new agent id is required.
+
+3. SkillsPage.tsx (/skills):
+   a. Index: table of skills (GET /api/skill-library) — render the actual fields returned (name, source, summary/
+      description, telemetry if present) — inspect the response, don't guess.
+   b. Detail (on select): GET /api/skill-library/{id} -> render SKILL.md via markdown.tsx + metadata.
+   c. A "Drift" section (GET /api/skill-library/drift) — list skills that drifted (dim if empty "Không có drift").
+   d. Deploy: per skill a "Triển khai" button -> POST /api/skill-library/{id}/deploy {target}; target chosen from a
+      small <select> or input (inspect what deploy() accepts). Show result; refresh deploy-log (GET .../deploy-log).
+
+SHARED:
+- Create a small reusable src/lib/Table.tsx (thead/tbody, tokens) and use it for the list/index tables (Sessions/
+  Skills). Keep it minimal — no sorting/paging unless trivial.
+- All fetches via api.ts. Vietnamese labels, sentence case, active-voice buttons. Tokens + Tailwind utilities only.
+  No new npm deps. Reuse markdown.tsx for any markdown. No dangerouslySetInnerHTML anywhere.
+- pages/index.tsx: route /workflows -> WorkflowsPage, /agents -> AgentsPage, /skills -> SkillsPage (remove those 3
+  placeholders; leave U4 placeholders approvals/usage/settings intact).
+
+VERIFY YOURSELF (no build): cd harness/hub/web-v3 && pnpm exec tsc -b must pass (if EPERM on .tsbuildinfo in your
+sandbox, run the equivalent no-emit type check and say so).
+DONE = summary: files created/changed, tsc result, per-page behaviors wired (Workflows view+validate+run,
+Agents CRUD+tabs, Skills index+detail+drift+deploy).

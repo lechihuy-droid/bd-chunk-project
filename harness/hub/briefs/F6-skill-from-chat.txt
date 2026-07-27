@@ -1,0 +1,52 @@
+STEP F6 — Kích hoạt Skill trực tiếp từ chat (SD-chat-control-plane.md §4). Model: gpt-5.6-luna.
+BACKEND + FRONTEND. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+⚠️ ĐIỀU KIỆN TIÊN QUYẾT: F5 phải xong trước. F6 dùng LẠI đường đưa system prompt vào provider mà F5 đã
+dựng. TUYỆT ĐỐI KHÔNG dựng đường thứ hai — hai cơ chế chèn prompt hệ thống song song là mầm lỗi.
+
+BỐI CẢNH — review ChatGPT §5.3: cho phép `#skill`, hiện chip skill đang bật kèm scope, và phải luôn thấy
+skill nào đang áp dụng để không quên tắt.
+
+SỰ THẬT ĐÃ KIỂM: `services/skill_library.py` có `list_skill_names()` (chỉ tên, CÓ CACHE) và `list_skills()`
+(kèm telemetry, RẤT CHẬM — từng làm `/api/workflows` treo 55 giây trên workspace thật, xem commit b70ce08).
+⚠️ Đường chat BẮT BUỘC dùng `list_skill_names()`. Dùng `list_skills()` là tái phạm đúng lỗi cũ.
+
+════ A. BACKEND ════
+
+A1. `/api/chat` nhận thêm `skills` (tuỳ chọn, mảng chuỗi id skill).
+    - Skill không tồn tại -> 400 kèm tên sai. Kiểm bằng `list_skill_names()`.
+    - Nội dung skill nạp qua hàm đọc có sẵn của `skill_library` (TỰ ĐỌC FILE ĐÓ để tìm hàm đúng; nếu
+      chưa có hàm đọc nội dung thì thêm một hàm nhỏ, đi qua `boundary.resolve_in_root` như
+      `services/workflow.py::workflow_path` đang làm — KHÔNG ghép đường dẫn từ id thô).
+    - Nội dung skill nối vào system prompt, SAU `system_prompt` của agent nếu có. Agent định nghĩa vai trò,
+      skill bổ sung nhiệm vụ — thứ tự này không được đảo.
+    - Giới hạn tổng độ dài skill đưa vào prompt; vượt thì cắt và BÁO cho client biết là đã cắt,
+      đừng cắt im lặng.
+
+A2. Test: skill không tồn tại -> 400 · skill hợp lệ -> nội dung có mặt trong prompt gửi đi ·
+    agent + skill cùng lúc -> đúng thứ tự · REGRESSION: không gửi `skills` thì chạy y như cũ ·
+    đường chat KHÔNG gọi `list_skills()` (monkeypatch nó raise, chat vẫn phải chạy).
+
+════ B. FRONTEND — src/pages/ChatPage.tsx ════
+
+B1. Gõ `#` trong composer -> hiện danh sách skill để chọn (nạp từ `GET /api/skills`, lọc theo chữ đang gõ).
+    Chọn xong -> thành chip `[# tên-skill ×]` phía trên ô nhập. Gõ `#tên` đầy đủ rồi cách cũng thành chip.
+
+B2. SCOPE mỗi chip, chọn bằng dropdown ngay trên chip:
+    - "Lượt này" (mặc định) — chỉ gửi kèm ở lượt gửi tiếp theo rồi tự bỏ chip.
+    - "Cả cửa sổ" — gửi kèm mọi lượt cho tới khi người dùng bỏ chip.
+    Chỉ hai mức. KHÔNG làm 5 mức như review đề xuất — chưa có nhu cầu thật, thêm mức là thêm chỗ sai.
+
+B3. Chip skill đang bật phải hiện Ở HEADER PANE nữa, không chỉ ở composer. Lý do review nêu đúng:
+    người dùng quên mất skill vẫn đang áp dụng. Scope "Cả cửa sổ" mà không thấy ở đâu là bẫy.
+
+B4. Skill gửi kèm theo đúng các pane đang được chọn ở target selector (F3), không phải mọi pane.
+
+RÀNG BUỘC: không đụng `send()` (chỉ thêm trường vào body), parseSse, `patchMessage`, lược đồ localStorage
+`hub-v3-chat`, giới hạn 4 pane, panel artifact, F1/F2/F3/F4/F5. Nhãn tiếng Việt, không thêm dep,
+không dangerouslySetInnerHTML.
+
+KIỂM TRA: cd /c/Users/HUY/workspace/ai-project-opus && .ih/Scripts/python.exe -m pytest harness/hub/tests -q
+          cd harness/hub/web-v3 && pnpm exec tsc -b
+DONE = file sửa, hàm đọc nội dung skill đã dùng/thêm, cách nối với system prompt của F5, dòng pytest, tsc.

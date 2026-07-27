@@ -1,0 +1,5 @@
+{"type":"assistant","timestamp":"2026-06-27T10:00:00Z","message":{"role":"assistant","model":"claude-opus-4-8","content":[{"type":"text","text":"Inspect."},{"type":"tool_use","id":"tool-1","name":"Bash","input":{"command":"Get-ChildItem harness"}}]}}
+{"type":"assistant","timestamp":"2026-06-27T10:00:05Z","message":{"role":"assistant","model":"claude-opus-4-8","content":[{"type":"tool_use","id":"tool-2","name":"Read","input":{"file_path":"harness/hub/server.py"}}]}}
+{"type":"assistant","timestamp":"2026-06-27T10:00:10Z","message":{"role":"assistant","model":"claude-opus-4-8","content":[{"type":"tool_use","id":"tool-3","name":"Edit","input":{"file_path":"harness/hub/server.py"}}]}}
+{"type":"assistant","timestamp":"2026-06-27T10:00:02Z","message":{"role":"assistant","model":"claude-opus-4-8","content":[{"type":"tool_use","id":"tool-4","name":"Write","input":{"file_path":"harness/hub/services/behavior.py"}}]}}
+{"type":"assistant","timestamp":"2026-06-27T11:10:03Z","message":{"role":"assistant","model":"claude-opus-4-8","content":[{"type":"tool_use","id":"tool-5","name":"Grep","input":{"pattern":"tool_use"}}]}}

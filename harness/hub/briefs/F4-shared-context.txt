@@ -1,0 +1,57 @@
+STEP F4 — Shared context và pane-local context (SD-chat-control-plane.md §4). Model: gpt-5.6-luna.
+FRONTEND ONLY (web-v3). Zero Python. Không thêm dep. Không chạy pnpm build. Không commit.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+BỐI CẢNH — review ChatGPT §5.4 đòi tách hai lớp context: shared (objective, quyết định đã chốt, thông tin
+ghim) và pane-local (lịch sử riêng từng model).
+
+⚠️ RÀNG BUỘC KỸ THUẬT BẮT BUỘC ĐỌC TRƯỚC KHI THIẾT KẾ:
+`/api/chat` **TỪ CHỐI role `system`** — server.py:112: "message role must be user or assistant".
+Nên shared context KHÔNG thể gửi dưới dạng system message ở phase này (đó là việc của F5).
+Cách làm ở F4: **chèn thẳng vào phần text của message user**, có nhãn rõ ràng. Người dùng phải nhìn thấy
+được chính xác cái gì đã được gửi đi — không có context tàng hình.
+
+PHẠM VI — src/pages/ChatPage.tsx (+ src/lib/ nếu tách hàm thuần):
+
+1. KHỐI SHARED CONTEXT — hiện ở đầu composer đáy (F3), thu gọn được:
+   - Một ô textarea "Bối cảnh chung" người dùng tự gõ (objective, ràng buộc, quyết định đã chốt).
+   - Danh sách message đã GHIM (mục 2), mỗi cái hiện 1 dòng rút gọn + nút bỏ ghim.
+   - Lưu vào localStorage bằng KHOÁ RIÊNG (ví dụ `hub-v3-shared-context`).
+     ⚠️ TUYỆT ĐỐI KHÔNG nhét vào khoá `hub-v3-chat` — lược đồ đó đang được dùng và đã có lỗi vì bị sửa
+     lược đồ trước đây (cờ `streaming` bị lược mất làm hỏng cả tính năng artifact).
+
+2. GHIM MESSAGE: thêm hành động "Ghim" vào message của assistant (cạnh nút Copy hiện có).
+   Ghim = đưa nội dung message đó vào shared context. Bỏ ghim được. Ghim tối đa 10 mục, vượt thì báo.
+
+3. GỬI KÈM SHARED CONTEXT — đây là phần dễ sai nhất, làm đúng theo mô tả:
+   Khi shared context KHÔNG rỗng, prompt gửi đi có dạng:
+       [Bối cảnh chung]
+       <nội dung shared context>
+
+       [Yêu cầu]
+       <text người dùng vừa gõ>
+   NHƯNG chỉ chèn khi CẦN:
+   - Pane chưa từng gửi lượt nào -> CHÈN.
+   - Shared context đã ĐỔI kể từ lần cuối chèn vào pane đó -> CHÈN.
+   - Ngược lại -> KHÔNG chèn, gửi mỗi text người dùng.
+   Lý do: provider CLI (claude/codex) resume theo `cliSessionId` và chỉ nhận message mới; chèn lại nguyên
+   khối bối cảnh mỗi lượt sẽ phình session và đốt token vô ích.
+   Cách theo dõi: lưu theo từng pane một dấu vân tay (hash hoặc chính chuỗi) của shared context lần cuối
+   đã chèn. Lưu trong state React theo `pane.id`, KHÔNG theo chỉ số mảng.
+
+4. HIỆN DUNG LƯỢNG hai lớp, cạnh số liệu token của F2:
+       Bối cảnh chung: ~1.2k · claude riêng: ~8.4k · codex riêng: ~5.1k
+   - Shared: ước tính từ số ký tự (chia 4). Local: ước tính từ tổng ký tự message của pane đó.
+   - BẮT BUỘC có dấu "~" và chú thích rằng đây là ƯỚC TÍNH theo ký tự, KHÔNG phải số token thật.
+     Số token thật chỉ có sau khi provider trả `usage` (F2 đã hiện riêng) — đừng trộn hai loại số này
+     làm một, và đừng để người đọc tưởng ước tính là số đo.
+
+5. XEM TRƯỚC: nút nhỏ "Xem prompt sẽ gửi" mở ra đúng chuỗi cuối cùng sắp gửi cho pane đang chọn,
+   gồm cả khối bối cảnh nếu lần này có chèn. Không có context tàng hình.
+
+RÀNG BUỘC: không đụng `send()` (chỉ đổi CHUỖI truyền vào nó), parseSse, `patchMessage`, lược đồ
+localStorage `hub-v3-chat`, giới hạn 4 pane, panel artifact, F1 error card/menu `…`, F2 token meter,
+F3 target selector. Nhãn tiếng Việt, không thêm dep, không dangerouslySetInnerHTML.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b   # EPERM .tsbuildinfo -> chạy --noEmit và nói rõ
+DONE = file sửa, quy tắc chèn lại ở mục 3 đã cài thế nào, kết quả tsc.

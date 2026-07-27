@@ -1,0 +1,22 @@
+{
+  "plan_id": "hub-super-agent-runtime",
+  "latest": "v0.2",
+  "latest_file": "v0.2-langgraph-integrated.md",
+  "updated": "2026-07-04",
+  "versions": [
+    {
+      "version": "v0.2",
+      "file": "v0.2-langgraph-integrated.md",
+      "status": "latest",
+      "date": "2026-07-04",
+      "supersedes": "v0.1"
+    },
+    {
+      "version": "v0.1",
+      "file": "v0.1-deerflow-baseline.md",
+      "status": "superseded",
+      "date": "2026-07-04",
+      "superseded_by": "v0.2"
+    }
+  ]
+}

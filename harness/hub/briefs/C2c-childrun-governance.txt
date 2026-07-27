@@ -1,0 +1,199 @@
+STEP C2c — Child-run / sub-agent packet + governance (Hub v2 Phase C). Runs
+AFTER C2b lands (depends on it — extends services/workflow_exec.py). Spec:
+harness/hub/BD-hub-v2-phaseC.md Step C2c. Read it + ARCHITECTURE.md §9 (Super
+Agent principles: sub-agents never self-spawn, only via child task packet +
+governance check; blackboard append-only/replayable) + RD FR-121→124.
+
+Study: harness/hub/services/workflow_exec.py (C2b's output — you are adding a
+spawn branch inside its per-node loop; read the whole file, especially how
+node_index/node_outputs/agent_calls/agent_elapsed_seconds are tracked in run
+metadata and the exact SSE event helper functions it defines). harness/hub/
+services/workflow.py (C2a's output, possibly touched already by C2b — you are
+adding `spawn:` to the node schema; read parse_workflow/validate_workflow/
+build_ir in full before editing). harness/hub/services/runtime_children.py
+(FULL — `create_child_run(parent_run_id, raw_packet)`,
+`complete_child_run(child_run_id, artifacts)`, `fail_child_run(child_run_id,
+message, timed_out=)`). harness/hub/services/governance.py
+(`effective_blocked_tiers(level=None) -> list[str]`, `record_denial(job_id,
+reasons, escalate=False)`). harness/hub/services/risk.py (`TIERS =
+["read_only", "write", "execute", "network", "destructive"]` — this is the
+risk_tier vocabulary agent profiles use per C1's schema). harness/hub/tests/
+test_runtime.py's `test_runtime_child_run_constraints_and_artifact_merge` (the
+existing test style for runtime_children — your child-spawn tests should feel
+similar).
+
+TWO CONTRACT FACTS THAT CHANGE THE SHAPE OF THIS WORK — verify them yourself
+by reading runtime_children.py before assuming the BD prose is complete:
+
+1. `create_child_run` is a pure bookkeeping call — it creates the child's run
+   record (+ optionally a gitjob) and returns immediately. It does NOT execute
+   any agent, call any provider, or produce any output by itself. "Child
+   executes via same node-execution helper" (per BD) means workflow_exec
+   itself must drive the child's provider call inline, synchronously, using
+   the same render/call/collect logic C2b built for regular nodes — then
+   call `runtime_children.complete_child_run(child_run_id, artifacts)` or
+   `fail_child_run(child_run_id, message)` yourself once the child's provider
+   stream finishes. There is no background executor to hand this off to.
+2. `create_child_run` raises `ValueError("Only the lead runtime can spawn
+   child runs")` unless the PARENT run's `metadata.agent_id == "lead"`. C2b's
+   brief already mandates the workflow run be created with `agent_id="lead"`
+   for exactly this reason — verify C2b actually did this (check the run's
+   metadata in a quick sanity test) before writing your own tests, otherwise
+   every spawn will hard-fail with a confusing ValueError that looks like a
+   governance bug but isn't.
+3. `_packet()`'s accepted raw_packet keys are exactly: objective, agent_id (or
+   agent), allowed_paths, allowed_tools, skills, budget (dict, passed through
+   as-is, NOT validated against any schema), timeout_seconds, use_gitjob.
+   `budget` already flows through untouched — you very likely do NOT need to
+   add a field to runtime_children.py at all; just pass `agent["budget"]`
+   (the spawned agent's own profile budget dict, per BD: "budget from agent
+   profile") as `raw_packet["budget"]`. There is no `handoff_contract` field
+   in `_packet()` and adding one is unnecessary — the "write findings to
+   blackboard claims.jsonl" contract can be enforced entirely inside
+   workflow_exec's own child-execution code (you already control both ends:
+   you build the child's raw_packet AND you drive its execution loop AND you
+   decide where its output gets written). Only touch runtime_children.py if,
+   after reading it, you find an actual gap — do not add speculative fields.
+4. `allowed_paths`/`allowed_tools` subset-of-parent enforcement in
+   `_ensure_subset` is a no-op whenever the PARENT's `metadata.allowed_paths`/
+   `allowed_tools` is empty (the check returns early if `not parent`). The
+   workflow schema has no allowed_paths/allowed_tools concept, so unless you
+   deliberately set them on the workflow run, this check is permissive by
+   default — that's fine and expected, just don't be surprised when a
+   deliberately-too-broad child packet in a test doesn't raise.
+
+TASK:
+1. workflow.py — add `spawn:` to the node schema (minimal, additive):
+   - Each node MAY have an optional `spawn: list[{agent: str, objective:
+     str}]` (both fields required within each spawn item if `spawn` is
+     present at all; empty list or omitted key both mean "no spawn").
+   - `validate_workflow` additions (append to the existing per-node checks,
+     still collecting ALL errors, not raising): each spawn item's `agent`
+     must be in the same agent-id set used for node.agent validation
+     (`{a["id"] for a in runtime_agents.list_agents()}`) — unknown agent id
+     is an error naming the id, same message style as the existing
+     "missing agent" check. Each spawn item's `objective` is a non-empty
+     string; its `{{...}}` template tokens follow the SAME forward-reference
+     rule as node prompts (only "objective" or "<earlier_node>_output" where
+     "earlier" is relative to the spawning node's own position in the walk
+     order) — reuse/extend the existing template-token check rather than
+     duplicating it.
+   - `build_ir` additions: each IR entry's `spawn` key (default `[]`) is a
+     list of `{"agent": <resolved agent profile dict>, "objective":
+     <template string, NOT yet rendered>}` — same "resolve agent id to full
+     profile dict" treatment the node's own `agent` key already gets.
+   - Add a `harness/hub/workflows/*.workflow.yaml` fixture only if useful for
+     your own tests; not required by the DoD (C2b/C2a's sample workflow is
+     enough for the live end-to-end demo, which doesn't need spawn).
+2. workflow_exec.py — extend the per-node loop (after a node completes
+   successfully, before moving to the next node index):
+   - For each `spawn` item on the completed node (if any):
+     a. Render `objective` via the same `render_template` helper C2b built,
+        using the same context (`objective` + `node_outputs` so far).
+     b. Governance check: `blocked = governance.effective_blocked_tiers()`;
+        if `spawn_agent["risk_tier"] in blocked`: call
+        `governance.record_denial(run_id, [f"risk_tier '{tier}' blocked for
+        agent '{agent_id}'"])` (escalate=False — a workflow config denial is
+        not itself an attack signal), emit an `error`-type SSE event scoped
+        to this spawn (include which agent/node was denied in the message —
+        do not fail the whole run), and continue to the NEXT spawn item /
+        next node — the parent run keeps going. Do not call
+        `create_child_run` at all for a denied spawn.
+     c. If allowed: build `raw_packet = {"objective": rendered_objective,
+        "agent_id": spawn_agent["id"], "budget": spawn_agent["budget"],
+        "skills": spawn_agent.get("skills", [])}` (omit allowed_paths/
+        allowed_tools/timeout_seconds/use_gitjob unless you have a concrete
+        reason to set them — defaults in `_packet()` handle their absence).
+        Call `runtime_children.create_child_run(run_id, raw_packet)` →
+        gives you `child_run_id`.
+     d. Execute the child inline using the SAME render/call/collect logic
+        as a regular node (messages = system_prompt + rendered objective,
+        `get_provider(spawn_agent["provider"])`, iterate `stream_chat`,
+        forward child deltas as SSE `child_run` events — namespaced so C3 can
+        tell parent vs child streams apart, e.g. include `child_run_id` and
+        `parent_run_id` fields on the event). Track child budget the same way
+        (agent_calls/agent_elapsed_seconds scoped to the CHILD run's own
+        metadata, independent counters from the parent's — a child is a
+        fresh run).
+     e. On child success: `runtime_children.complete_child_run(child_run_id,
+        artifacts=[...])`; append the child's full output text as one JSON
+        line to `<parent run dir>/artifacts/claims.jsonl` (append-only,
+        never truncate/rewrite — use `runtime_state.runtime_path("run",
+        run_id, "artifacts", "claims.jsonl")` to resolve the path safely,
+        `mkdir(parents=True, exist_ok=True)` the parent dir, open in append
+        mode). Each claims.jsonl line should carry enough to reconstruct
+        provenance: `{"child_run_id":, "node_id":, "agent_id":, "objective":,
+        "output":, "ts":}`.
+        Store `node_outputs[f"{node_id}_claims"]` = a short summary (e.g. the
+        child's raw output text, or a pointer) so that a LATER node's prompt
+        can reference `{{<node_id>_claims}}` — add this token pattern to
+        workflow.py's template-token validation in TASK 1 alongside
+        "<node_id>_output" (same forward-reference rule, just a second
+        allowed suffix).
+     f. On child failure (provider error event from the child's own stream):
+        `runtime_children.fail_child_run(child_run_id, message)`; emit an
+        `error`-scoped `child_run` SSE event; the PARENT run does NOT fail —
+        this is the isolation requirement from the BD/DoD ("parent completes
+        when child fails"). Continue to the next spawn item / next node
+        normally.
+   - None of this blocks or delays the parent's own node_index advancement —
+     spawns are a side effect of a completed node, not a gate (gates are
+     `gate: approval`, already handled by C2b; spawn has no gate semantics).
+3. Tests in harness/hub/tests/test_childrun.py (new file), reusing the
+   `run_workflow`-direct-call test style from C2b (fake provider via
+   `monkeypatch.setitem(providers.registry, "fake", ...)`, hand-built IR with
+   a `spawn` entry on one node):
+   - Blocked tier denied: monkeypatch
+     `governance.effective_blocked_tiers` (or set up real governance state
+     via the `GOVERNANCE_STATE_FILE` tmp path like test_runtime.py's fixture
+     does) so the spawned agent's `risk_tier` is blocked → assert
+     `create_child_run` is never called (e.g. spy/monkeypatch it to raise if
+     called, or assert no new run appears under `runtime_state.list_runs()`
+     beyond the parent), assert `governance` recorded a denial (check
+     `governance.status()["recent_denials"]` or the state file), assert the
+     parent run still reaches "succeeded".
+   - Allowed child runs with fake provider: assert a child run_id appears,
+     its status is "succeeded", `claims.jsonl` exists under the parent run's
+     artifacts dir with one line containing the child's output text, and
+     `runtime_state.read_run(parent_run_id)["child_runs"]` includes the child
+     (via `complete_child_run`'s own parent-side bookkeeping).
+   - Parent completes when child fails: fake child provider yields an
+     `error` event → child run status "failed", parent run status still
+     reaches "succeeded", claims.jsonl either absent or unaffected for that
+     child.
+   - (Sanity, not necessarily a separate test) confirm the parent run was
+     created with `metadata.agent_id == "lead"` — if this assertion fails,
+     the bug is in C2b's run creation, not your spawn code; do not "fix" it
+     by loosening runtime_children's check.
+
+RUN: .ih\Scripts\python.exe -m pytest harness/hub/tests/test_childrun.py -q
+(green) — then .ih\Scripts\python.exe -m pytest harness/hub/tests -q as a
+full-suite regression check, paying particular attention to
+test_workflow_exec.py (C2b) and test_runtime.py's existing child-run test
+still passing unmodified.
+Scope whitelist: services/workflow_exec.py (extend, same file C2b created),
+services/workflow.py (spawn schema + validation + build_ir additions only —
+do not touch agent-node validation logic C2a already wrote beyond what's
+needed to add the spawn checks), services/runtime_children.py (ONLY if you
+find, after reading it, a genuine gap — expected outcome per the analysis
+above is that you do NOT need to touch this file), tests/test_childrun.py
+(new). Do NOT touch: runtime_pipeline.py, runtime_agents.py, server.py (no
+new routes needed — spawn is an internal side effect of an existing workflow
+run, not a new API surface), governance.py (only call its existing public
+functions, do not add new ones). Do NOT commit.
+FINAL MESSAGE: files changed, pytest result (scoped + full-suite), whether you
+ended up touching runtime_children.py and why (if you did), the exact
+claims.jsonl line schema you wrote, and confirmation that a denied spawn and
+a failed child both leave the parent run status "succeeded" (isolation
+requirement).
+
+ADDENDUM (orchestra, 2026-07-17) — REAL REJECT SEMANTICS (required):
+C3's HITL panel sends action "reject" to the workflow resume route. Current
+C2b spec only logs the action and re-enters the node (audit-only) — that is
+NOT acceptable for a governance gate. In workflow_exec.py resume path:
+- action == "approve" (or "resume"): re-enter gated node as specced.
+- action == "reject": do NOT execute the node. Mark run status
+  "failed" with metadata.error "rejected at gate:<node_id>", write checkpoint,
+  emit SSE error event {message: "rejected at gate:<node_id>"}, end stream.
+Test: gate node -> resolve with action reject -> run failed, provider NOT
+called (fake provider records zero calls for that node).

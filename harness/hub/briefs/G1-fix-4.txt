@@ -1,0 +1,71 @@
+STEP G1-fix-4 — bảng màu di trú DỞ DANG, nhiều class đang chết âm thầm. FRONTEND ONLY.
+Model: gpt-5.6-luna. Không thêm dep. Không chạy pnpm build. Không commit.
+Cấm sửa file cấu hình thật để thử.
+(Lệnh "không build / không commit" áp cho Codex; kiến trúc sư lo build và commit.)
+
+════ BẰNG CHỨNG ĐO TRÊN TRÌNH DUYỆT (bản build hiện tại, trang /#/usage) ════
+Kiểm computed style của phần tử THẬT đang mang class cũ:
+    bg-panel     -> rgb(20,24,33)      CÒN SỐNG
+    text-dim     -> rgb(155,167,184)   CÒN SỐNG
+    bg-panel2    -> rgba(0,0,0,0)      **CHẾT** (mất nền)
+    text-faint   -> rgb(238,242,248)   **CHẾT** (rơi về màu chữ chính, hết phân cấp)
+    border-line  -> viền lấy màu chữ   **CHẾT**
+    bg-ink       -> rgba(0,0,0,0)      **CHẾT**
+    text-text    -> rơi về kế thừa     **CHẾT**
+Số phần tử mang các class này CHỈ RIÊNG trang Usage: **136**.
+Toàn dự án còn **384 lượt dùng** các class màu cũ trong pages/ và components/.
+
+HẬU QUẢ NHÌN THẤY: chip và ô nhập mất nền, nhãn phụ sáng ngang nhãn chính (mất hierarchy),
+viền ngả trắng vì lấy màu chữ. `tsc` và `pnpm build` KHÔNG bao giờ bắt được — class không tồn tại thì
+Tailwind chỉ lặng lẽ không sinh rule.
+
+⚠️ Đây là hệ quả của G1-fix-3: token mới đã vào `@theme` (tốt), nhưng bảng CŨ bị gỡ đi một phần trong khi
+384 chỗ gọi vẫn dùng tên cũ. Nửa vời còn tệ hơn cả hai lựa chọn dứt khoát.
+
+════ VIỆC ════
+
+A. DI TRÚ HẾT 384 LƯỢT sang tên token mới. Ánh xạ (đối chiếu lại với DESIGN.md §3 trước khi làm):
+       bg-ink        -> bg-app
+       bg-panel      -> bg-surface        (kiểm lại: sidebar/topbar dùng bg-sidebar)
+       bg-panel2     -> bg-elevated
+       border-line   -> border-border-subtle   (viền cần nhấn -> border-border-strong)
+       text-text     -> text-primary
+       text-dim      -> text-secondary
+       text-faint    -> text-muted
+       bg-gate/text-gate -> warning ; bg-ok/text-ok -> success ; bg-err/text-err -> error
+   GIỮ NGUYÊN `claude/codex/nvidia/gemini` — chỉ dùng trong ProviderDot.
+
+B. SAU KHI DI TRÚ, XOÁ HẲN token cũ khỏi `@theme` trong index.css
+   (`--color-ink`, `--color-panel`, `--color-panel2`, `--color-line`, `--color-text`, `--color-dim`,
+   `--color-faint`, `--color-gate`, `--color-ok`, `--color-err` — kiểm tên thật trong file).
+   Chỉ còn MỘT bảng màu. Nếu xoá xong mà còn chỗ nào tham chiếu tên cũ thì phải sửa nốt chỗ đó.
+
+C. GỠ CLASS ĐÈ Ở CHỖ GỌI PRIMITIVE. Có **14 chỗ** truyền `className` vào `<Button>`; nhiều chỗ truyền
+   nền/viền/bo góc, đè lên variant. Ví dụ thật trong ChatPage.tsx (panel artifact):
+       <Button variant="ghost" className="rounded border border-line px-2 py-1">
+   Bỏ hết class nền/viền/bo góc ở chỗ gọi; chỉ giữ class BỐ CỤC (flex, w-, gap-, m-, truncate…).
+   Việc chỉnh hình thức là của variant, không phải của chỗ gọi.
+
+D. BO GÓC LỆCH THANG: còn class `rounded` trần (4px) trong ChatPage.tsx, SessionsPage.tsx, UsagePage.tsx.
+   DESIGN.md chỉ cho 6/8/12/999. Đổi sang `rounded-sm|md|lg|full` cho đúng vai trò.
+   Kiểm chứng: tập `borderRadius` phân biệt trên mỗi trang KHÔNG được chứa `4px`.
+
+E. CÁC TRANG CHƯA DÙNG PRIMITIVE: còn control thô ở
+       AgentsPage.tsx 3 · ApprovalsPage.tsx 3 · SkillsPage.tsx 3 · RunsPage.tsx 1 · SessionsPage.tsx 1
+   Đo trên trình duyệt: SkillsPage có 16 nút mà **0** nút dùng primitive (không có focus ring),
+   AgentsPage 7/9 nút không có focus ring. Chuyển nốt sang Button/IconButton/Input/Select/Textarea.
+   (`lib/markdown.tsx` có 1 nút Copy trong khối code — chuyển sang IconButton hoặc Button ghost.)
+
+F. NGHIỆM THU BẮT BUỘC — đo, đừng khẳng định suông:
+   1. `grep` toàn bộ src/: KHÔNG còn lượt dùng nào của 7 class cũ ở mục A.
+   2. Không còn token cũ trong `@theme`.
+   3. Nếu chạy được trình duyệt: trên /#/usage, đếm phần tử có `backgroundColor` trong suốt mà lẽ ra phải
+      có nền -> phải là 0; và tập `borderRadius` không chứa `4px`.
+      Không chạy được trình duyệt thì NÓI RÕ chưa kiểm, đừng khẳng định.
+
+KHÔNG ĐỔI HÀNH VI. Không đụng `send()`, parseSse, `patchMessage`, localStorage, luồng SSE.
+KHÔNG làm hỏng: chat ghim theo viewport (4 pane -> scrollHeight ≈ innerHeight, lưới cuộn nội bộ),
+đúng MỘT nút nền `rgb(139,124,246)` trên trang chat, panel artifact, canvas workflow.
+
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b     # BẮT BUỘC -b
+DONE = số lượt đã di trú theo từng class, xác nhận đã xoá token cũ, kết quả 3 mục nghiệm thu ở F, `tsc -b`.

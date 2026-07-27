@@ -1,0 +1,24 @@
+STEP U1-fix-1 — four review fixes in web-v3 (frontend only, zero Python, no build, no commit).
+File: harness/hub/web-v3/src/pages/ChatPage.tsx + src/lib/api.ts. Reviewer line refs approximate — locate by logic.
+
+1. MED — stop/abort leaves pane stuck streaming (ChatPage ~39-50):
+   a. In the send() abort/error path: on AbortError (and any throw), patch last message
+      { streaming: false } before returning — use a finally so every exit clears it.
+   b. When persisting panes to localStorage, strip the transient streaming flag
+      (map messages to { ...m, streaming: undefined } or omit key) so a reload never
+      restores a permanently-stuck streaming bubble.
+
+2. MED — nvidia reasoning chunks overwritten (ChatPage ~34): reasoning event must APPEND
+   like the delta handler (functional patch: m => ({ reasoning: (m.reasoning ?? '') + text })),
+   not replace.
+
+3. LOW — api.ts dead detail extraction: apiRequest throws on !ok before api() parses the
+   body detail. Restructure so the JSON body's `detail` (when present) reaches the thrown
+   error message; keep typed error with status.
+
+4. LOW — broadcast double-stream corruption (ChatPage ~21): sendAll must skip panes whose
+   last message has streaming true (guard before send per pane).
+
+Do not refactor anything else (leave the getElementById provider picker as is).
+VERIFY: cd harness/hub/web-v3 && pnpm exec tsc -b (must pass).
+DONE = list of changed hunks (file + what).
