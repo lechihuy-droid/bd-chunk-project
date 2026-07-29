@@ -1,0 +1,39 @@
+{
+  "document": {
+    "id": "RD-001",
+    "name": "Authentication Requirement Definition",
+    "type": "RequirementDefinition",
+    "version": "1.2",
+    "status": "active",
+    "module": "Authentication",
+    "source_path": "samples/rd/RD-001.xlsx"
+  },
+  "entities": [
+    {
+      "id": "REQ-101",
+      "type": "Requirement",
+      "name": "Account lock after failed login",
+      "description": "Lock an account after five consecutive failed login attempts.",
+      "source_document_id": "RD-001",
+      "source_location": "Sheet: Requirements, Row: 18",
+      "confidence": 0.94,
+      "extraction_method": "llm_structured_output",
+      "document_version": "1.2",
+      "review_status": "pending"
+    }
+  ],
+  "relationships": [
+    {
+      "source": "REQ-101",
+      "type": "governed_by",
+      "target": "BR-SEC-03",
+      "source_document_id": "RD-001",
+      "source_location": "Sheet: Requirements, Row: 18",
+      "evidence": "The account shall be locked after five consecutive failed login attempts.",
+      "confidence": 0.91,
+      "extraction_method": "llm_structured_output",
+      "document_version": "1.2",
+      "review_status": "pending"
+    }
+  ]
+}

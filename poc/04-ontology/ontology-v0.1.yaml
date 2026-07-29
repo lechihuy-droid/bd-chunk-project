@@ -1,0 +1,83 @@
+version: 0.1
+name: rd-to-bd-poc-ontology
+
+entities:
+  Document:
+    required_fields: [id, name, document_type, version, status, source_path]
+  Requirement:
+    required_fields: [id, name, description]
+  BusinessRule:
+    required_fields: [id, name, description]
+  Actor:
+    required_fields: [id, name]
+  Process:
+    required_fields: [id, name]
+  Screen:
+    required_fields: [id, name]
+  ScreenField:
+    required_fields: [id, name]
+  API:
+    required_fields: [id, name]
+  DataObject:
+    required_fields: [id, name]
+  Table:
+    required_fields: [id, name]
+  Column:
+    required_fields: [id, name]
+  Batch:
+    required_fields: [id, name]
+  Interface:
+    required_fields: [id, name]
+  Module:
+    required_fields: [id, name]
+  Version:
+    required_fields: [id, value]
+
+relationships:
+  describes:
+    from: [Document]
+    to: [Requirement, BusinessRule, Actor, Process, Screen, ScreenField, API, DataObject, Table, Column, Batch, Interface]
+  belongs_to:
+    from: [Requirement, BusinessRule, Actor, Process, Screen, API, Table, Batch, Interface]
+    to: [Module]
+  supersedes:
+    from: [Document]
+    to: [Document]
+  implemented_by:
+    from: [Requirement]
+    to: [Screen, API, Batch, Interface]
+  governed_by:
+    from: [Requirement, Screen, API, Batch, Interface]
+    to: [BusinessRule]
+  invokes:
+    from: [Screen, API, Batch]
+    to: [API, Batch, Interface]
+  contains:
+    from: [Screen, Table]
+    to: [ScreenField, Column]
+  reads:
+    from: [API, Batch, Interface]
+    to: [Table, DataObject]
+  writes:
+    from: [API, Batch, Interface]
+    to: [Table, DataObject]
+  affects:
+    from: [Requirement]
+    to: [Screen, API, Table, Batch, Interface, BusinessRule]
+  references:
+    from: [Document, Requirement, BusinessRule, Screen, API, Batch, Interface]
+    to: [Document, Requirement, BusinessRule, Screen, API, Table, Batch, Interface]
+
+provenance_required:
+  - source_document_id
+  - source_location
+  - confidence
+  - extraction_method
+  - document_version
+  - review_status
+
+rules:
+  unknown_entity_policy: propose_for_human_review
+  unknown_relationship_policy: reject
+  missing_source_evidence_policy: reject
+  obsolete_document_retrieval_policy: exclude_by_default
