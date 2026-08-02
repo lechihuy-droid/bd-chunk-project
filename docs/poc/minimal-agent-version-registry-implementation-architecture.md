@@ -1,361 +1,484 @@
-# Minimal Agent Version Registry — Implementation Architecture
+# Harness Hub Versioning Subsystem — Implementation Architecture
 
-**Status:** Proposed for POC  
-**Scope:** RD-to-BD Harness POC  
-**Audience:** System architects, backend engineers, AI workflow engineers, coding agents  
-**Primary objective:** Provide the smallest practical architecture for managing prompt versions, agent/workflow releases, execution lineage, generated artifact revisions, and approved BD baselines without building a full enterprise registry platform.
+**Status:** Revised POC architecture  
+**Version:** 0.2  
+**Scope:** Integration into the existing Harness Hub application  
+**Primary use case:** RD-to-BD generation and Basic Design artifact governance  
+**Audience:** System architects, AI platform engineers, backend engineers, workflow engineers, coding agents
 
 ---
 
 ## 1. Executive Decision
 
-The POC shall use the following architecture:
+The organization already has a **Harness Hub application**. Therefore, the POC shall not introduce a separate standalone Harness Registry product or a second control-plane UI.
+
+The recommended architecture is to add a bounded **Versioning and Artifact Governance subsystem** inside Harness Hub, while reusing specialized platforms for workflow execution, prompt lifecycle, tracing, evaluation, and binary storage.
 
 ```text
-Git
+Existing Harness Hub
++ Versioning and Artifact Governance module
++ LangGraph Runtime Adapter
 + LangGraph OSS / Agent Server
 + MLflow 3
 + PostgreSQL
-+ MinIO
-+ Thin Harness Registry
++ MinIO or existing S3-compatible storage
++ Git
 ```
 
-Responsibilities are separated as follows:
+The architecture follows four decisions:
 
-| Capability | System of record |
-|---|---|
-| Workflow and agent source code | Git |
-| Workflow execution, thread state, checkpoints | LangGraph Agent Server |
-| Prompt versions, experiments, traces, evaluation results | MLflow |
-| Agent manifests, workflow releases, artifact revision chains, approved baselines | Thin Harness Registry |
-| Binary and document artifacts | MinIO |
-| Registry metadata and transactional state | PostgreSQL |
+1. **Harness Hub remains the host application and user-facing control plane.**
+2. **LangGraph remains the initial execution engine, not the business system of record.**
+3. **MLflow owns prompt versions, experiments, traces, and evaluation references.**
+4. **Harness Hub owns capability composition, agent/workflow releases, frozen run manifests, artifact revision chains, and approved baselines.**
 
-The POC shall not attempt to replace Git, MLflow, LangGraph, or object storage. The Thin Harness Registry exists only to cover business capabilities that those platforms do not natively model well for the RD-to-BD delivery process.
+This is an integration architecture, not a greenfield platform build.
 
 ---
 
-## 2. Problem Statement
+## 2. Context and Problem Statement
 
-The RD-to-BD Harness must answer the following questions for every generated Basic Design artifact:
+Harness Hub already provides the surrounding application shell, user experience, workspace context, authentication, model/tool access, and orchestration entry points. The missing capability is a consistent mechanism to answer, for every AI-generated delivery artifact:
 
-1. Which workflow version generated it?
-2. Which agent version and prompt versions were resolved at execution time?
-3. Which tool and model configuration were used?
-4. Which RD input or knowledge snapshot was used?
-5. Which human or AI revision produced the current document?
-6. Which revision is the approved project baseline?
-7. Why does one output differ from another output?
+1. Which capability, agent, and workflow release generated it?
+2. Which exact prompt versions were resolved at execution time?
+3. Which tools, model profile, and source-code commit were used?
+4. Which RD files or knowledge snapshot were used?
+5. Which runtime executed the workflow and where is its checkpoint state?
+6. Which output revision was AI-generated, human-edited, regenerated, or imported?
+7. Which revision is the active approved project baseline?
+8. Why does one output differ from another?
 
-Git alone cannot answer runtime and artifact-lineage questions. LangGraph manages execution but should not become the system of record for prompt releases or BD baselines. MLflow manages prompt, trace, experiment, and evaluation metadata, but does not provide a domain model for project artifact revisions and approved BD baselines.
+Git alone cannot answer runtime provenance. LangGraph manages workflow execution but should not own prompt publication, release promotion, or BD baselines. MLflow provides strong prompt, trace, experiment, and evaluation capabilities but does not model project artifact revisions, delivery baselines, or reusable business capabilities as first-class Harness concepts.
 
-The Thin Harness Registry closes these gaps.
+The new subsystem fills these gaps **inside Harness Hub**.
 
 ---
 
-## 3. POC Scope
+## 3. Revised Architectural Position
 
-### 3.1 In scope
+### 3.1 Previous interpretation
 
-The POC shall support:
+The original proposal treated the Thin Harness Registry as a small standalone control-plane application with its own UI and API.
 
-- Prompt registration and immutable versioning through MLflow Prompt Registry.
-- Agent manifest versioning.
-- Workflow release versioning.
-- Exact prompt, tool, model-profile, and Git commit references in a workflow release.
-- Environment-to-release mapping for `DEV` and `PROD`.
+### 3.2 Revised interpretation
+
+The existing Harness Hub is already the control plane. The proposed registry functions become internal modules and APIs of Harness Hub:
+
+```text
+Harness Hub Control Plane
+├── Workspace and Project Context
+├── Chat and Task Entry Points
+├── Model and Tool Gateway
+├── Skill and Workflow Activation
+├── Capability Catalog
+├── Agent and Workflow Release Management
+├── Run Manifest and Lineage
+├── Artifact Revision and Baseline Governance
+└── Runtime Adapter Ports
+```
+
+The subsystem shall reuse Harness Hub authentication, workspace isolation, navigation, configuration, audit identity, and API conventions wherever these already exist.
+
+It shall not duplicate:
+
+- Login or identity management.
+- Workspace/project master data.
+- Existing model-provider integration.
+- Existing tool gateway.
+- Existing chat or task UI.
+- Existing generic audit infrastructure, when suitable.
+- Existing object storage integration, when suitable.
+
+---
+
+## 4. Target Architecture
+
+```text
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         Existing Harness Hub UI                          │
+│                                                                          │
+│ Chat | Projects | Capabilities | Agents | Workflows | Runs | Artifacts  │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    Harness Hub Control Plane API                         │
+│                                                                          │
+│ Existing modules                         New bounded subsystem            │
+│ ├── Identity / Workspace                 ├── Capability Catalog           │
+│ ├── Model Gateway                        ├── Agent Version Service        │
+│ ├── Tool Gateway                         ├── Workflow Release Service     │
+│ ├── Chat / Task Service                  ├── Environment Mapping          │
+│ └── Existing Audit                       ├── Run Manifest Service         │
+│                                          ├── Artifact Revision Service   │
+│                                          ├── Baseline Approval           │
+│                                          └── Lineage Query Service       │
+└───────────────┬───────────────────┬───────────────────┬──────────────────┘
+                │                   │                   │
+                ▼                   ▼                   ▼
+        Runtime Adapter Port      MLflow 3        Object Storage
+                │             prompts, traces,    MinIO / S3
+                │             eval references     immutable files
+                ▼
+      LangGraph Runtime Adapter
+                │
+                ▼
+      LangGraph OSS / Agent Server
+      threads, runs, checkpoints
+                │
+                ▼
+     Harness Hub Model and Tool Gateways
+```
+
+### 4.1 Control plane
+
+Harness Hub is authoritative for:
+
+- Workspace and project context.
+- Capability definitions and versions.
+- Agent versions.
+- Workflow releases.
+- Environment-to-release mappings.
 - Frozen run manifests.
-- LangGraph run and checkpoint references.
-- MLflow trace and evaluation references.
-- Knowledge snapshot references or input content hashes.
-- Generated artifact registration.
-- Immutable artifact revisions.
-- Human-edited revisions.
-- One active approved baseline per artifact business key.
-- Basic upstream lineage.
-- Comparison of two run manifests.
-- Audit records for publication, promotion, approval, and baseline changes.
+- Artifact business identity and revision chains.
+- Human approvals and active baseline pointers.
+- Cross-system lineage references.
 
-### 3.2 Out of scope
-
-The POC shall not include:
-
-- A generic enterprise asset framework.
-- A graph database.
-- Bidirectional Git synchronization.
-- A general-purpose policy engine.
-- Cross-workspace sharing.
-- Multi-region deployment.
-- A full document editor for Excel or PDF.
-- A custom tracing backend.
-- A custom evaluation execution engine.
-- Complex semantic diff generated by an LLM.
-- Multiple workflow runtimes.
-- Temporal, Airflow, or n8n orchestration.
-
----
-
-## 4. Architecture Principles
-
-### 4.1 Immutable published versions
-
-Published prompt, agent, workflow-release, run-manifest, and artifact-revision records must not be edited. A change creates a new version or revision.
-
-### 4.2 Mutable pointers, immutable targets
-
-Environment mappings and baseline pointers may change. Their target versions and revisions remain immutable.
-
-```text
-PROD -> workflow release 1.2.0
-Baseline -> artifact revision 4
-```
-
-Rollback changes the pointer, not the historical record.
-
-### 4.3 Runtime resolves exact versions
-
-Aliases may be used during authoring, but a run manifest must contain exact immutable version identifiers.
-
-```text
-Before execution:
-  prompt alias: production
-
-Frozen run manifest:
-  prompt name: bd-api-writer
-  prompt version: 7
-```
-
-### 4.4 One owner per type of state
-
-Each state category has one authoritative owner. The same lifecycle must not be independently maintained in multiple platforms.
-
-### 4.5 Registry is a control plane
-
-The Thin Harness Registry validates releases, freezes execution manifests, stores business metadata, and records artifact lifecycle. It does not execute LangGraph nodes or evaluate model outputs directly.
-
-### 4.6 Fail closed
-
-A production run must not start when required version references are missing, revoked, or cannot be resolved.
-
----
-
-## 5. Logical Architecture
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                         Harness UI                          │
-│                                                             │
-│ Releases | Runs | Artifacts | Revisions | Baselines | Diff │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ HTTPS / JSON
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Thin Harness Registry API                   │
-│                                                             │
-│ Agent Manifest Service                                      │
-│ Workflow Release Service                                    │
-│ Environment Mapping Service                                 │
-│ Run Manifest Service                                        │
-│ Artifact Revision Service                                   │
-│ Baseline Approval Service                                   │
-│ Lineage Query Service                                       │
-│ Audit Service                                               │
-└───────────────┬────────────────┬────────────────┬───────────┘
-                │                │                │
-                ▼                ▼                ▼
-         PostgreSQL          MLflow 3          MinIO
-         metadata and        prompts, runs,    document and
-         transactions        traces, evals     JSON artifacts
-                │
-                ▼
-       LangGraph Runtime Adapter
-                │
-                ▼
-       LangGraph Agent Server
-       threads, runs, checkpoints
-                │
-                ▼
-          LLM and approved tools
-```
-
----
-
-## 6. Component Responsibilities
-
-## 6.1 Git
-
-Git stores human-maintained source definitions:
-
-```text
-workflows/
-agents/
-tools/
-schemas/
-evaluators/
-```
-
-A workflow release records:
-
-- Repository.
-- Commit SHA.
-- Graph entrypoint.
-- State-schema version.
-- Optional source path.
-
-Git is the source of truth for code, not runtime state.
-
----
-
-## 6.2 LangGraph Agent Server
+### 4.2 Execution plane
 
 LangGraph is responsible for:
 
 - Graph execution.
-- Shared graph state.
+- State transitions inside the graph.
 - Conditional routing.
-- Human interrupts.
-- Resume behavior.
 - Checkpoints.
-- Thread and run execution state.
-- Node retries defined by the workflow.
+- Human interrupts and resume operations.
+- Node-level retry behavior.
+- Runtime thread/run identifiers.
 
-LangGraph must not own:
-
-- Prompt publication lifecycle.
-- Agent release lifecycle.
-- Environment promotion.
-- Artifact baseline status.
-- Cross-run artifact revision history.
-
-The Runtime Adapter shall translate Registry execution commands into LangGraph thread/run requests and send execution events back to the Registry.
-
----
-
-## 6.3 MLflow 3
+### 4.3 Observability and experiment plane
 
 MLflow is responsible for:
 
 - Prompt Registry.
 - Immutable prompt versions.
-- Prompt aliases used in authoring or experimentation.
+- Prompt aliases for authoring and experimentation.
 - Experiment runs.
-- LangGraph traces.
+- Traces and spans.
 - Evaluation datasets and results.
-- Logged application/model metadata where useful.
-- Auxiliary run artifacts such as trace exports and evaluation reports.
+- Auxiliary experiment artifacts.
 
-MLflow identifiers are referenced from the Thin Registry but are not duplicated as complete trace payloads.
+### 4.4 Artifact storage plane
 
-The POC should enable LangGraph tracing through the MLflow integration or OpenTelemetry-compatible instrumentation.
+MinIO, S3, or the existing Harness Hub object store is responsible for immutable file blobs. Harness Hub stores business metadata, content hashes, and storage references.
 
 ---
 
-## 6.4 Thin Harness Registry
+## 5. Architecture Principles
 
-The Thin Registry owns the business model that is missing from Git, LangGraph, and MLflow:
+### 5.1 Integrate before creating a new service
 
-### Agent Manifest
+A new deployable service shall be created only when Harness Hub module boundaries, scaling, security, or release cadence require it. The POC should start as a modular subsystem in the current backend.
 
-An immutable composition of:
+### 5.2 Domain model must not depend on LangGraph classes
 
-- Git commit.
+Harness Hub domain entities shall use runtime-neutral identifiers and contracts. LangGraph-specific payloads remain inside the LangGraph adapter.
+
+### 5.3 One owner per state category
+
+The same lifecycle shall not be independently maintained in Harness Hub, LangGraph, and MLflow.
+
+### 5.4 Immutable published versions
+
+Published capability versions, agent versions, workflow releases, frozen run manifests, and artifact revisions are immutable.
+
+### 5.5 Mutable pointers, immutable targets
+
+Environment mappings and active baseline pointers may change. Their target releases and revisions remain immutable.
+
+```text
+PROD -> workflow release 1.3.0
+BD baseline -> artifact revision 4
+```
+
+### 5.6 Exact runtime resolution
+
+Aliases may be used while authoring, but a run must store exact immutable component versions.
+
+### 5.7 Fail closed for production execution
+
+A production run must not start when mandatory references cannot be resolved, are revoked, or fail validation.
+
+### 5.8 Capability is the smallest reusable business unit
+
+A workflow is a composition of capabilities. An agent is an execution configuration that realizes one or more capabilities. This avoids treating an agent as the only reuse boundary.
+
+### 5.9 Avoid speculative platform abstractions
+
+The design shall introduce a runtime port and capability model, but the POC implements only one runtime adapter and only the capability behaviors needed by RD-to-BD.
+
+---
+
+## 6. Core Concepts
+
+## 6.1 Capability
+
+A capability describes a reusable business or delivery ability, independent of a particular workflow topology.
+
+Examples:
+
+- Parse RD source.
+- Extract API requirements.
+- Generate API Basic Design.
+- Review naming conventions.
+- Validate traceability.
+- Produce Excel delivery package.
+
+A capability version declares:
+
+- Input contract.
+- Output contract.
+- Required resources.
+- Quality criteria.
+- Compatible agent implementations.
+- Optional evaluation references.
+
+Capability does not directly execute. It is realized by an Agent Version or workflow node binding.
+
+## 6.2 Agent Version
+
+An immutable executable composition containing:
+
+- Source-code reference.
 - Agent entrypoint.
-- Prompt-version references.
+- Capability versions implemented.
+- Exact prompt-version references.
 - Tool-version references.
 - Model profile.
 - Runtime limits.
-- Output-schema version.
+- Input/output schema references.
 
-### Workflow Release
+## 6.3 Workflow Release
 
 An immutable deployable package containing:
 
 - Workflow source reference.
+- Graph entrypoint.
 - State-schema version.
-- Agent-manifest versions.
-- Required prompt versions.
-- Required tool versions.
-- Model profile.
+- Capability bindings.
+- Agent-version bindings.
 - Runtime configuration.
+- Required model and tool policies.
 
-### Frozen Run Manifest
+## 6.4 Frozen Run Manifest
 
-A resolved snapshot created before execution starts.
+A resolved snapshot generated by Harness Hub before execution. It records exact component versions, input snapshot, selected runtime, model/tool references, and integration identifiers.
 
-### Artifact Revision
+## 6.5 Artifact and Artifact Revision
 
-An immutable generated, imported, transformed, or human-edited output revision.
+An Artifact is the stable business identity of an output, such as `API Design / Function F001`.
 
-### Approved Baseline
+An Artifact Revision is immutable content produced by:
 
-A mutable pointer identifying the active approved revision for a project artifact business key.
+- AI generation.
+- Human editing.
+- AI regeneration.
+- Import.
+- System transformation.
+
+## 6.6 Approved Baseline
+
+A mutable pointer to one approved Artifact Revision for a defined artifact business key.
+
+## 6.7 Knowledge Snapshot
+
+For the POC, a knowledge snapshot is intentionally minimal:
+
+- Snapshot ID.
+- Source URI or source identifiers.
+- Source version or timestamp when available.
+- Content hash or manifest hash.
+- Created time.
+
+Ontology, vector-index, and graph snapshots remain outside this POC unless the existing Harness Hub already exposes them.
 
 ---
 
-## 6.5 PostgreSQL
+## 7. System-of-Record Ownership
 
-PostgreSQL stores:
+| Information | System of record |
+|---|---|
+| User, workspace, project | Existing Harness Hub |
+| Workflow and agent source code | Git |
+| Capability definitions and versions | Harness Hub |
+| Agent versions and manifests | Harness Hub |
+| Workflow releases | Harness Hub |
+| Environment-to-release mapping | Harness Hub |
+| Frozen run manifest | Harness Hub |
+| Runtime thread, checkpoint, node state | LangGraph |
+| Prompt versions | MLflow Prompt Registry |
+| Traces and evaluation results | MLflow |
+| Artifact business identity and revisions | Harness Hub |
+| Artifact binary content | MinIO/S3/existing object storage |
+| Approved baseline | Harness Hub |
+| Model execution | Existing Harness Hub model gateway |
+| Tool execution and permissions | Existing Harness Hub tool gateway |
 
-- Registry metadata.
-- Version and revision records.
-- Environment mappings.
-- Frozen run manifests.
-- Artifact metadata.
-- Approval records.
-- Audit records.
-- Basic lineage relations.
-
-PostgreSQL recursive queries are sufficient for the POC. Neo4j or another graph database is not required.
+A Harness Hub run record references MLflow and LangGraph identifiers but does not duplicate their complete internal state.
 
 ---
 
-## 6.6 MinIO
+## 8. Runtime Abstraction
 
-MinIO stores immutable content blobs:
+Harness Hub shall depend on a runtime-neutral port rather than LangGraph SDK types.
 
-- RD snapshots when permitted.
-- Generated Markdown.
-- Excel Basic Design files.
-- JSON manifests.
-- Review reports.
-- Diagram sources.
-- Export packages.
-
-The Registry stores MinIO object references and SHA-256 hashes.
-
-Recommended object key pattern:
-
-```text
-{workspace_id}/{project_id}/{artifact_business_key}/{revision_id}/{filename}
+```python
+class WorkflowRuntimePort(Protocol):
+    async def start(self, request: StartRunRequest) -> RuntimeRunRef: ...
+    async def resume(self, request: ResumeRunRequest) -> RuntimeRunRef: ...
+    async def cancel(self, request: CancelRunRequest) -> None: ...
+    async def get_status(self, runtime_run_id: str) -> RuntimeStatus: ...
+    async def get_checkpoint(self, runtime_run_id: str) -> CheckpointRef: ...
 ```
 
-Object overwrite must be disabled by convention and bucket policy where possible.
+The POC implements:
+
+```text
+WorkflowRuntimePort
+└── LangGraphRuntimeAdapter
+```
+
+The architecture does not require a second runtime. The port exists to prevent LangGraph objects, status names, and persistence schemas from leaking into the Harness Hub domain.
+
+### 8.1 Canonical runtime statuses
+
+Harness Hub uses its own canonical execution statuses:
+
+```text
+CREATED
+QUEUED
+RUNNING
+WAITING_APPROVAL
+SUCCEEDED
+FAILED
+CANCELLED
+TIMED_OUT
+```
+
+The adapter maps LangGraph runtime state into these statuses.
+
+### 8.2 Runtime events
+
+Runtime events sent to Harness Hub must include:
+
+- Event ID.
+- Harness run ID.
+- Runtime run ID.
+- Event type.
+- Occurred time.
+- Runtime status.
+- Optional checkpoint reference.
+- Optional artifact registration reference.
+- Idempotency key or sequence version.
+
+Duplicate and late events must not silently overwrite terminal state.
 
 ---
 
-## 7. Core Domain Model
+## 9. Harness Hub Module Boundaries
+
+The new code should be organized as a bounded module rather than scattered through chat, workflow, and artifact controllers.
 
 ```text
-Project
-  ├── Agent
-  │     └── AgentVersion
-  ├── Workflow
-  │     └── WorkflowRelease
-  ├── Environment
-  │     └── Active WorkflowRelease
-  ├── ExecutionRun
-  │     └── FrozenRunManifest
-  └── Artifact
+modules/version_governance/
+├── capabilities/
+├── agents/
+├── workflow_releases/
+├── environments/
+├── runs/
+├── artifacts/
+├── approvals/
+├── lineage/
+├── runtime_ports/
+├── integrations/
+│   ├── langgraph/
+│   ├── mlflow/
+│   └── object_storage/
+└── audit/
+```
+
+If the existing Harness Hub uses different naming conventions, preserve its conventions while maintaining the same ownership boundaries.
+
+### 9.1 Existing modules reused
+
+The subsystem should call existing Harness Hub modules for:
+
+- Workspace/project authorization.
+- Model-provider access.
+- Tool permissions and invocation.
+- Secrets.
+- Authentication.
+- Common audit actor identity.
+- Notifications when available.
+
+### 9.2 Modules not created in the POC
+
+Do not create:
+
+- A second user-management service.
+- A second model gateway.
+- A second tool registry when Harness Hub already has one.
+- A separate workflow designer.
+- A generic marketplace.
+- A new message bus solely for this subsystem.
+
+---
+
+## 10. Minimal Domain Model
+
+```text
+Workspace                  existing Harness Hub entity
+└── Project                existing Harness Hub entity
+    ├── Capability
+    │   └── CapabilityVersion
+    ├── Agent
+    │   └── AgentVersion
+    ├── Workflow
+    │   └── WorkflowRelease
+    ├── Environment
+    │   └── ActiveWorkflowRelease
+    ├── ExecutionRun
+    │   └── FrozenRunManifest
+    └── Artifact
         ├── ArtifactRevision
         └── BaselinePointer
 ```
 
-### 7.1 Agent version
+### 10.1 Capability version example
+
+```yaml
+capability_id: generate-api-basic-design
+version: 1.0.0
+status: PUBLISHED
+input_schema: rd-api-requirement/v1
+output_schema: api-basic-design/v2
+quality_rules:
+  - complete-required-sections
+  - preserve-source-traceability
+implemented_by:
+  - agent: bd-api-writer
+    minimum_version: 1.2.0
+```
+
+### 10.2 Agent version example
 
 ```yaml
 agent_id: bd-api-writer
 version: 1.2.0
 status: PUBLISHED
+capabilities:
+  - generate-api-basic-design@1.0.0
 source:
   repository: lechihuy-droid/bd-runtime
   commit: e6a42f1
@@ -370,7 +493,7 @@ prompts:
     name: bd-api-drafting
     version: 7
 tools:
-  - name: rd-reader
+  - tool_id: rd-reader
     version: 1.0.0
 model_profile:
   id: high-accuracy-design
@@ -378,12 +501,10 @@ model_profile:
 runtime:
   max_iterations: 5
   timeout_seconds: 600
-output_schema:
-  name: api-design
-  version: 2
+output_schema: api-basic-design/v2
 ```
 
-### 7.2 Workflow release
+### 10.3 Workflow release example
 
 ```yaml
 workflow_id: rd-to-bd-api
@@ -393,23 +514,28 @@ source:
   repository: lechihuy-droid/bd-runtime
   commit: a8c917f
   entrypoint: workflows.rd_to_bd_api:graph
-state_schema:
-  name: rd-to-bd-state
-  version: 2
-agents:
-  planner: bd-planner@1.1.0
-  writer: bd-api-writer@1.2.0
-  reviewer: bd-reviewer@1.0.0
 runtime:
-  checkpoint_namespace: rd-to-bd
+  adapter: langgraph
+  state_schema: rd-to-bd-state/v2
   max_run_seconds: 1800
+bindings:
+  parse_rd:
+    capability: parse-rd-source@1.0.0
+    agent: rd-parser@1.1.0
+  generate_bd:
+    capability: generate-api-basic-design@1.0.0
+    agent: bd-api-writer@1.2.0
+  review_bd:
+    capability: review-api-basic-design@1.0.0
+    agent: bd-reviewer@1.0.0
 ```
 
-### 7.3 Frozen run manifest
+### 10.4 Frozen run manifest example
 
 ```json
 {
   "run_id": "run_01J...",
+  "workspace_id": "ws_bd",
   "project_id": "project_bd_poc",
   "environment": "PROD",
   "workflow": {
@@ -417,71 +543,85 @@ runtime:
     "release_version": "1.3.0",
     "git_commit": "a8c917f"
   },
+  "capabilities": {
+    "generate_bd": "generate-api-basic-design@1.0.0"
+  },
   "agents": {
-    "writer": {
-      "id": "bd-api-writer",
-      "version": "1.2.0"
-    }
+    "generate_bd": "bd-api-writer@1.2.0"
   },
   "prompts": {
     "bd-api-system": 4,
     "bd-api-drafting": 7
   },
-  "model_profile": {
-    "id": "high-accuracy-design",
-    "version": 1
+  "tools": {
+    "rd-reader": "1.0.0"
   },
+  "model_profile": "high-accuracy-design@1",
   "knowledge_snapshot": {
     "id": "ks_01J...",
-    "content_hash": "sha256:..."
+    "manifest_hash": "sha256:..."
   },
-  "integrations": {
-    "langgraph_thread_id": null,
-    "langgraph_run_id": null,
+  "runtime": {
+    "type": "langgraph",
+    "runtime_run_id": null,
+    "thread_id": null,
+    "checkpoint_ref": null
+  },
+  "observability": {
     "mlflow_run_id": null,
     "mlflow_trace_id": null
   }
 }
 ```
 
-The manifest is frozen before LangGraph execution. Integration identifiers may be appended to dedicated nullable fields or related records without changing resolved component versions.
+Resolved component fields are immutable. Runtime and observability references may be appended through dedicated integration records without mutating the resolved release content.
 
 ---
 
-## 8. Minimal Relational Schema
+## 11. Minimal Persistence Model
 
-The POC should start with the following tables:
+Reuse the existing Harness Hub PostgreSQL database for the POC unless isolation or operational constraints require a separate database.
+
+Recommended tables:
 
 ```text
-project
+capability
+capability_version
 agent
 agent_version
+agent_capability
 workflow
 workflow_release
+workflow_release_binding
 environment_release
 execution_run
 run_component
+runtime_reference
 knowledge_snapshot
 artifact
 artifact_revision
 artifact_baseline
 approval
-audit_event
+audit_event or existing audit table
+outbox_event
 ```
 
-### 8.1 Key constraints
+Existing `workspace` and `project` tables must be referenced rather than recreated.
 
-1. `agent_version(agent_id, version)` is unique.
-2. `workflow_release(workflow_id, release_version)` is unique.
-3. Published version content is immutable.
-4. `environment_release(project_id, environment)` has one active release.
-5. `execution_run.idempotency_key` is unique within a project.
-6. `artifact_revision(artifact_id, revision_number)` is unique.
-7. Only one active baseline exists per artifact.
-8. Every stored file has a content hash.
-9. Every run component uses an exact version.
+### 11.1 Core constraints
 
-### 8.2 Suggested run-component structure
+1. Published versions and releases are immutable.
+2. `capability_version(capability_id, version)` is unique.
+3. `agent_version(agent_id, version)` is unique.
+4. `workflow_release(workflow_id, release_version)` is unique.
+5. One active release exists per project and environment.
+6. Run idempotency key is unique within project scope.
+7. Every run component uses an exact version.
+8. Artifact revision numbers are unique within an artifact.
+9. Only one active baseline exists per artifact business key.
+10. Every persisted content blob has a SHA-256 hash.
+
+### 11.2 Run component representation
 
 ```text
 run_component
@@ -495,10 +635,11 @@ external_registry
 external_reference
 ```
 
-Component types for POC:
+Component types:
 
 ```text
 WORKFLOW
+CAPABILITY
 AGENT
 PROMPT
 TOOL
@@ -509,73 +650,104 @@ KNOWLEDGE_SNAPSHOT
 
 ---
 
-## 9. Runtime Interaction Flow
+## 12. Integration Contracts
 
-## 9.1 Publish an agent version
+## 12.1 Harness Hub to MLflow
+
+Harness Hub must be able to:
+
+- Resolve a prompt name and version.
+- Validate that an exact prompt version exists.
+- Retrieve prompt metadata required for manifest display.
+- Store MLflow run and trace IDs.
+- Link evaluation results to a Harness run or release candidate.
+
+Harness Hub shall not copy complete trace payloads into its relational database.
+
+## 12.2 Harness Hub to LangGraph
+
+The LangGraph adapter must be able to:
+
+- Start a run from a frozen manifest.
+- Resume a paused run.
+- Cancel a run.
+- Retrieve normalized status.
+- Retrieve thread/run/checkpoint references.
+- Receive or poll terminal status.
+- Register output artifact references.
+
+## 12.3 Harness Hub to object storage
+
+The artifact service must support:
+
+- Upload intent or signed upload URL.
+- Content hash verification.
+- Immutable object key.
+- Metadata registration after successful upload.
+- Authorized download.
+- Optional existing malware/quarantine pipeline reuse.
+
+Recommended key pattern:
 
 ```text
-Developer commits agent code
-  -> registers exact MLflow prompt versions
-  -> submits Agent Manifest draft
-  -> Registry validates references
-  -> Registry calculates content hash
-  -> Agent Version is published and immutable
+{workspace_id}/{project_id}/{artifact_business_key}/{revision_id}/{filename}
 ```
 
-## 9.2 Publish a workflow release
+## 12.4 Harness Hub model and tool gateways
 
-```text
-Developer selects Git commit and agent versions
-  -> Registry validates all exact references
-  -> Registry validates state-schema compatibility
-  -> Workflow Release is published
-  -> DEV or PROD mapping may be changed after approval
-```
+LangGraph nodes shall invoke models and approved tools through Harness Hub gateways where technically feasible. This preserves existing provider abstraction, permission policy, logging, and cost controls.
 
-## 9.3 Execute RD-to-BD
-
-```text
-Client requests run with project + environment + input reference
-  -> Registry resolves environment to workflow release
-  -> Registry resolves exact agent and prompt versions
-  -> Registry validates required references
-  -> Registry creates ExecutionRun and FrozenRunManifest
-  -> Runtime Adapter creates LangGraph thread/run
-  -> LangGraph executes workflow
-  -> MLflow records trace and evaluation references
-  -> Runtime registers generated artifact revision
-  -> Registry marks run terminal after validated runtime event
-```
-
-## 9.4 Human revision and baseline approval
-
-```text
-AI-generated revision 1
-  -> reviewer downloads or opens externally
-  -> reviewer uploads human-edited revision 2
-  -> reviewer approves revision 2
-  -> Registry atomically moves baseline pointer to revision 2
-```
-
-The old revision remains stored and queryable.
+Direct provider access from a workflow should be treated as a documented exception.
 
 ---
 
-## 10. State Models
+## 13. Main Execution Flow
 
-## 10.1 Agent and workflow publication
+```text
+User starts RD-to-BD from Harness Hub
+  -> Harness Hub resolves project and environment
+  -> Environment resolves exact Workflow Release
+  -> Release resolves Capability and Agent Versions
+  -> Agent Versions resolve exact MLflow Prompt Versions
+  -> Harness Hub validates tool and model access
+  -> Harness Hub freezes Run Manifest
+  -> LangGraph Runtime Adapter starts execution
+  -> LangGraph executes through Harness model/tool gateways
+  -> MLflow records trace and evaluation references
+  -> Runtime registers generated Artifact Revision
+  -> Harness Hub records lineage and terminal status
+  -> Reviewer creates or uploads Human Revision
+  -> Reviewer approves revision
+  -> Harness Hub atomically moves Baseline Pointer
+```
+
+### 13.1 Run authority
+
+Harness Hub owns the business run lifecycle. LangGraph owns runtime execution state.
+
+LangGraph events request or report transitions; Harness Hub validates and persists canonical transitions.
+
+### 13.2 Frozen manifest rule
+
+No runtime adapter may replace resolved workflow, capability, agent, prompt, tool, model-profile, or knowledge-snapshot versions after execution starts.
+
+---
+
+## 14. State Models
+
+### 14.1 Capability, agent, and workflow publication
 
 ```text
 DRAFT -> IN_REVIEW -> PUBLISHED
-                     -> REJECTED
+                   -> REJECTED
 
 PUBLISHED -> DEPRECATED -> ARCHIVED
 PUBLISHED -> REVOKED
 ```
 
-`DEV` and `PROD` are environment mappings, not version states.
+`DEV` and `PROD` are environment mappings, not version lifecycle states.
 
-## 10.2 Run lifecycle
+### 14.2 Run lifecycle
 
 ```text
 CREATED -> QUEUED -> RUNNING
@@ -598,9 +770,9 @@ CANCELLED
 TIMED_OUT
 ```
 
-Late events received after a terminal transition must not silently overwrite the terminal state. They must be stored as ignored or conflicting events for audit.
+Late events after a terminal state are retained for audit but do not silently replace the terminal state.
 
-## 10.3 Artifact revision lifecycle
+### 14.3 Artifact revision lifecycle
 
 ```text
 CREATED -> IN_REVIEW -> APPROVED
@@ -608,438 +780,385 @@ CREATED -> IN_REVIEW -> APPROVED
 APPROVED -> SUPERSEDED
 ```
 
-Baseline selection is separate from revision approval.
+Approval and baseline selection remain separate operations.
 
 ---
 
-## 11. API Boundary
+## 15. Harness Hub API Extensions
 
-The Thin Registry should expose a compact REST API.
+These paths are illustrative and should follow existing Harness Hub conventions.
 
-### 11.1 Agent APIs
+### 15.1 Capabilities
+
+```text
+POST /projects/{projectId}/capabilities
+POST /capabilities/{capabilityId}/versions
+POST /capability-versions/{versionId}/publish
+GET  /capabilities/{capabilityId}/versions
+```
+
+### 15.2 Agent versions
 
 ```text
 POST /projects/{projectId}/agents
 POST /agents/{agentId}/versions
 POST /agent-versions/{versionId}/publish
-GET  /agents/{agentId}/versions
 GET  /agent-versions/{versionId}
 ```
 
-### 11.2 Workflow release APIs
+### 15.3 Workflow releases
 
 ```text
 POST /projects/{projectId}/workflows
 POST /workflows/{workflowId}/releases
 POST /workflow-releases/{releaseId}/publish
 PUT  /projects/{projectId}/environments/{environment}/release
-GET  /workflow-releases/{releaseId}
 ```
 
-### 11.3 Run APIs
+### 15.4 Runs
 
 ```text
 POST /projects/{projectId}/runs
 GET  /runs/{runId}
-GET  /runs/{runId}/manifest
-POST /runs/{runId}/events
-POST /runs/{runId}/integration-references
+POST /runs/{runId}/resume
+POST /runs/{runId}/cancel
+POST /runs/{runId}/runtime-events
+GET  /runs/{runId}/lineage
+POST /runs/compare
 ```
 
-### 11.4 Artifact APIs
+### 15.5 Artifacts
 
 ```text
 POST /projects/{projectId}/artifacts
 POST /artifacts/{artifactId}/revisions
-GET  /artifacts/{artifactId}/revisions
 POST /artifact-revisions/{revisionId}/approve
 PUT  /artifacts/{artifactId}/baseline
-GET  /artifacts/{artifactId}/lineage
+GET  /artifacts/{artifactId}/revisions
 ```
 
-### 11.5 Comparison API
+---
+
+## 16. UI Integration into Harness Hub
+
+Do not build a separate registry UI. Add focused views into existing Harness Hub navigation.
+
+Minimum POC UI:
+
+1. **Capability and Agent Catalog** — version list and dependencies.
+2. **Workflow Release Detail** — bindings and environment mapping.
+3. **Run Detail** — frozen manifest, LangGraph reference, MLflow trace link, generated artifacts.
+4. **Artifact Revision View** — revision history, source run, approval, and active baseline.
+5. **Manifest Comparison** — differences between two runs or releases.
+
+Existing chat or task screens should display the active workflow release and resulting artifact revision without reproducing the full governance UI.
+
+---
+
+## 17. Deployment Topology
+
+### 17.1 Preferred POC topology
 
 ```text
-GET /runs/compare?left={runId1}&right={runId2}
+Existing Harness Hub frontend
+Existing Harness Hub backend
+  └── Versioning and Artifact Governance module
+Existing PostgreSQL
+Existing model/tool gateways
+LangGraph Agent Server
+MLflow server
+MinIO or existing S3-compatible storage
 ```
 
-The response should classify changes by component type and must not rely on an LLM for correctness.
+### 17.2 Separate-service extraction criteria
+
+Extract the subsystem into a separate service only when one or more conditions become true:
+
+- Independent release cadence is required.
+- Lineage queries materially affect Harness Hub latency.
+- Runtime events require independent scaling.
+- Security policy requires isolated storage or credentials.
+- Multiple applications consume the registry domain.
+- Ownership moves to a separate platform team.
+
+Until then, a modular monolith boundary is preferred.
 
 ---
 
-## 12. Integration Contracts
+## 18. Reliability and Consistency
 
-## 12.1 Registry to LangGraph
+### 18.1 Idempotency
 
-The Runtime Adapter receives:
+Run creation and runtime event ingestion require idempotency keys.
 
-```json
-{
-  "run_id": "run_01J...",
-  "workflow_entrypoint": "workflows.rd_to_bd_api:graph",
-  "git_commit": "a8c917f",
-  "frozen_manifest_uri": "registry://runs/run_01J.../manifest",
-  "input_reference": "minio://...",
-  "callback_url": "https://registry/api/runs/run_01J.../events"
-}
-```
+### 18.2 Optimistic concurrency
 
-The adapter must not resolve prompt aliases independently. It uses the exact versions in the frozen manifest.
+Use a version column or equivalent for:
 
-## 12.2 LangGraph to Registry event
+- Run-state transitions.
+- Environment-release pointer changes.
+- Baseline pointer changes.
 
-```json
-{
-  "event_id": "evt_01J...",
-  "run_id": "run_01J...",
-  "event_type": "RUN_SUCCEEDED",
-  "occurred_at": "2026-08-02T01:00:00Z",
-  "producer": "langgraph-runtime",
-  "payload": {
-    "langgraph_thread_id": "thread_...",
-    "langgraph_run_id": "run_...",
-    "mlflow_run_id": "...",
-    "mlflow_trace_id": "..."
-  }
-}
-```
+### 18.3 Transactional outbox
 
-Event processing must be idempotent by `event_id`.
+Use the existing Harness Hub outbox when available. Otherwise add an `outbox_event` table for reliable publication of:
 
-## 12.3 Registry to MLflow
+- Release promoted.
+- Run created.
+- Run completed.
+- Artifact revision created.
+- Baseline changed.
 
-The Registry needs only a small MLflow adapter:
+Kafka, NATS, or another event broker is not required for the POC.
 
-- Verify prompt name/version exists.
-- Resolve authoring aliases before publication if allowed.
-- Validate MLflow run/trace references.
-- Build deep links for UI navigation.
+### 18.4 Integration degradation
 
-The Registry does not copy complete MLflow traces.
-
-## 12.4 Registry to MinIO
-
-Use pre-signed upload/download URLs. After upload, the client or worker confirms:
-
-- Object URI.
-- File name.
-- MIME type.
-- Size.
-- SHA-256.
-
-The Registry creates the immutable artifact revision only after validation succeeds.
+- If MLflow is unavailable, production release validation and production execution requiring prompt resolution must fail closed.
+- If LangGraph is unavailable, run creation may remain `QUEUED` only when queue semantics are explicitly supported; otherwise fail before execution.
+- If object storage is unavailable, artifact revision registration must not report success.
+- Historical Harness Hub metadata must remain queryable when external systems are temporarily unavailable.
 
 ---
 
-## 13. Security and Trust Boundaries
+## 19. Security and Isolation
 
-### 13.1 Minimum POC controls
+Reuse Harness Hub authorization and project isolation.
 
-- All API access requires authentication.
-- Project membership is checked server-side.
-- Runtime Adapter uses a service identity.
-- MLflow and MinIO credentials are never sent to browser clients.
-- Upload size and allowed MIME types are validated.
-- File hashes are required.
-- Pre-signed URLs have short expiration.
-- Production environment changes require an authorized role.
-- Baseline changes require an authorized reviewer role.
-- Secrets are referenced through environment variables or a secret store; they are not committed to Git.
+The subsystem must enforce:
 
-### 13.2 Artifact handling
+- Workspace/project ownership on every command and query.
+- Role checks for publish, promote, approve, and baseline changes.
+- Short-lived object-storage access.
+- Secret references rather than raw secrets in manifests.
+- Audit actor, time, previous target, and new target for pointer changes.
+- Tool permission validation before starting production execution.
+- No direct LangGraph access to production databases unless exposed through approved Harness Hub tools or connectors.
 
-For the POC, artifact malware scanning may be implemented as a synchronous or asynchronous adapter. Until scanning completes, uploaded files should remain in a `QUARANTINED` state and must not be downloadable by normal users.
-
-If scanning is unavailable in the first local prototype, the limitation must be explicit and the prototype must not ingest untrusted external files.
+Artifact upload should reuse existing malware scanning, MIME validation, size limits, and quarantine capability when available.
 
 ---
 
-## 14. Observability
+## 20. POC Scope
 
-The POC must record:
+### 20.1 In scope
 
-- Registry request ID.
-- Project ID.
-- Execution run ID.
-- LangGraph thread/run IDs.
-- MLflow run/trace IDs.
-- Artifact and revision IDs.
-- State transition result.
-- Integration latency.
-- Integration failures.
+- Integration into one existing Harness Hub deployment.
+- One workspace model already supplied by Harness Hub.
+- Project-scoped capability, agent, workflow release, run, and artifact records.
+- Prompt version resolution through MLflow.
+- One LangGraph runtime adapter.
+- One RD-to-BD workflow.
+- Basic capability bindings.
+- Frozen run manifests.
+- Artifact revision chain and one active baseline.
+- Basic lineage and manifest comparison.
+- Existing model/tool gateway reuse.
+- Outbox-based integration events.
 
-Recommended approach:
+### 20.2 Out of scope
+
+- Standalone registry application.
+- A second Harness UI.
+- Multiple runtime implementations.
+- Generic runtime marketplace.
+- Visual workflow builder.
+- Graph database.
+- Bidirectional Git synchronization.
+- General-purpose policy engine.
+- Complex ontology snapshot management.
+- Cross-workspace asset sharing.
+- Embedded Excel/PDF co-authoring.
+- Custom trace backend.
+- Custom evaluation execution engine.
+- Kafka or Temporal solely for this POC.
+
+---
+
+## 21. Implementation Phases
+
+### Phase 0 — Harness Hub integration discovery
+
+- Map existing Harness Hub modules.
+- Identify existing workspace/project, model gateway, tool gateway, audit, object store, and job abstractions.
+- Record integration decisions as ADRs.
+- Confirm whether MLflow and LangGraph will run locally or as managed services.
+
+**Exit:** No duplicate subsystem is planned for an existing Harness capability.
+
+### Phase 1 — Domain and persistence foundation
+
+- Capability and Capability Version.
+- Agent and Agent Version.
+- Workflow and Workflow Release.
+- Environment mapping.
+- Immutable version validation.
+- Existing authorization integration.
+
+**Exit:** A release can bind exact capability, agent, prompt, tool, and source versions.
+
+### Phase 2 — Runtime integration
+
+- Runtime port.
+- LangGraph adapter.
+- Frozen run manifest.
+- Idempotent run creation.
+- Runtime event normalization.
+- LangGraph and MLflow references.
+
+**Exit:** Harness Hub can start and track one RD-to-BD run without leaking LangGraph domain objects.
+
+### Phase 3 — Artifact governance
+
+- Artifact and revisions.
+- Object-store integration.
+- Human revision upload.
+- Approval.
+- Atomic baseline switch.
+- Basic lineage.
+
+**Exit:** A generated BD can be revised and approved while preserving complete history.
+
+### Phase 4 — Comparison and hardening
+
+- Run-manifest comparison.
+- Release comparison.
+- Revocation checks.
+- Outbox worker.
+- Recovery and integration-failure tests.
+- POC dashboards and audit views.
+
+**Exit:** The POC satisfies all acceptance criteria.
+
+---
+
+## 22. Acceptance Criteria
+
+### AC-01 — No duplicate control plane
+
+Given the existing Harness Hub, when the subsystem is deployed, then users access capability, release, run, and artifact governance through Harness Hub rather than a separate application.
+
+### AC-02 — Capability binding
+
+Given a published capability version and compatible agent version, when a workflow release is published, then the release stores exact immutable capability and agent references.
+
+### AC-03 — Runtime neutrality
+
+Given a Harness Hub run, when LangGraph executes it, then Harness Hub records only canonical runtime status and adapter-owned external references; no LangGraph class or persistence object is required by the core domain.
+
+### AC-04 — Exact prompt resolution
+
+Given an MLflow prompt alias, when a run is frozen, then the manifest stores the exact MLflow prompt version rather than only the alias.
+
+### AC-05 — Frozen release resolution
+
+Given an environment mapped to workflow release 1.3.0, when a run starts, then all capability, agent, prompt, tool, model, source, and knowledge references are persisted before runtime execution.
+
+### AC-06 — Existing gateway reuse
+
+Given a LangGraph node requiring an LLM or tool, when it executes, then it uses the Harness Hub model/tool gateway unless an approved exception is recorded.
+
+### AC-07 — Artifact lineage
+
+Given an artifact revision, when lineage is requested, then Harness Hub displays its source run, workflow release, capability and agent versions, prompt versions, knowledge snapshot, runtime reference, and MLflow trace reference.
+
+### AC-08 — Human revision
+
+Given an AI-generated revision, when a reviewer uploads a modified document, then a new immutable revision is created with `HUMAN_EDITED` origin and a parent revision reference.
+
+### AC-09 — Atomic baseline change
+
+Given an approved new revision and an existing baseline, when an authorized reviewer changes the baseline, then only one active baseline exists and the previous baseline remains historical.
+
+### AC-10 — Manifest comparison
+
+Given two outputs created by different runs, when compared, then Harness Hub identifies changed workflow, capability, agent, prompt, tool, model-profile, source commit, or knowledge-snapshot references.
+
+### AC-11 — Fail closed
+
+Given a missing or revoked mandatory version reference, when a production run is requested, then Harness Hub rejects the run before calling LangGraph.
+
+### AC-12 — Idempotent runtime events
+
+Given the same LangGraph completion event delivered more than once, when Harness Hub processes it, then business state and artifact metadata are not duplicated.
+
+---
+
+## 23. Code-Size Guardrail
+
+Because Harness Hub already exists, the incremental production-code target should be lower than the previous standalone estimate.
+
+| Area | Incremental production LOC |
+|---|---:|
+| Harness Hub backend modules | 4,000–7,000 |
+| Harness Hub UI extensions | 2,000–4,000 |
+| LangGraph adapter and workers | 1,500–3,000 |
+| MLflow and object-store integration | 1,000–2,000 |
+| Migrations/configuration | 500–1,000 |
+| **Total incremental production code** | **9,000–17,000** |
+
+Test code target:
 
 ```text
-Registry application logs
-+ OpenTelemetry traces
-+ MLflow LangGraph traces
+7,000–14,000 LOC
 ```
 
-The Registry should expose health endpoints for PostgreSQL, MinIO, MLflow, and the LangGraph Runtime Adapter.
+If implementation exceeds approximately 17,000 production LOC for this POC, review for:
+
+- Duplicating Harness Hub functionality.
+- Building generic policy or asset frameworks.
+- Over-generalizing runtime support.
+- Building custom MLflow, tracing, or storage behavior.
+- Expanding UI beyond the five required views.
+
+LOC is a scope guardrail, not a quality target.
 
 ---
 
-## 15. Deployment Topology
+## 24. ADRs Required Before Coding
 
-## 15.1 Local development
+1. **ADR-001 — Harness Hub module integration boundary.**
+2. **ADR-002 — Capability versus agent responsibilities.**
+3. **ADR-003 — Harness Hub versus LangGraph run-state ownership.**
+4. **ADR-004 — MLflow prompt and evaluation ownership.**
+5. **ADR-005 — Object storage reuse versus dedicated MinIO.**
+6. **ADR-006 — Existing model/tool gateway invocation from LangGraph.**
+7. **ADR-007 — Existing audit/outbox reuse.**
+8. **ADR-008 — Criteria for future service extraction.**
+
+---
+
+## 25. Final Recommendation
+
+Implement the proposal as an internal **Versioning and Artifact Governance subsystem of Harness Hub**, not as a separate product.
+
+The recommended POC stack is:
 
 ```text
-Docker Compose
-├── thin-registry-api
-├── thin-registry-ui
-├── postgres
-├── minio
-├── mlflow
-└── langgraph-agent-server
+Existing Harness Hub
+├── Capability Catalog
+├── Agent Version Management
+├── Workflow Release Management
+├── Frozen Run Manifests
+├── Artifact Revision and Baseline Governance
+└── Runtime Adapter Port
+
+External / specialized components
+├── Git                     source versioning
+├── LangGraph Agent Server  workflow execution and checkpoints
+├── MLflow 3                prompt versions, traces, evaluations
+└── MinIO / S3              immutable artifact content
 ```
 
-This topology is sufficient for learning and the first RD-to-BD demonstration.
-
-## 15.2 POC pilot
-
-```text
-Internal VM or Kubernetes namespace
-├── registry-api (1–2 replicas)
-├── registry-ui
-├── runtime-adapter
-├── langgraph-agent-server
-├── managed or dedicated PostgreSQL
-├── MinIO/S3-compatible storage
-└── MLflow tracking server
-```
-
-The API should remain stateless. PostgreSQL, LangGraph checkpoints, MLflow metadata, and object storage are external state stores.
-
----
-
-## 16. Recommended Technology Choices
-
-| Area | Recommended POC choice |
-|---|---|
-| Workflow orchestration | LangGraph OSS |
-| Runtime API | LangGraph Agent Server |
-| Prompt and experiment registry | MLflow 3 |
-| Registry backend | FastAPI |
-| Registry frontend | Next.js or React |
-| Metadata database | PostgreSQL |
-| Artifact storage | MinIO |
-| ORM/migrations | SQLAlchemy + Alembic |
-| Validation | Pydantic |
-| Authentication | Existing OIDC provider or lightweight development auth |
-| Telemetry | OpenTelemetry |
-| Local deployment | Docker Compose |
-
-FastAPI is recommended because the Runtime and MLflow integrations are Python-centric, and shared Pydantic contracts can reduce adapter code in the POC.
-
----
-
-## 17. Repository Separation
-
-This repository remains a documentation and planning library.
-
-Recommended separation:
-
-```text
-bd-chunk-project
-└── architecture, requirements, schemas, workflow definitions
-
-future bd-harness-runtime repository
-├── registry-api
-├── registry-ui
-├── runtime-adapter
-├── langgraph-workflows
-├── migrations
-└── deployment
-```
-
-The runtime repository must reference approved architecture and schema versions from this documentation repository.
-
----
-
-## 18. Suggested Implementation Structure
-
-```text
-apps/
-├── registry-api/
-│   ├── domain/
-│   ├── application/
-│   ├── api/
-│   ├── infrastructure/
-│   └── tests/
-├── registry-ui/
-└── runtime-adapter/
-
-packages/
-├── contracts/
-├── mlflow-adapter/
-├── minio-adapter/
-└── langgraph-adapter/
-
-workflows/
-└── rd_to_bd/
-
-deploy/
-├── docker-compose.yml
-└── env.example
-```
-
-The POC may use a modular monolith. Microservices are not required.
-
----
-
-## 19. Delivery Plan
-
-## Phase 0 — Platform learning
-
-- Run MLflow locally.
-- Register two prompt versions.
-- Run a minimal LangGraph workflow.
-- Capture MLflow trace.
-- Store one generated file in MinIO.
-
-## Phase 1 — Version foundation
-
-- Implement projects.
-- Implement agent and agent-version records.
-- Implement workflow releases.
-- Validate exact MLflow prompt references.
-- Implement `DEV` and `PROD` environment mappings.
-
-## Phase 2 — Runtime lineage
-
-- Implement frozen run manifest.
-- Implement Runtime Adapter.
-- Link LangGraph and MLflow identifiers.
-- Register knowledge snapshot reference.
-- Register AI-generated artifact revision.
-
-## Phase 3 — Review and baseline
-
-- Upload human-edited revision.
-- Approve revision.
-- Atomically change baseline pointer.
-- Display basic lineage.
-- Compare two run manifests.
-
-## Phase 4 — Hardening
-
-- Add idempotent runtime events.
-- Add audit records.
-- Add authorization checks.
-- Add upload quarantine/scanning integration.
-- Add integration health checks.
-
----
-
-## 20. POC Acceptance Criteria
-
-### AC-01 Prompt resolution
-
-Given an MLflow prompt alias references version 7, when an agent version is published, then the stored agent manifest contains exact prompt version 7 rather than the alias.
-
-### AC-02 Immutable agent version
-
-Given an agent version is published, when a user attempts to change its prompt reference, then the Registry rejects the update and requires a new agent version.
-
-### AC-03 Frozen run manifest
-
-Given `PROD` points to workflow release 1.3.0, when a run is created, then the run stores release 1.3.0 and all exact component versions before LangGraph execution starts.
-
-### AC-04 Alias change isolation
-
-Given a run was created with prompt version 7, when the MLflow production alias later moves to version 8, then the old run still reports prompt version 7.
-
-### AC-05 Artifact revision chain
-
-Given an AI-generated artifact revision exists, when a reviewer uploads an edited file, then the Registry creates a new immutable revision linked to the prior revision.
-
-### AC-06 Single baseline
-
-Given revision 2 is the active baseline, when an authorized reviewer promotes revision 3, then revision 3 becomes the only active baseline and revision 2 remains historical.
-
-### AC-07 Manifest comparison
-
-Given two runs differ only in one prompt version, when they are compared, then the system reports a prompt-version change and does not report changes to workflow, agent, model profile, tool, or knowledge snapshot.
-
-### AC-08 Idempotent runtime event
-
-Given the same LangGraph completion event is received twice, when both messages are processed, then only one run transition and one audit outcome are produced.
-
-### AC-09 Fail closed
-
-Given a workflow release references a missing or revoked agent version, when a production run is requested, then the Registry rejects the request before calling LangGraph.
-
-### AC-10 Trace navigation
-
-Given a completed run has MLflow and LangGraph references, when a user views the run, then the UI provides trace and runtime navigation links without copying trace payloads into the Registry database.
-
----
-
-## 21. Code-Size Guardrail
-
-The target POC must remain a thin control layer.
-
-Recommended production-code budget:
-
-```text
-Registry backend:       5,000–8,000 LOC
-Registry frontend:      3,000–5,000 LOC
-Runtime adapter:        1,500–3,000 LOC
-Deployment/config:      1,000–2,000 LOC
---------------------------------------
-Total production:      10,500–18,000 LOC
-```
-
-If the estimate exceeds this range, defer one or more of the following:
-
-- Advanced semantic diff.
-- Generic policy engine.
-- Git synchronization.
-- Cross-project lineage.
-- Embedded document editing.
-- Evaluation execution.
-- Multiple runtime adapters.
-
----
-
-## 22. Architecture Decisions to Record
-
-The implementation repository should create ADRs for:
-
-1. Registry-first agent manifest ownership.
-2. Git as workflow source of truth.
-3. LangGraph as the only POC workflow runtime.
-4. MLflow as prompt, trace, and evaluation system of record.
-5. Environment-to-release-to-exact-version resolution.
-6. PostgreSQL relational lineage for the POC.
-7. MinIO immutable artifact storage.
-8. External evaluation execution boundary.
-9. Modular monolith for the Thin Registry.
-
----
-
-## 23. Final Recommendation
-
-Start with the following operational model:
-
-```text
-Git defines the workflow and agent code.
-MLflow versions prompts and records traces and evaluations.
-The Thin Registry publishes exact agent and workflow compositions.
-LangGraph executes the frozen composition.
-MinIO stores immutable output files.
-PostgreSQL links the complete lineage and approved baseline.
-```
-
-This architecture is small enough for a POC but preserves the most important production properties:
-
-- Immutable version history.
-- Exact runtime resolution.
-- Reproducible lineage.
-- Artifact revision history.
-- Human approval.
-- Rollback through mutable pointers.
-- Clear system ownership.
-
-It also creates a controlled migration path. If the POC proves that workflow release management, policy governance, or cross-project impact analysis are core differentiators, the Thin Registry can evolve into a broader Harness control plane without replacing LangGraph, MLflow, Git, or object storage.
+This design incorporates the two-SA debate without over-expanding the POC:
+
+- **Capability** becomes a first-class reusable business unit.
+- **LangGraph** is isolated behind a small runtime adapter.
+- **Harness Hub** is explicitly the control plane and host application.
+- **MLflow** is reused rather than replicated.
+- **Knowledge Snapshot** remains minimal but traceable.
+- **PostgreSQL** remains sufficient; no graph database is introduced.
+- **Transactional outbox** is used before introducing an event broker.
+- **Release** remains the deployable unit.
+- **Artifact Revision** remains the immutable delivery-history unit.
+
+The architecture is intentionally extensible but implements only one runtime, one delivery workflow, and the minimum governance needed to prove reproducibility and controlled BD output lifecycle.
