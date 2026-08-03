@@ -5,13 +5,14 @@ This folder is the implementation specification for the RD Markdown → Requirem
 ## Reading order
 
 1. [`00_IMPLEMENTATION_GUIDE.md`](00_IMPLEMENTATION_GUIDE.md) — architecture boundary, components, package layout and milestones.
-2. [`01_DATA_CONTRACTS.md`](01_DATA_CONTRACTS.md) — Pydantic-oriented contracts for documents, SourceUnits, validation, ontology, evidence and review.
-3. [`02_PARSER_AND_SOURCE_UNIT_BUILDER.md`](02_PARSER_AND_SOURCE_UNIT_BUILDER.md) — deterministic Markdown parsing, exact source extraction and stable SourceUnit construction.
-4. [`03_VALIDATOR_AND_REPAIR.md`](03_VALIDATOR_AND_REPAIR.md) — validation rules, PASS/SPLIT/MERGE/REVIEW/REJECT semantics and repair lineage.
-5. [`04_ONTOLOGY_AND_TAGGER.md`](04_ONTOLOGY_AND_TAGGER.md) — lightweight requirement ontology, terminology resolution, LLM structured output and evidence policy.
-6. [`05_PERSISTENCE_AND_INCREMENTAL_INGESTION.md`](05_PERSISTENCE_AND_INCREMENTAL_INGESTION.md) — PostgreSQL model, transaction boundaries and add/change/remove processing.
-7. [`06_TEST_AND_QUALITY_PLAN.md`](06_TEST_AND_QUALITY_PLAN.md) — unit/integration/golden tests, metrics and quality gates.
-8. [`07_OPERATIONS_RUNBOOK.md`](07_OPERATIONS_RUNBOOK.md) — CLI, run state, retries, review operations, monitoring, security and go-live checklist.
+2. [`01_DATA_CONTRACTS.md`](01_DATA_CONTRACTS.md) — methodology for contract boundaries, identity, lifecycle, evidence, versioning and review.
+3. [`01A_PYDANTIC_MODEL_DESIGN.md`](01A_PYDANTIC_MODEL_DESIGN.md) — Pydantic model methodology, model families, validation layers, serialization, schema versioning and implementation principles.
+4. [`02_PARSER_AND_SOURCE_UNIT_BUILDER.md`](02_PARSER_AND_SOURCE_UNIT_BUILDER.md) — deterministic Markdown parsing, exact source extraction and stable SourceUnit construction.
+5. [`03_VALIDATOR_AND_REPAIR.md`](03_VALIDATOR_AND_REPAIR.md) — validation rules, PASS/SPLIT/MERGE/REVIEW/REJECT semantics and repair lineage.
+6. [`04_ONTOLOGY_AND_TAGGER.md`](04_ONTOLOGY_AND_TAGGER.md) — lightweight requirement ontology, terminology resolution, LLM structured output and evidence policy.
+7. [`05_PERSISTENCE_AND_INCREMENTAL_INGESTION.md`](05_PERSISTENCE_AND_INCREMENTAL_INGESTION.md) — PostgreSQL model, transaction boundaries and add/change/remove processing.
+8. [`06_TEST_AND_QUALITY_PLAN.md`](06_TEST_AND_QUALITY_PLAN.md) — unit/integration/golden tests, metrics and quality gates.
+9. [`07_OPERATIONS_RUNBOOK.md`](07_OPERATIONS_RUNBOOK.md) — CLI, run state, retries, review operations, monitoring, security and go-live checklist.
 
 ## Implementation boundary
 
