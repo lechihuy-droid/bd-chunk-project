@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Version Governance — Hướng dẫn người dùng</title>
+  <link rel="stylesheet" href="../../html-kit/styles.css">
+  <script src="../../html-kit/diagram.js" defer></script>
+</head>
+<body>
+
+  <header class="doc-header">
+    <span class="badge">User Guide · POC</span>
+    <h1>Version Governance — Hướng dẫn người dùng</h1>
+    <p class="lead">Cụm chức năng trả lời được ba câu hỏi mà hôm nay bạn chỉ có thể phỏng đoán:
+    <em>output này sinh ra từ cấu hình nào</em>, <em>vì sao hôm nay khác hôm qua</em>, và
+    <em>bản nào là bản chuẩn để giao khách</em>.</p>
+    <p class="meta">Đối tượng: delivery engineer · BD author · reviewer · delivery lead &nbsp;·&nbsp;
+    Harness Hub <code>http://127.0.0.1:8799</code> &nbsp;·&nbsp; vgov-api <code>http://127.0.0.1:8810</code></p>
+  </header>
+
+  <main>
+
+    <!-- ══════════════════ MỤC LỤC ══════════════════ -->
+    <h2 id="toc">Mục lục</h2>
+
+    <div class="compare">
+      <div>
+        <div class="col-head">Phần A — Chức năng &amp; mục đích</div>
+        <div class="card" style="border-radius:0 0 4px 4px; margin:0;">
+          <p class="text-small text-muted">Đọc trước khi dùng: cụm này là gì, tôi có cần không, chức năng nào
+          ứng với câu hỏi tôi đang có.</p>
+          <ol>
+            <li><a href="#s1">Cụm này giải quyết bài toán gì</a></li>
+            <li><a href="#s2">Tra ngược: câu hỏi nghiệp vụ → chức năng nào trả lời</a></li>
+            <li><a href="#s3">Danh mục chức năng</a></li>
+            <li><a href="#s4">Vòng đời một artifact</a></li>
+            <li><a href="#s5">Ai dùng gì</a></li>
+            <li><a href="#s6">Hướng dẫn quyết định</a></li>
+            <li><a href="#s7">Năm chỗ dễ hiểu lầm</a></li>
+          </ol>
+        </div>
+      </div>
+      <div>
+        <div class="col-head">Phần B — Thao tác</div>
+        <div class="card" style="border-radius:0 0 4px 4px; margin:0;">
+          <p class="text-small text-muted">Đọc trong khi dùng: bấm ở đâu, gõ lệnh gì, lỗi này nghĩa là gì.</p>
+          <ol start="8">
+            <li><a href="#s8">Bắt đầu nhanh — từ 0 tới một run chạy được</a></li>
+            <li><a href="#s9">Bản đồ điều hướng</a></li>
+            <li><a href="#s10">Hướng dẫn theo tác vụ</a></li>
+            <li><a href="#s11">Đọc kết quả Explain Difference</a></li>
+            <li><a href="#s12">Bảng tra lỗi</a></li>
+            <li><a href="#s13">Giới hạn hiện tại</a></li>
+            <li><a href="#s14">Tham chiếu API</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+    <h1 style="font-size:1.6rem; margin-top:2rem;">PHẦN A — Chức năng và mục đích sử dụng</h1>
+
+    <!-- ══════════════════ 1 ══════════════════ -->
+    <h2 id="s1">1. Cụm này giải quyết bài toán gì</h2>
+
+    <p>Bạn gửi cùng một RD cho hệ thống hai lần, cách nhau vài ngày. Hai bản API Basic Design nhận về khác
+    nhau. Reviewer hỏi:</p>
+
+    <div class="callout"><strong>“Vì sao output hôm nay khác hôm qua?”</strong> — RD có đổi không? Ai sửa
+    prompt? Workflow có deploy bản mới không? Hay chỉ là ai đó chỉnh tay bản cũ?</div>
+
+    <p>Và trước khi giao khách, delivery lead hỏi câu thứ hai:</p>
+
+    <div class="callout"><strong>“Bản nào là bản chuẩn?”</strong> — thư mục đang có ba file cùng tên. Bản
+    mới nhất chưa chắc là bản đã được duyệt.</div>
+
+    <p>Không có cụm chức năng này, cả hai câu đều trả lời bằng trí nhớ. Git quản source code, nhưng Git
+    không biết alias prompt <code>production</code> hôm đó trỏ vào version nào, model nào được gọi, input
+    là revision nào của RD, hay bản nào đã được duyệt làm chuẩn.</p>
+
+    <h3>Nếu không có cụm này thì bạn mất gì</h3>
+    <table>
+      <thead><tr><th>Mất</th><th>Hậu quả thực tế</th></tr></thead>
+      <tbody>
+        <tr><td>Không tái hiện được</td><td>Khách hỏi “chạy lại giúp tôi bản của tuần trước” — bạn không biết
+        tuần trước prompt đang ở version nào, nên chạy lại ra một bản khác.</td></tr>
+        <tr><td>Không giải thích được</td><td>Hai bản khác nhau, cả team ngồi đọc diff văn bản để đoán
+        nguyên nhân. Đoán sai thì sửa nhầm chỗ.</td></tr>
+        <tr><td>Không audit được</td><td>Không trả lời được “PROD hôm 20 tây chạy release nào, ai đổi, vì
+        sao”.</td></tr>
+        <tr><td>Không có bản chuẩn</td><td>Mỗi người cầm một file. Bản đã review bị ghi đè bởi lần chạy lại
+        sau đó, không ai biết.</td></tr>
+      </tbody>
+    </table>
+
+    <p>Cụm Version Governance ghi lại <strong>toàn bộ cấu hình đã tạo ra một kết quả</strong>, đóng băng nó
+    <em>trước khi</em> chạy, rồi cho phép so hai lần chạy để chỉ đích danh cái gì đã đổi.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Tái hiện</h3>
+        <p>Mỗi run có một bản ghi bất biến — Frozen Run Manifest — chứa exact version của mọi thứ đã dùng.</p>
+      </div>
+      <div class="card">
+        <h3>Truy vết</h3>
+        <p>Từ một output đi ngược về run → cấu hình → prompt version → git commit → hash của RD input.</p>
+      </div>
+      <div class="card">
+        <h3>Giải thích</h3>
+        <p>So hai output, hệ thống liệt kê chính xác thành phần nào changed / unchanged theo 7 nhóm.</p>
+      </div>
+      <div class="card">
+        <h3>Phê duyệt</h3>
+        <p>Chọn một revision làm baseline chính thức, ghi ai duyệt và bản nào bị thay thế.</p>
+      </div>
+    </div>
+
+    <p><strong>Bạn có cần cụm này không?</strong> Cần, nếu output AI của bạn đi ra ngoài team (giao khách,
+    làm đầu vào cho bước sau, hoặc bị audit). Không cần, nếu bạn chỉ đang thử nghiệm prompt cho vui và
+    không ai hỏi lại bạn về kết quả cũ.</p>
+
+    <p>Phạm vi POC hiện tại: đúng một luồng <strong>RD → API Basic Design</strong>, hai environment
+    <code>DEV</code> và <code>PROD</code>. Chưa mở sang Screen Design, DB Design, Batch Design hay Coding.</p>
+
+    <!-- ══════════════════ 2 ══════════════════ -->
+    <h2 id="s2">2. Tra ngược: câu hỏi nghiệp vụ → chức năng nào trả lời</h2>
+
+    <p>Đây là bảng nên đọc đầu tiên. Tìm câu hỏi bạn đang có ở cột trái, đi thẳng tới chỗ trả lời.</p>
+
+    <table>
+      <thead>
+        <tr><th>Bạn đang hỏi</th><th>Dùng chức năng</th><th>Ở đâu</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>“Output này sinh ra từ cấu hình nào?”</td>
+          <td>Lineage (Provenance)</td>
+          <td>màn <em>Provenance</em> · <code>GET /revisions/{id}/lineage</code></td>
+        </tr>
+        <tr>
+          <td>“Vì sao hai bản này khác nhau?”</td>
+          <td>Explain Difference</td>
+          <td>màn <em>Compare outputs</em> · <code>POST /explain-difference</code></td>
+        </tr>
+        <tr>
+          <td>“Bản nào đang là bản chuẩn để giao khách?”</td>
+          <td>Approved Baseline</td>
+          <td>màn <em>Output history</em> (nút Approve) · <code>GET /artifacts</code>, <code>GET /baselines</code></td>
+        </tr>
+        <tr>
+          <td>“Hôm qua PROD chạy release nào? Ai đổi?”</td>
+          <td>Environment audit</td>
+          <td><code>GET /environments/{env}/audit?workflow_id=…</code></td>
+        </tr>
+        <tr>
+          <td>“PROD <em>hiện</em> đang trỏ release nào?”</td>
+          <td>Environment pointer</td>
+          <td>màn <em>Releases</em> · <code>GET /environments?workflow_id=…</code></td>
+        </tr>
+        <tr>
+          <td>“Lần chạy đó dùng chính xác prompt version nào?”</td>
+          <td>Frozen Run Manifest</td>
+          <td><code>GET /runs/{id}/manifest</code> · màn Provenance (mở <em>Show release &amp; manifest</em>)</td>
+        </tr>
+        <tr>
+          <td>“Bản này do AI sinh hay người sửa tay? Sửa từ bản nào?”</td>
+          <td>Artifact Revision chain (<code>origin</code> + <code>parent_revision_id</code>)</td>
+          <td>màn <em>Output history</em> · <code>GET /artifacts/{id}/revisions</code></td>
+        </tr>
+        <tr>
+          <td>“Chạy lại có ra đúng cấu hình cũ không?”</td>
+          <td>So <code>manifest_hash</code> của hai run</td>
+          <td><code>GET /runs/{id}/manifest</code> hai lần, so trường <code>manifest_hash</code></td>
+        </tr>
+        <tr>
+          <td>“Project này đã chạy bao nhiêu lần, lần nào hỏng?”</td>
+          <td>Execution Run list</td>
+          <td><code>GET /runs?project_key=…&amp;workflow_id=…</code></td>
+        </tr>
+        <tr>
+          <td>“Run này hỏng ở đâu — trước hay sau khi đóng băng cấu hình?”</td>
+          <td>Run status + <code>error_code</code></td>
+          <td><code>GET /runs/{id}</code> · màn <em>Run workflow</em></td>
+        </tr>
+        <tr>
+          <td>“Release 1.0.0 pin đúng commit nào?”</td>
+          <td>Workflow Release</td>
+          <td>màn <em>Releases</em> · <code>GET /releases/{id}</code></td>
+        </tr>
+        <tr>
+          <td>“Nội dung bản đã duyệt là gì?”</td>
+          <td>Artifact Revision content</td>
+          <td>màn <em>Output history</em> · <code>GET /revisions/{id}/content</code></td>
+        </tr>
+        <tr>
+          <td>“Bản mới có tệ hơn bản cũ không?”</td>
+          <td><span class="badge gray">Ngoài phạm vi</span> POC không có evaluation engine</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>“Đoạn nào trong văn bản đã đổi?”</td>
+          <td><span class="badge gray">Ngoài phạm vi</span> POC so cấu hình, không so nội dung</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ══════════════════ 3 ══════════════════ -->
+    <h2 id="s3">3. Danh mục chức năng</h2>
+
+    <p>Chín chức năng. Mỗi khối trả lời bốn câu: là gì, giải quyết bài toán gì, khi nào nên dùng và khi nào
+    không cần, và đánh đổi phải biết trước.</p>
+
+    <details open>
+      <summary><strong>3.1 Workflow Release</strong> — bản đóng gói bất biến của quy trình</summary>
+      <p><strong>Là gì:</strong> một phiên bản đã chốt của quy trình chạy — gồm workflow nào, code ở commit
+      nào, node nào dùng prompt nào, model profile nào. Sau khi publish thì không sửa được nữa.</p>
+      <p><strong>Giải quyết:</strong> workflow draft thay đổi liên tục; production cần một trạng thái đã
+      kiểm tra, deploy được và rollback được.</p>
+      <p><strong>Khi nào nên dùng:</strong> khi code workflow hoặc binding prompt đã ổn định và bạn muốn
+      một bản có thể đưa lên DEV/PROD. <strong>Khi nào không cần:</strong> đang thử nghiệm binding, chưa
+      chốt — cứ để ở <code>DRAFT</code>, hoặc chạy run với <code>release_id</code> ghim thẳng.</p>
+      <p><strong>Đánh đổi:</strong> publish là một chiều. Sai một ký tự trong <code>bindings</code> thì
+      không sửa được — phải tạo release mới với <code>release_version</code> khác. Cặp
+      <code>(workflow_id, release_version)</code> là duy nhất, trùng sẽ nhận <code>CONFLICT</code>.</p>
+    </details>
+
+    <details>
+      <summary><strong>3.2 Environment pointer</strong> — DEV/PROD trỏ vào release nào (promote &amp; rollback)</summary>
+      <p><strong>Là gì:</strong> một con trỏ có thể di chuyển, từ <code>DEV</code> hoặc <code>PROD</code>
+      tới một release đã publish. Promote và rollback là <em>cùng một thao tác</em>: đổi con trỏ.</p>
+      <p><strong>Giải quyết:</strong> cho phép đưa bản mới lên và quay về bản cũ mà không xoá, không sửa
+      lịch sử release. Mỗi lần đổi ghi một dòng audit: ai, khi nào, từ release nào sang release nào, lý do.</p>
+      <p><strong>Khi nào nên dùng:</strong> khi muốn mọi run sau đó tự động dùng bản mới mà không phải sửa
+      từng chỗ gọi. <strong>Khi nào không cần:</strong> chạy thử một release cụ thể — truyền
+      <code>release_id</code> thẳng vào run, đừng đụng pointer của cả team.</p>
+      <p><strong>Đánh đổi:</strong> pointer là mutable. Hai run cách nhau 5 phút có thể chạy hai release
+      khác nhau nếu ai đó promote giữa chừng — và đó chính là lý do manifest phải đóng băng release id
+      tại thời điểm start. POC chỉ có đúng hai environment; trỏ vào release còn <code>DRAFT</code> sẽ bị
+      từ chối với <code>RELEASE_NOT_PUBLISHED</code>.</p>
+    </details>
+
+    <details>
+      <summary><strong>3.3 Execution Run</strong> — một lần chạy cụ thể</summary>
+      <p><strong>Là gì:</strong> bản ghi của một lần thực thi: chạy release nào, với input nào, ở
+      environment nào, trạng thái ra sao, tham chiếu tới runtime và trace.</p>
+      <p><strong>Giải quyết:</strong> một release chạy nhiều lần với nhiều input; mỗi lần cần status,
+      trace và provenance riêng. Run được ghi vào Harness Hub <em>trước</em> khi runtime được gọi, nên cả
+      lần chạy hỏng ngay từ đầu cũng để lại dấu vết.</p>
+      <p><strong>Khi nào nên dùng:</strong> mỗi lần cần sinh hoặc tái sinh một tài liệu BD.
+      <strong>Khi nào không cần:</strong> chỉ muốn đọc lại bản cũ — đọc revision, đừng chạy lại (chạy lại
+      tốn tiền LLM và tạo revision mới).</p>
+      <p><strong>Đánh đổi:</strong> vòng đời status có bảy giá trị và bạn phải phân biệt được hai loại
+      hỏng: <code>FAILED_PRECONDITION</code> (hỏng trước khi đóng băng, không có manifest, runtime chưa
+      hề được gọi) và <code>FAILED</code> (hỏng sau khi đóng băng, manifest được giữ lại).</p>
+    </details>
+
+    <details>
+      <summary><strong>3.4 Frozen Run Manifest</strong> — cấu hình đã đóng băng trước khi chạy</summary>
+      <p><strong>Là gì:</strong> ảnh chụp bất biến của mọi tham chiếu đã được resolve thành giá trị chính
+      xác, ghi <em>trước</em> khi runtime khởi động: release id, git commit, exact prompt version, model
+      profile, runtime adapter, environment, input hash, cộng thêm một <code>manifest_hash</code> tổng hợp.</p>
+      <p><strong>Giải quyết:</strong> alias prompt và environment pointer đều di chuyển được. Nếu không
+      đóng băng thì một tháng sau bạn không còn cách nào biết run đó thực sự đã chạy bằng version nào.</p>
+      <p><strong>Khi nào nên dùng:</strong> bạn không phải làm gì — nó tự sinh ra khi bạn bấm Run. Bạn
+      <em>đọc</em> nó khi cần chứng minh hoặc khi đối chiếu hai lần chạy.
+      <strong>Khi nào không cần:</strong> không bao giờ tắt được; đây là điều kiện để mọi chức năng còn
+      lại có nghĩa.</p>
+      <p><strong>Đánh đổi:</strong> manifest chỉ ghi <em>tham chiếu và version</em>, không ghi nội dung
+      prompt hay source code. Muốn đọc lại prompt version 2 thì phải vào MLflow; muốn đọc code thì phải
+      checkout commit. Đổi lại, governance DB không phình to và không có hai bản sao của cùng một sự thật.</p>
+    </details>
+
+    <details>
+      <summary><strong>3.5 Artifact và Artifact Revision</strong> — identity nghiệp vụ và nội dung bất biến</summary>
+      <p><strong>Là gì:</strong> <em>Artifact</em> là định danh nghiệp vụ ổn định (“API Design F001” trong
+      project <code>demo-api</code>). <em>Artifact Revision</em> là một bản nội dung bất biến của nó tại
+      một thời điểm, có content hash sha256, storage URI trên MinIO, và origin
+      (<code>AI_GENERATED</code> / <code>HUMAN_EDITED</code> / <code>IMPORTED</code>).</p>
+      <p><strong>Giải quyết:</strong> cùng một đối tượng nghiệp vụ có nhiều bản theo thời gian nhưng phải
+      giữ một identity thống nhất, nếu không thì chuỗi revision đứt và không so sánh được.</p>
+      <p><strong>Khi nào nên dùng:</strong> mọi output và mọi RD input đều đi qua đây — RD bạn upload cũng
+      là một revision origin <code>IMPORTED</code>, nhờ vậy hai run mới dùng chung được một input hash.
+      <strong>Khi nào không cần:</strong> file nháp cá nhân, không cần vào hệ thống.</p>
+      <p><strong>Đánh đổi:</strong> <code>output_business_key</code> do <em>bạn</em> đặt, không phải AI.
+      Đặt sai (hôm nay <code>F001</code>, mai <code>F-001</code>) là tạo ra hai artifact khác nhau và chuỗi
+      revision bị đứt — xem <a href="#s6">§6</a>. Ký tự cho phép: <code>A-Z a-z 0-9 . _ -</code>, tối đa
+      128 ký tự.</p>
+    </details>
+
+    <details>
+      <summary><strong>3.6 Human edit</strong> — sửa tay mà không mất bản gốc</summary>
+      <p><strong>Là gì:</strong> sửa nội dung một output sẽ tạo <em>revision mới</em> với
+      <code>origin = HUMAN_EDITED</code> và <code>parent_revision_id</code> trỏ về bản vừa sửa. Bản AI gốc
+      còn nguyên.</p>
+      <p><strong>Giải quyết:</strong> reviewer luôn cần chỉnh vài chỗ trước khi duyệt. Nếu ghi đè thì
+      không còn phân biệt được “AI viết thế” với “người sửa thành thế”.</p>
+      <p><strong>Khi nào nên dùng:</strong> chỉnh sửa nhỏ, có chủ đích, trước khi approve.
+      <strong>Khi nào không cần:</strong> nếu phải sửa quá nhiều thì vấn đề nằm ở prompt — sửa prompt,
+      publish release mới rồi chạy lại, đừng vá tay từng bản.</p>
+      <p><strong>Đánh đổi:</strong> Explain Difference đọc <code>origin</code>, <strong>không</strong> diff
+      nội dung. Nó nói cho bạn biết “bên này có bàn tay con người”, chứ không nói người đó sửa gì.</p>
+    </details>
+
+    <details>
+      <summary><strong>3.7 Approved Baseline</strong> — bản chuẩn được công nhận</summary>
+      <p><strong>Là gì:</strong> một con trỏ từ artifact tới đúng một revision được công nhận là bản chuẩn,
+      kèm <code>approved_by</code>, <code>approved_at</code> và <code>superseded_baseline_id</code> trỏ về
+      baseline bị thay thế.</p>
+      <p><strong>Giải quyết:</strong> “mới nhất” không đồng nghĩa “đã duyệt”. Revision 3 có thể vừa sinh
+      ra và đang chờ review, trong khi bản giao khách vẫn là revision 2.</p>
+      <p><strong>Khi nào nên dùng:</strong> khi một bản đã qua review và được chọn làm bản giao.
+      <strong>Khi nào không cần:</strong> trong lúc còn đang thử nghiệm — cứ để artifact không có baseline,
+      hệ thống <strong>không bao giờ</strong> tự lấy latest làm baseline.</p>
+      <p><strong>Đánh đổi:</strong> đây là phê duyệt <em>một bước</em>, không có review chain nhiều cấp,
+      không multi-approver. Và <code>approved_by</code> lấy từ header <code>X-Actor</code> — chuỗi client
+      tự khai, chưa xác thực (xem <a href="#s13">§13</a>).</p>
+    </details>
+
+    <details>
+      <summary><strong>3.8 Lineage</strong> — chuỗi truy vết ngược từ output về input</summary>
+      <p><strong>Là gì:</strong> một truy vấn trả về chuỗi: revision → chuỗi parent (nếu có human edit) →
+      run → manifest → workflow release → danh sách component (prompt/model/tool/agent với exact version)
+      → git commit → RD input revision và hash của nó.</p>
+      <p><strong>Giải quyết:</strong> câu hỏi “bản này ở đâu ra” phải trả lời được bằng một thao tác, không
+      phải bằng cách hỏi vòng quanh team.</p>
+      <p><strong>Khi nào nên dùng:</strong> chuẩn bị audit, điều tra một output đáng ngờ, hoặc lấy đúng
+      <code>run.id</code> để so sánh. <strong>Khi nào không cần:</strong> chỉ muốn biết “cái gì đã đổi
+      giữa hai bản” — dùng Explain Difference, nhanh hơn và trả lời trực diện hơn.</p>
+      <p><strong>Đánh đổi:</strong> lineage chỉ đi <em>ngược lên</em> (upstream). Không có truy vấn xuôi
+      kiểu “prompt version 2 đã tạo ra những output nào”.</p>
+    </details>
+
+    <details>
+      <summary><strong>3.9 Explain Difference</strong> — chỉ đích danh thành phần đã đổi</summary>
+      <p><strong>Là gì:</strong> so hai run hoặc hai revision, trả về một verdict
+      (<code>IDENTICAL</code> / <code>DIFFERENT</code>) cùng hai danh sách changed và unchanged, phân theo
+      7 category: <code>INPUT</code>, <code>WORKFLOW_RELEASE</code>, <code>PROMPT</code>,
+      <code>MODEL</code>, <code>TOOL</code>, <code>RUNTIME</code>, <code>HUMAN_EDIT</code>.</p>
+      <p><strong>Giải quyết:</strong> đúng câu hỏi “vì sao output hôm nay khác hôm qua”, trả lời bằng dữ
+      liệu chứ không bằng phỏng đoán.</p>
+      <p><strong>Khi nào nên dùng:</strong> ngay khi có người hỏi “vì sao khác?”, hoặc để chứng minh
+      “không có gì đổi” (verdict <code>IDENTICAL</code> = tái lập được).
+      <strong>Khi nào không cần:</strong> khi bạn cần biết <em>nội dung</em> khác chỗ nào — cái đó ngoài
+      phạm vi POC.</p>
+      <p><strong>Đánh đổi:</strong> deterministic tuyệt đối, không LLM tham gia; gọi hai lần cho kết quả
+      giống hệt nhau. Đổi lại nó chỉ nhìn thấy những gì có trong manifest: nếu một release không khai
+      tool nào thì category <code>TOOL</code> không có facet nào để so và biến mất khỏi cả hai bảng — đó
+      là hợp lệ, không phải lỗi.</p>
+    </details>
+
+    <!-- ══════════════════ 4 ══════════════════ -->
+    <h2 id="s4">4. Vòng đời một artifact</h2>
+
+    <p>Các khái niệm ở §3 chỉ ghép thành câu chuyện khi đi hết một vòng. Dưới đây là vòng đời thật của
+    một tài liệu BD, từ lúc nạp RD tới lúc so sánh hai bản.</p>
+
+    <div class="diagram" data-chart='{
+      "type": "flow",
+      "nodes": [
+        {"id":"n1","label":"1. Nap RD","shape":"terminal"},
+        {"id":"n2","label":"2. Run A"},
+        {"id":"n3","label":"3. Revision 1 (AI)"},
+        {"id":"n4","label":"4. Sua tay"},
+        {"id":"n5","label":"5. Revision 2 (HUMAN)"},
+        {"id":"n6","label":"6. Approve baseline"},
+        {"id":"n7","label":"7. Prompt v2 + Run B"},
+        {"id":"n8","label":"8. Revision 3 (AI)"},
+        {"id":"n9","label":"9. Explain Difference","shape":"terminal"}
+      ],
+      "edges": [
+        {"from":"n1","to":"n2"},
+        {"from":"n2","to":"n3"},
+        {"from":"n3","to":"n4"},
+        {"from":"n4","to":"n5"},
+        {"from":"n5","to":"n6"},
+        {"from":"n6","to":"n7"},
+        {"from":"n7","to":"n8"},
+        {"from":"n8","to":"n9"}
+      ]
+    }'></div>
+
+    <ul class="timeline">
+      <li>
+        <span class="time">Bước 1 — nạp RD</span>
+        <p>Bạn upload file RD. Hệ thống tính sha256, lưu nội dung lên MinIO và tạo một
+        <strong>artifact revision origin <code>IMPORTED</code></strong> (artifact type
+        <code>RD_SOURCE</code>). Từ giờ RD này có một identity ổn định và một hash cố định — điều kiện để
+        về sau chứng minh được “input không đổi”.</p>
+      </li>
+      <li>
+        <span class="time">Bước 2 — Run A</span>
+        <p>Bạn chọn RD vừa nạp, chọn environment <code>PROD</code>, nhập output business key
+        <code>F001</code>, bấm Run. Hệ thống ghi run vào DB, đọc environment pointer ra release, hỏi
+        MLflow alias <code>production</code> đang là version mấy (giả sử <strong>1</strong>), kiểm tra
+        commit, rồi <strong>đóng băng manifest</strong>. Chỉ sau đó runtime LangGraph mới được gọi.</p>
+      </li>
+      <li>
+        <span class="time">Bước 3 — Revision 1</span>
+        <p>Runtime chạy xong, gửi kết quả về. Hệ thống ghi nội dung lên MinIO, tạo
+        <strong>revision 1, origin <code>AI_GENERATED</code></strong>, <code>source_run_id</code> trỏ về
+        Run A. Run chuyển sang <code>SUCCEEDED</code>.</p>
+      </li>
+      <li>
+        <span class="time">Bước 4–5 — reviewer sửa tay</span>
+        <p>Reviewer sửa vài chỗ rồi lưu. Hệ thống <strong>không ghi đè</strong>: nó tạo
+        <strong>revision 2, origin <code>HUMAN_EDITED</code></strong>, <code>parent_revision_id</code> trỏ
+        về revision 1. Bản AI gốc còn nguyên để đối chiếu.</p>
+      </li>
+      <li>
+        <span class="time">Bước 6 — approve baseline</span>
+        <p>Delivery lead chọn revision 2 và bấm Approve. Baseline pointer của F001 chuyển sang revision 2;
+        baseline cũ (nếu có) bị hạ cờ <code>active</code> và được ghi vào
+        <code>superseded_baseline_id</code>. Từ giờ “bản chuẩn của F001” là một câu trả lời có thật trong
+        hệ thống.</p>
+      </li>
+      <li>
+        <span class="time">Bước 7 — prompt đổi, chạy lại</span>
+        <p>Ai đó cải tiến prompt và chuyển alias <code>production</code> sang version <strong>2</strong>.
+        Bạn chạy lại đúng RD cũ, đúng release cũ, đúng business key <code>F001</code>.</p>
+      </li>
+      <li>
+        <span class="time">Bước 8 — Revision 3</span>
+        <p>Run B sinh <strong>revision 3</strong> của <em>cùng một artifact</em> F001. Baseline
+        <strong>vẫn</strong> ở revision 2 — hệ thống không tự chuyển sang bản mới nhất.</p>
+      </li>
+      <li>
+        <span class="time">Bước 9 — Explain Difference</span>
+        <p>So revision 1 với revision 3: hệ thống báo <code>PROMPT</code> đổi từ <code>1</code> sang
+        <code>2</code>, còn <code>INPUT</code>, <code>WORKFLOW_RELEASE</code>, <code>MODEL</code>,
+        <code>RUNTIME</code>, <code>HUMAN_EDIT</code> đều unchanged. Câu trả lời cho reviewer: “khác vì
+        prompt lên version 2, không phải vì RD hay quy trình.”</p>
+      </li>
+    </ul>
+
+    <div class="callout">Ba việc trong vòng đời trên xảy ra <strong>tự động phía sau</strong>, bạn không
+    phải bấm gì: đóng băng manifest, đăng ký lineage, tạo artifact revision. Chỉ ba việc là
+    <strong>hành động tường minh</strong>: <em>publish release</em>, <em>promote environment</em> và
+    <em>approve baseline</em>.</div>
+
+    <!-- ══════════════════ 5 ══════════════════ -->
+    <h2 id="s5">5. Ai dùng gì</h2>
+
+    <table>
+      <thead>
+        <tr><th>Vai trò</th><th>Quan tâm gì</th><th>Dùng màn nào</th><th>Không cần đụng</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>BD author</strong><br><span class="text-small text-muted">người sinh tài liệu</span></td>
+          <td>Nạp đúng RD, chạy ra bản BD, đọc kết quả, chạy lại khi RD đổi.</td>
+          <td><em>Run workflow</em> → <em>Output history</em></td>
+          <td>Releases, environment pointer, manifest. Cứ để mặc định <code>PROD</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Reviewer</strong></td>
+          <td>Đọc nội dung, sửa tay chỗ cần, và biết vì sao bản này khác bản trước.</td>
+          <td><em>Output history</em> (Edit) → <em>Compare outputs</em></td>
+          <td>Releases, publish, promote. Không cần biết MLflow là gì.</td>
+        </tr>
+        <tr>
+          <td><strong>Delivery lead</strong></td>
+          <td>Chọn bản chuẩn để giao, kiểm soát bản nào đang chạy ở PROD, rollback khi có vấn đề.</td>
+          <td><em>Releases</em> (publish / promote / rollback) → <em>Output history</em> (Approve)</td>
+          <td>Nội dung chi tiết của manifest; chỉ cần release version và pointer.</td>
+        </tr>
+        <tr>
+          <td><strong>Auditor</strong></td>
+          <td>Chứng minh một output đến từ đâu, ai duyệt, PROD từng chạy gì.</td>
+          <td><em>Provenance</em> · <code>GET /environments/{env}/audit</code> · <code>GET /baselines</code></td>
+          <td>Không cần chạy run nào. Toàn bộ công việc là đọc.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="text-small text-muted">POC chưa có phân quyền: mọi vai trò đều thấy và bấm được mọi thứ.
+    Bảng trên là phân công công việc, không phải quyền hạn kỹ thuật — xem <a href="#s13">§13</a>.</p>
+
+    <!-- ══════════════════ 6 ══════════════════ -->
+    <h2 id="s6">6. Hướng dẫn quyết định</h2>
+
+    <p>Năm lựa chọn hệ thống không quyết thay bạn được.</p>
+
+    <h3>6.1 Alias <code>production</code> hay ghim cứng <code>prompt_version</code>?</h3>
+    <p>Trong <code>bindings</code> của release, mỗi node có prompt có thể khai
+    <code>"prompt_alias": "production"</code> <em>hoặc</em> <code>"prompt_version": 2</code>. Nếu khai cả
+    hai thì <code>prompt_version</code> thắng.</p>
+    <table>
+      <thead><tr><th>Cách khai</th><th>Hệ quả</th><th>Chọn khi</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>prompt_alias</code></td>
+          <td>Cải tiến prompt trong MLflow là mọi run sau đó tự dùng bản mới, <strong>không phải tạo
+          release mới</strong>. Nhưng hai run cùng một release có thể ra hai prompt version khác nhau —
+          đúng như thiết kế, và manifest ghi lại con số thật của từng lần.</td>
+          <td>Prompt còn đang được tinh chỉnh thường xuyên; bạn muốn vòng lặp cải tiến ngắn.</td>
+        </tr>
+        <tr>
+          <td><code>prompt_version</code></td>
+          <td>Release này vĩnh viễn dùng đúng version đó, kể cả khi alias di chuyển. Muốn đổi prompt thì
+          phải <strong>tạo release mới</strong> và promote.</td>
+          <td>Release đã lên PROD và bạn cần bảo đảm không ai thay đổi hành vi từ bên ngoài.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">Dù chọn cách nào, manifest <strong>luôn</strong> ghi số version chính xác, không
+    bao giờ ghi alias. Database có ràng buộc từ chối mọi giá trị dạng <code>production</code>,
+    <code>latest</code>, <code>staging</code>, <code>prod</code>, <code>champion</code>,
+    <code>current</code> ở cột <code>exact_version</code>.</div>
+
+    <h3>6.2 Khi nào tạo release mới, khi nào chỉ đổi environment pointer?</h3>
+    <ul>
+      <li><strong>Tạo release mới</strong> khi <em>định nghĩa</em> đổi: code workflow đổi (commit khác),
+      binding đổi (node dùng prompt khác, ghim version khác), model profile đổi, entrypoint hoặc state
+      schema đổi.</li>
+      <li><strong>Chỉ đổi pointer</strong> khi định nghĩa không đổi mà bạn chỉ muốn chọn <em>bản nào đang
+      phục vụ</em>: đưa 1.1.0 lên PROD, hoặc quay về 1.0.0.</li>
+    </ul>
+    <p>Ranh giới đơn giản: release trả lời “chạy cái gì”, pointer trả lời “bản nào đang chạy”. Không bao
+    giờ sửa release đã publish để đạt hiệu ứng của pointer — database sẽ chặn, và kể cả không chặn thì
+    làm vậy là bóp méo ngược lịch sử của mọi run đã tham chiếu tới nó.</p>
+
+    <h3>6.3 DEV hay PROD?</h3>
+    <table>
+      <thead><tr><th>Chọn</th><th>Khi</th><th>Lưu ý</th></tr></thead>
+      <tbody>
+        <tr><td><code>DEV</code></td><td>Thử một release mới, prompt mới, hoặc RD lạ.</td>
+        <td>Phải promote release vào DEV trước, nếu không sẽ nhận <code>NO_RELEASE_FOR_ENVIRONMENT</code>.
+        DEV không được cấu hình sẵn trong seed demo.</td></tr>
+        <tr><td><code>PROD</code></td><td>Sinh bản để giao, hoặc tái sinh một bản chính thức.</td>
+        <td>Mặc định của UI và của script demo.</td></tr>
+        <tr><td><code>release_id</code> ghim thẳng</td><td>Chạy lại đúng một release cũ mà không muốn
+        đụng pointer của cả team.</td>
+        <td>Truyền <code>release_id</code> thay cho <code>environment</code> ở <code>POST /runs</code>;
+        run được đánh <code>execution_mode = PINNED_RELEASE</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>Environment là <em>một facet của category <code>RUNTIME</code></em> trong Explain Difference: so
+    một run DEV với một run PROD sẽ báo <code>RUNTIME</code> changed dù mọi thứ khác y hệt. Nếu bạn muốn
+    chứng minh “chỉ prompt đổi”, hãy chạy cả hai run trên cùng một environment.</p>
+
+    <h3>6.4 Quy ước đặt <code>business_key</code></h3>
+    <p><code>business_key</code> là identity nghiệp vụ của tài liệu sẽ sinh ra (ví dụ <code>F001</code>).
+    Bạn đặt, không phải AI. Nó cùng với <code>project_key</code> và <code>artifact_type</code> tạo thành
+    khoá duy nhất của artifact, và cũng trở thành segment trong object key trên MinIO.</p>
+    <div class="callout warn"><strong>Ràng buộc charset thật của code:</strong> mỗi segment
+    (<code>project_key</code>, <code>artifact_type</code>, <code>business_key</code>) phải khớp
+    <code>[A-Za-z0-9._-]</code> với độ dài 1–128, và không được là <code>.</code> hay <code>..</code>.
+    Sai định dạng → HTTP 422 <code>VALIDATION_ERROR</code>. Không có khoảng trắng, không dấu tiếng Việt,
+    không dấu <code>/</code>.</div>
+    <ul>
+      <li><strong>Cùng business key</strong> ở lần chạy sau = tạo revision mới của cùng một artifact →
+      so sánh được, có chuỗi lịch sử.</li>
+      <li><strong>Đổi business key</strong> = tạo một artifact hoàn toàn khác → chuỗi revision đứt,
+      baseline không mang sang, và Explain Difference sẽ báo <code>same_artifact: false</code>.</li>
+      <li>Chốt quy ước ngay từ đầu project và ghi vào tài liệu team. Đổi tên sau khi đã có revision là
+      không sửa được — chỉ tạo mới.</li>
+    </ul>
+
+    <h3>6.5 Khi nào approve baseline, khi nào để nguyên latest?</h3>
+    <p><strong>Approve</strong> khi: bản đã qua review, đã sửa xong, và sẽ được dùng làm bản giao hoặc làm
+    đầu vào cho bước sau. Approve là hành động ghi nhận trách nhiệm — <code>approved_by</code> và
+    <code>approved_at</code> vào audit.</p>
+    <p><strong>Để nguyên</strong> khi: còn đang thử prompt, chạy nhiều lần trong ngày, chưa ai review.
+    Không approve không gây hại gì — artifact chỉ đơn giản là chưa có baseline, và hệ thống
+    <strong>không</strong> tự chọn bản mới nhất thay bạn.</p>
+    <p>Approve lại một artifact đã có baseline là hợp lệ và được khuyến khích khi có bản tốt hơn: trong
+    cùng một transaction, baseline cũ bị hạ cờ và baseline mới ghi lại nó ở
+    <code>superseded_baseline_id</code>. Chuỗi đó chính là lịch sử phê duyệt.</p>
+
+    <!-- ══════════════════ 7 ══════════════════ -->
+    <h2 id="s7">7. Năm chỗ dễ hiểu lầm</h2>
+
+    <h3>7.1 Alias vs exact version</h3>
+    <div class="compare">
+      <div>
+        <div class="col-head">Alias</div>
+        <div class="card" style="border-radius:0 0 4px 4px; margin:0;">
+          <p><code>production</code>, <code>latest</code> là <strong>con trỏ di động</strong>. Hôm nay nó
+          trỏ version 1, mai ai đó chuyển sang version 2 — cùng một chữ nhưng khác nội dung. Alias chỉ
+          dùng để <em>khai báo ý định</em> trong release.</p>
+        </div>
+      </div>
+      <div>
+        <div class="col-head">Exact version</div>
+        <div class="card" style="border-radius:0 0 4px 4px; margin:0;">
+          <p><code>2</code> là <strong>đích bất biến</strong>. Manifest chỉ được ghi con số này. Database
+          có ràng buộc từ chối mọi giá trị dạng alias và bắt buộc prompt version phải là chữ số, nên sai
+          lầm này không thể lọt qua.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>7.2 Artifact vs Revision</h3>
+    <p><strong>Artifact</strong> là identity nghiệp vụ ổn định — “API Design F001”.
+    <strong>Revision</strong> là một bản nội dung bất biến của nó tại một thời điểm. F001 có thể có
+    revision 1 (AI sinh), revision 2 (reviewer sửa), revision 3 (sinh lại từ prompt mới) — vẫn là một
+    F001. Bạn không sửa được revision đã có; mọi thay đổi tạo revision mới.</p>
+
+    <h3>7.3 Latest revision vs Approved baseline</h3>
+    <p>Bản mới nhất chưa chắc là bản đã duyệt. Revision 3 có thể vừa sinh ra và đang chờ review, trong khi
+    baseline vẫn trỏ revision 2. Hệ thống <strong>không bao giờ tự lấy latest làm baseline</strong> — chỉ
+    thao tác Approve tường minh mới di chuyển pointer. Khi giao khách, lấy theo baseline, đừng lấy theo
+    “bản cuối trong danh sách”.</p>
+
+    <h3>7.4 Vì sao release đã publish không sửa được</h3>
+    <p>Vì mọi run đã chạy đều tham chiếu tới release đó. Sửa release nghĩa là làm sai lệch ngược lịch sử:
+    những run cũ bỗng “được chạy bằng” một cấu hình mà chúng chưa từng thấy. Ràng buộc này cài ở tầng
+    database bằng trigger, không chỉ ở code — kể cả <code>UPDATE</code> trực tiếp bằng SQL cũng bị chặn
+    (lỗi trả về mã <code>IMMUTABLE_OBJECT</code>). Muốn đổi gì thì <strong>tạo release mới</strong> rồi
+    promote; release cũ vẫn còn để rollback.</p>
+
+    <h3>7.5 Vì sao manifest vẫn còn khi run FAILED</h3>
+    <p>Vì manifest ghi lại cấu hình đã được resolve tại thời điểm đó, và nó có giá trị audit độc lập với
+    việc execution có chạy được hay không. Nếu runtime chết ở bước gọi, bạn vẫn trả lời được “lần chạy
+    hỏng đó dùng prompt version nào, commit nào”. Đây là <strong>hành vi đúng thiết kế, không phải
+    rác</strong> — đo thật: khi stop <code>vgov-runtime</code> rồi start run, kết quả là
+    <code>HTTP 502</code>, run <code>FAILED:RUNTIME_UNAVAILABLE</code>, và
+    <strong><code>manifests=1</code></strong>.</p>
+    <p>Ngược lại, hỏng <em>trước</em> khi đóng băng (không resolve được prompt, environment chưa trỏ
+    release…) thì <strong>không</strong> có manifest nào được tạo và runtime không hề được gọi — nguyên
+    tắc <em>fail closed</em>. Đo thật: xoá alias <code>production</code> rồi start run cho
+    <code>HTTP 422</code>, <code>code=PROMPT_UNRESOLVED</code>, <strong><code>manifests=0</code></strong>.</p>
+    <p>Phân biệt hai trường hợp bằng status: <code>FAILED</code> có manifest,
+    <code>FAILED_PRECONDITION</code> thì không.</p>
+
+    <hr>
+    <h1 style="font-size:1.6rem; margin-top:2rem;">PHẦN B — Thao tác</h1>
+
+    <!-- ══════════════════ 8 ══════════════════ -->
+    <h2 id="s8">8. Bắt đầu nhanh — từ 0 tới một run chạy được</h2>
+
+    <p>Toàn bộ lệnh chạy từ thư mục gốc repo <code>C:\Users\HUY\workspace\ai-project-opus</code>. Cần
+    Docker Desktop đang chạy và các port trống trên host: <strong>5433</strong> (postgres),
+    <strong>8810</strong> (vgov-api), <strong>8811</strong> (vgov-runtime), <strong>8812</strong> (mlflow).
+    MinIO chỉ chạy trong mạng nội bộ của compose, không mở port ra host.</p>
+
+    <div class="callout">Mọi port đều bind vào <code>127.0.0.1</code>, tức chỉ máy local truy cập được.
+    Máy khác trong LAN không gọi tới được.</div>
+
+    <h3>Bước 1 — cấu hình biến môi trường</h3>
+    <p>Stack đọc file <code>harness/version-governance/deploy/.env</code>. Nếu chưa có, chép từ mẫu rồi điền:</p>
+<pre><code>cp harness/version-governance/deploy/.env.example harness/version-governance/deploy/.env</code></pre>
+    <p>Các biến trong file đó: <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code>,
+    <code>VGOV_DATABASE_URL</code>, <code>MLFLOW_DATABASE_URL</code>, <code>MINIO_ROOT_USER</code>,
+    <code>MINIO_ROOT_PASSWORD</code>, <code>VGOV_S3_ACCESS_KEY</code>, <code>VGOV_S3_SECRET_KEY</code>,
+    <code>NVIDIA_API_KEY</code>, <code>VGOV_LLM_BASE_URL</code>,
+    <code>VGOV_CALLBACK_GRACE_SECONDS</code>.</p>
+    <div class="callout warn">
+      <p><strong>Hai chỗ dễ sai:</strong></p>
+      <ul>
+        <li><code>VGOV_S3_ACCESS_KEY</code> / <code>VGOV_S3_SECRET_KEY</code> phải <strong>trùng</strong>
+        với <code>MINIO_ROOT_USER</code> / <code>MINIO_ROOT_PASSWORD</code> — script
+        <code>init-minio.sh</code> dùng chính cặp khoá đó để đăng nhập MinIO và tạo bucket. Lệch nhau thì
+        service <code>minio-init</code> fail và cả chain <code>depends_on</code> không lên.</li>
+        <li>Không hardcode credential vào code hay doc. File <code>.env</code> không được commit.</li>
+      </ul>
+    </div>
+    <p class="text-small text-muted"><code>NVIDIA_API_KEY</code> để trống vẫn chạy được: runtime sẽ trả
+    output placeholder (ghép prompt với nội dung RD) thay vì gọi LLM thật. Đủ để thử luồng governance,
+    không đủ để đánh giá chất lượng tài liệu.</p>
+
+    <h3>Bước 2 — khởi động stack</h3>
+<pre><code>docker compose -f harness/version-governance/deploy/docker-compose.yml up -d --build</code></pre>
+    <p>Stack gồm 5 service chạy dài: <code>postgres</code>, <code>minio</code>, <code>mlflow</code>,
+    <code>vgov-api</code>, <code>vgov-runtime</code>, cộng <code>minio-init</code> chạy một lần rồi thoát.</p>
+
+    <div class="callout warn"><strong>MLflow mất khoảng 2 phút mới healthy.</strong> Đây là hành vi bình
+    thường đã đo trên máy, không phải lỗi — <code>start_period</code> của healthcheck đặt 240s. Các service
+    phụ thuộc chỉ khởi động sau khi MLflow xanh, nên lần <code>up</code> đầu tiên hãy kiên nhẫn.</div>
+
+    <p>Kiểm tra:</p>
+<pre><code>docker compose -f harness/version-governance/deploy/docker-compose.yml ps
+curl http://127.0.0.1:8810/health</code></pre>
+    <p>Kỳ vọng: mọi service <code>healthy</code>, và <code>/health</code> trả
+    <code>{"status":"ok","dependencies":{"postgres":"ok","minio":"ok","mlflow":"ok","runtime":"ok"}}</code>.
+    Nếu có dependency <code>error</code> thì endpoint trả HTTP 503.</p>
+
+    <h3>Bước 3 — seed dữ liệu mẫu</h3>
+    <p>Script seed cần thư viện <code>mlflow</code> và mạng nội bộ của compose, nên chạy <em>bên trong</em>
+    container <code>vgov-api</code> (thư mục <code>scripts/</code> đã được mount vào
+    <code>/app/scripts</code>):</p>
+<pre><code>docker compose -f harness/version-governance/deploy/docker-compose.yml exec -T vgov-api \
+  python /app/scripts/demo_seed.py \
+  --api-base http://localhost:8810/api/vgov \
+  --tracking-uri http://mlflow:8812</code></pre>
+
+    <p>Script này idempotent (chạy lại không tạo trùng) và làm đúng 5 việc:</p>
+    <ul>
+      <li>đăng ký prompt <code>api-bd-generator</code> version 1 và version 2 trong MLflow;</li>
+      <li>trỏ alias <code>production</code> về version 1;</li>
+      <li>tạo workflow release <code>rd-to-bd-api</code> phiên bản <code>1.0.0</code> rồi publish;</li>
+      <li>trỏ environment <strong>PROD</strong> vào release đó (DEV để trống);</li>
+      <li>upload 2 revision RD mẫu (business key <code>RD-DEMO</code>) vào project <code>demo-api</code>.</li>
+    </ul>
+    <p>Output là JSON in ra <code>prompt_versions</code>, <code>release_id</code> và danh sách
+    <code>input_revisions</code> — giữ lại các UUID này, bạn sẽ cần chúng ở phần API.</p>
+
+    <h3>Bước 4 — build và mở UI</h3>
+    <p>Harness Hub phục vụ SPA đã build tại <code>harness/hub/web-v3/dist</code>, nên phải build trước:</p>
+<pre><code>pnpm --dir harness/hub/web-v3 build
+.\harness\hub\run-hub.ps1</code></pre>
+    <p>Mở <code>http://127.0.0.1:8799</code>. Trong sidebar có nhóm <strong>Version Governance</strong> với
+    đủ 5 mục: <em>Releases</em>, <em>Run workflow</em>, <em>Output history</em>, <em>Provenance</em>,
+    <em>Compare outputs</em>.</p>
+
+    <h3>Bước 5 — chạy thử một run</h3>
+    <p>Vào <code>/vgov/run</code>, giữ nguyên giá trị mặc định (project <code>demo-api</code>, workflow
+    <code>rd-to-bd-api</code>, environment <code>PROD</code>), chọn một RD input, nhập <em>Output business
+    key</em> (ví dụ <code>F001</code>), bấm <strong>Run</strong>. Trạng thái tự poll mỗi giây tới khi
+    <code>SUCCEEDED</code>. Sau đó mở <em>Output history</em> để đọc nội dung BD.</p>
+
+    <details>
+      <summary>Tuỳ chọn — chạy kịch bản demo và kiểm tra Definition of Done bằng script</summary>
+      <p>Chạy một scenario end-to-end (A = prompt version 1; B = prompt version 2, cùng input; C = input
+      revision 2 + prompt version 2):</p>
+<pre><code>docker compose -f harness/version-governance/deploy/docker-compose.yml exec -T vgov-api \
+  python /app/scripts/demo_run.py --scenario A \
+  --api-base http://localhost:8810/api/vgov \
+  --tracking-uri http://mlflow:8812</code></pre>
+      <p>Chạy toàn bộ 12 tiêu chí DoD (script này chạy trên host, nó tự <code>exec</code> vào container):</p>
+<pre><code>python harness/version-governance/verify_dod.py</code></pre>
+      <p>Chạy test suite:</p>
+<pre><code>docker compose -f harness/version-governance/deploy/docker-compose.yml exec -T vgov-api \
+  python -m pytest tests -q</code></pre>
+      <p>Kết quả thật đã ghi nhận ngày 2026-08-03: <strong>DoD 12/12 PASS</strong>, vgov
+      <strong>42 test pass</strong>, hub <strong>334 test pass</strong>, <code>pnpm build</code> và
+      <code>pnpm lint</code> đều xanh.</p>
+      <div class="callout warn"><code>verify_dod.py</code> có phần “error cases” cố tình xoá alias
+      <code>production</code> và <strong>stop container <code>vgov-runtime</code></strong> rồi khôi phục lại.
+      Đừng chạy nó khi người khác đang dùng stack.</div>
+    </details>
+
+    <!-- ══════════════════ 9 ══════════════════ -->
+    <h2 id="s9">9. Bản đồ điều hướng</h2>
+
+    <p>Bạn đi theo trục công việc, không theo trục đối tượng kỹ thuật. Release, Manifest, Component,
+    Artifact vẫn tồn tại đầy đủ ở backend nhưng chỉ hiện ra khi bạn mở sâu vào một output cụ thể.</p>
+
+    <div class="diagram" data-chart='{
+      "type": "flow",
+      "nodes": [
+        {"id":"p","label":"Project","shape":"terminal"},
+        {"id":"w","label":"Workflow"},
+        {"id":"r","label":"Run"},
+        {"id":"o","label":"Output"},
+        {"id":"h","label":"History"},
+        {"id":"c","label":"Compare"},
+        {"id":"a","label":"Approve"}
+      ],
+      "edges": [
+        {"from":"p","to":"w"},
+        {"from":"w","to":"r"},
+        {"from":"r","to":"o"},
+        {"from":"o","to":"h"},
+        {"from":"o","to":"c"},
+        {"from":"o","to":"a"}
+      ]
+    }'></div>
+
+    <table>
+      <thead>
+        <tr><th>Màn hình (sidebar)</th><th>URL</th><th>Dùng khi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Releases</td><td><code>/vgov/releases</code></td><td>Publish một release, promote hoặc rollback DEV/PROD</td></tr>
+        <tr><td>Run workflow</td><td><code>/vgov/run</code></td><td>Chọn RD input + environment, đặt business key, chạy</td></tr>
+        <tr><td>Output history</td><td><code>/vgov/output</code></td><td>Đọc nội dung BD, sửa tay, approve baseline</td></tr>
+        <tr><td>Provenance</td><td><code>/vgov/provenance</code></td><td>Xem output này đến từ đâu, bằng cấu hình nào</td></tr>
+        <tr><td>Compare outputs</td><td><code>/vgov/compare</code></td><td>Explain Difference giữa hai revision</td></tr>
+      </tbody>
+    </table>
+
+    <p>Cả 5 mục đều có link trong sidebar, nhóm <strong>Version Governance</strong>. Những việc sau xảy ra
+    <strong>tự động phía sau</strong>: đóng băng manifest, đăng ký lineage, tạo artifact revision. Ba việc
+    là <strong>hành động tường minh</strong>: publish release, promote environment, approve baseline.</p>
+
+    <h3>Điều gì xảy ra khi bạn bấm Run</h3>
+
+    <div class="diagram" data-chart='{
+      "type": "sequence",
+      "actors": ["Ban", "Hub 8799", "vgov-api", "MLflow", "LangGraph"],
+      "steps": [
+        {"from":"Ban","to":"Hub 8799","msg":"Bam Run"},
+        {"from":"Hub 8799","to":"vgov-api","msg":"POST /api/vgov/runs"},
+        {"from":"vgov-api","to":"vgov-api","msg":"1. Tao run (status CREATED)"},
+        {"from":"vgov-api","to":"vgov-api","msg":"2. Doc env pointer -> release"},
+        {"from":"vgov-api","to":"MLflow","msg":"3. Resolve alias production"},
+        {"from":"MLflow","to":"vgov-api","msg":"exact version = 2","return":true},
+        {"from":"vgov-api","to":"vgov-api","msg":"4. Dong bang manifest (MANIFEST_FROZEN)"},
+        {"from":"vgov-api","to":"LangGraph","msg":"5. Start — kem prompt DA resolve"},
+        {"from":"LangGraph","to":"vgov-api","msg":"6. Callback: BD Markdown","return":true},
+        {"from":"vgov-api","to":"vgov-api","msg":"7. Luu revision + SUCCEEDED"},
+        {"from":"vgov-api","to":"Ban","msg":"Output revision moi","return":true}
+      ]
+    }'></div>
+
+    <p>Thứ tự này là điểm cốt lõi: <strong>đóng băng trước, chạy sau</strong>. Nếu gọi runtime xong mới ghi
+    manifest thì alias có thể đã bị người khác di chuyển giữa chừng và manifest ghi sai. Runtime cũng
+    <strong>không</strong> tự tra MLflow — nó nhận prompt template đã resolve sẵn từ vgov-api, nên không
+    có đường nào để hai bên lệch nhau.</p>
+
+    <div class="callout">Hai đường vào cùng một API: <code>http://127.0.0.1:8799/api/vgov/...</code> (qua
+    Harness Hub, đúng đường UI đi) và <code>http://127.0.0.1:8810/api/vgov/...</code> (thẳng vào vgov-api).
+    Hub giữ nguyên prefix <code>/api/vgov</code> khi chuyển tiếp, nên hai đường có cùng path.</div>
+
+    <!-- ══════════════════ 10 ══════════════════ -->
+    <h2 id="s10">10. Hướng dẫn theo tác vụ</h2>
+
+    <details open>
+      <summary><strong>10.1 Nạp RD input vào hệ thống</strong></summary>
+      <p><em>Khi nào:</em> trước mỗi lần chạy với một RD mới, hoặc khi RD được cập nhật.</p>
+      <p><em>Các bước:</em> hiện chưa có form upload trên UI — dùng API:</p>
+<pre><code>curl -X POST http://127.0.0.1:8810/api/vgov/inputs \
+  -H "X-Actor: your.name" \
+  -F project_key=demo-api \
+  -F business_key=RD-DEMO \
+  -F file=@rd.md</code></pre>
+      <p><em>Kết quả:</em> HTTP 201 kèm <code>{"id": "...", "revision_no": 1, "content_hash": "sha256:..."}</code>.
+      File được lưu thành một artifact revision origin <code>IMPORTED</code>, artifact type
+      <code>RD_SOURCE</code>, hash sha256 tính từ nội dung. Upload lại đúng nội dung cũ cho ra cùng hash,
+      nên hai run dùng chung một input hash — điều kiện bắt buộc để Explain Difference chứng minh được
+      “input không đổi”.</p>
+      <p>Xem lại danh sách input đã nạp: <code>GET /api/vgov/inputs?project_key=demo-api</code>. Trên UI
+      chúng xuất hiện trong dropdown <em>RD input</em> ở màn Run.</p>
+      <div class="callout warn"><code>project_key</code>, <code>business_key</code> và
+      <code>artifact_type</code> trở thành segment của object key trên MinIO, nên chỉ chấp nhận ký tự
+      <code>A-Z a-z 0-9 . _ -</code>, tối đa 128 ký tự. Sai định dạng → HTTP 422.</div>
+    </details>
+
+    <details>
+      <summary><strong>10.2 Publish một workflow release</strong></summary>
+      <p><em>Khi nào:</em> khi code workflow hoặc binding prompt thay đổi và bạn muốn một bản có thể deploy được.</p>
+      <p><em>Các bước:</em></p>
+      <ol>
+        <li>Tạo draft (API): <code>POST /api/vgov/releases</code> với các trường
+        <code>workflow_id</code>, <code>release_version</code>, <code>git_repo</code>, <code>git_ref</code>,
+        <code>entrypoint</code>, <code>state_schema_version</code>, <code>bindings</code>,
+        <code>runtime_adapter_id</code>, <code>model_profile</code>.</li>
+        <li>Mở <code>/vgov/releases</code>, bấm <strong>Publish</strong> ở dòng release đang <code>DRAFT</code>.</li>
+      </ol>
+      <p><em>Kết quả:</em> status chuyển <code>DRAFT → PUBLISHED</code>, trường <code>git_commit</code> được
+      resolve thành SHA 40 ký tự tại đúng thời điểm publish, kèm <code>published_at</code> và
+      <code>published_by</code>. Từ giây phút đó release là <strong>bất biến</strong>.</p>
+      <p><code>bindings</code> là nơi khai báo node nào dùng prompt nào. Mẫu của demo:</p>
+<pre><code>"bindings": {
+  "generate_bd": {
+    "prompt_ref": "mlflow://api-bd-generator",
+    "prompt_alias": "production"
+  }
+}</code></pre>
+      <p>Dùng <code>"prompt_version": 2</code> thay cho <code>prompt_alias</code> nếu muốn ghim cứng
+      (xem <a href="#s6">§6.1</a>). Binding còn nhận <code>agent_ref</code> + <code>agent_version</code>
+      và <code>tool_refs</code>; khai <code>agent_ref</code> hay tool mà thiếu version thì run
+      <strong>fail closed</strong> chứ không tự đoán. Khai cùng một prompt/tool ở nhiều node với version
+      khác nhau cũng bị từ chối (<code>CONFLICTING_COMPONENT_VERSION</code>) — đó là mâu thuẫn thật trong
+      release.</p>
+      <p>Node không có binding sẽ dùng prompt mặc định trong code runtime. Chỉ những node có
+      <code>prompt_ref</code> mới được ghi thành component trong manifest và mới được Explain Difference
+      theo dõi.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.3 Promote hoặc rollback environment</strong></summary>
+      <p><em>Khi nào:</em> đưa một release lên DEV/PROD, hoặc quay về bản cũ khi bản mới có vấn đề.</p>
+      <p><em>Các bước:</em> mở <code>/vgov/releases</code> → ở dòng release đã <code>PUBLISHED</code>, bấm
+      <strong>Promote DEV</strong> hoặc <strong>Promote / rollback PROD</strong>.</p>
+      <p><em>Kết quả:</em> ô “DEV pointer” / “PROD pointer” ở đầu trang đổi sang version mới. Bảng audit ghi
+      thêm một dòng: ai đổi, từ release nào sang release nào, lý do, thời điểm. Xem lịch sử qua
+      <code>GET /api/vgov/environments/PROD/audit?workflow_id=rd-to-bd-api</code>.</p>
+      <p><strong>Rollback dùng chung một thao tác với promote</strong> — chỉ là trỏ pointer về một release
+      cũ hơn. Không release nào bị xoá hay sửa. Đây là lý do lịch sử luôn tái hiện được.</p>
+      <p>POC chỉ có đúng hai environment: <code>DEV</code> và <code>PROD</code>. Trỏ environment vào một
+      release còn <code>DRAFT</code> → HTTP 422 <code>RELEASE_NOT_PUBLISHED</code>. Trỏ vào release của
+      workflow khác → 422 <code>VALIDATION_ERROR</code>.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.4 Chạy một run</strong></summary>
+      <p><em>Khi nào:</em> mỗi lần cần sinh hoặc tái sinh một API Basic Design từ RD.</p>
+      <p><em>Các bước:</em> mở <code>/vgov/run</code> → điền Project, Workflow → chọn <em>RD input</em> →
+      chọn <em>Environment</em> (DEV/PROD) → nhập <em>Output business key</em> → bấm <strong>Run</strong>.</p>
+      <p><em>Kết quả:</em> ô trạng thái hiện run id và status, tự cập nhật mỗi giây tới khi đạt trạng thái cuối.</p>
+      <p>Vòng đời status:</p>
+      <table>
+        <thead><tr><th>Status</th><th>Nghĩa</th></tr></thead>
+        <tbody>
+          <tr><td><code>CREATED</code></td><td>Run đã được ghi vào Harness Hub, chưa resolve xong cấu hình</td></tr>
+          <tr><td><code>MANIFEST_FROZEN</code></td><td>Cấu hình đã đóng băng, chuẩn bị gọi runtime</td></tr>
+          <tr><td><code>RUNNING</code></td><td>LangGraph đang chạy</td></tr>
+          <tr><td><code>SUCCEEDED</code></td><td>Đã có output revision mới <span class="badge green">OK</span></td></tr>
+          <tr><td><code>FAILED_PRECONDITION</code></td><td>Hỏng <em>trước</em> khi đóng băng — không có manifest, runtime chưa hề được gọi</td></tr>
+          <tr><td><code>FAILED</code></td><td>Hỏng <em>sau</em> khi đóng băng — manifest vẫn còn</td></tr>
+          <tr><td><code>CANCELLED</code></td><td>Runtime báo huỷ</td></tr>
+        </tbody>
+      </table>
+      <p>Xem lại các run cũ của project: <code>GET /api/vgov/runs?project_key=demo-api</code>, lọc thêm
+      bằng <code>&amp;workflow_id=rd-to-bd-api</code>. Danh sách này <em>không</em> reconcile (xem 10.10),
+      để một lần liệt kê không kéo theo N lần gọi runtime.</p>
+      <div class="callout"><strong>Output business key</strong> là identity nghiệp vụ của tài liệu sẽ sinh
+      ra (ví dụ <code>F001</code>). Bạn quyết định nó, không phải AI. Chạy lại với cùng business key sẽ tạo
+      <em>revision mới của cùng một artifact</em>; đổi business key sẽ tạo một artifact khác hẳn và làm đứt
+      chuỗi revision.</div>
+    </details>
+
+    <details>
+      <summary><strong>10.5 Xem output</strong></summary>
+      <p><em>Khi nào:</em> sau khi run thành công, hoặc khi cần đọc lại một bản cũ.</p>
+      <p><em>Các bước:</em> mở <code>/vgov/output</code> → nhập Project → chọn artifact → chọn revision
+      trong dropdown (nhãn dạng <code>Revision 2 · AI_GENERATED</code>).</p>
+      <p><em>Kết quả:</em> nội dung BD Markdown được render. Mỗi revision là một bản bất biến; chuyển
+      dropdown là xem đúng nội dung của thời điểm đó, không phải bản mới nhất.</p>
+      <p class="text-small text-muted">Màn này lọc theo <code>artifact_type = API_BASIC_DESIGN</code>. RD
+      input (<code>RD_SOURCE</code>) không hiện ở đây — xem qua <code>GET /inputs</code>.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.6 Sửa tay một output (human edit)</strong></summary>
+      <p><em>Khi nào:</em> reviewer cần chỉnh nội dung AI sinh trước khi duyệt.</p>
+      <p><em>Các bước:</em> ở <code>/vgov/output</code>, bấm <strong>Edit content</strong> → sửa trong ô
+      soạn thảo → bấm <strong>Save human edit</strong>.</p>
+      <p><em>Kết quả:</em> hệ thống <strong>không</strong> ghi đè bản cũ. Nó tạo một revision mới với
+      <code>origin = HUMAN_EDITED</code> và <code>parent_revision_id</code> trỏ về bản bạn vừa sửa. Bản AI
+      gốc còn nguyên. Thông báo hiện “Saved human revision N”.</p>
+      <p>Đây cũng là cách Explain Difference phát hiện được yếu tố con người: nó đọc <code>origin</code>,
+      không diff nội dung.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.7 Approve một revision làm baseline</strong></summary>
+      <p><em>Khi nào:</em> khi một bản được công nhận là bản chuẩn của project.</p>
+      <p><em>Các bước:</em> ở <code>/vgov/output</code>, chọn đúng revision rồi bấm <strong>Approve</strong>.</p>
+      <p><em>Kết quả:</em> baseline pointer của artifact chuyển sang revision đó. Trong cùng một
+      transaction, baseline cũ bị hạ cờ <code>active = false</code> và baseline mới ghi
+      <code>superseded_baseline_id</code> trỏ về bản cũ — chuỗi này chính là audit trail. Bản ghi giữ
+      <code>approved_by</code> (lấy từ header <code>X-Actor</code>) và <code>approved_at</code>.</p>
+      <p>Mỗi cặp (artifact, scope) chỉ có <strong>đúng một</strong> baseline active; <code>scope</code> mặc
+      định là <code>default</code>. Xem lịch sử phê duyệt qua
+      <code>GET /api/vgov/baselines?artifact_id=&lt;uuid&gt;</code>. Baseline hiện hành cũng hiện trong
+      <code>GET /api/vgov/artifacts</code>.</p>
+      <p>Approve một revision không thuộc artifact đang chọn → HTTP 422 <code>VALIDATION_ERROR</code>.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.8 Xem provenance của một output</strong></summary>
+      <p><em>Khi nào:</em> khi cần chứng minh output này được sinh ra từ đâu, hoặc chuẩn bị cho audit.</p>
+      <p><em>Các bước:</em> mở <code>/vgov/provenance</code> → dán UUID của revision → bấm <strong>Trace</strong>.</p>
+      <p><em>Kết quả:</em> một chuỗi đọc từ trên xuống:</p>
+      <ul class="timeline">
+        <li><span class="time">Output revision</span><p>Số revision và origin (AI_GENERATED / HUMAN_EDITED / IMPORTED)</p></li>
+        <li><span class="time">Parent revision</span><p>Các bản cha nếu đây là chuỗi human edit</p></li>
+        <li><span class="time">Run</span><p>Run đã sinh ra bản AI gốc</p></li>
+        <li><span class="time">RD input</span><p>Content hash của RD đã dùng</p></li>
+      </ul>
+      <p>Bấm <strong>Show release &amp; manifest</strong> để mở phần kỹ thuật: workflow + release version,
+      manifest hash, git commit, và danh sách component dạng
+      <code>PROMPT: mlflow://api-bd-generator @ 2</code>. Phần này mặc định đóng — đúng nguyên tắc
+      progressive disclosure.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.9 So sánh hai output (Explain Difference)</strong></summary>
+      <p><em>Khi nào:</em> đúng lúc có người hỏi “vì sao khác?”.</p>
+      <p><em>Các bước:</em> lấy UUID của hai revision (ở màn Output history hoặc qua API) → mở
+      <code>/vgov/compare</code> → dán vào ô trái và ô phải → bấm <strong>Compare</strong>.</p>
+      <p><em>Kết quả:</em> một dòng verdict (<code>IDENTICAL</code> hoặc <code>DIFFERENT</code>), bảng
+      <strong>Changed</strong> (category · from · to) và bảng <strong>Unchanged</strong> (category · value ·
+      facet). Cách đọc chi tiết ở <a href="#s11">§11</a>.</p>
+      <p>Qua API còn so được trực tiếp hai <code>run_id</code>, không cần đi đường revision. Mỗi bên phải
+      có <strong>đúng một</strong> trong hai khoá.</p>
+      <p>So sánh là <strong>deterministic</strong>: gọi hai lần cho ra kết quả giống hệt nhau. Không có LLM
+      tham gia bước này. Hai revision thuộc hai artifact khác nhau vẫn so được; response có cờ
+      <code>same_artifact</code> để bạn không nhầm.</p>
+    </details>
+
+    <details>
+      <summary><strong>10.10 Run kẹt ở RUNNING — cơ chế tự đóng</strong></summary>
+      <p><em>Khi nào:</em> runtime đã chạy xong hoặc đã chết, nhưng kết quả không bao giờ về tới nơi.</p>
+      <p><em>Các bước:</em> mở <code>GET /api/vgov/runs/{id}</code> (hoặc để màn Run poll). Chỉ endpoint
+      <em>xem một run cụ thể</em> mới kích hoạt cơ chế đối soát — <strong>không có job nền</strong> nào quét
+      định kỳ, nên một run mồ côi sẽ nằm im cho tới khi có người mở nó ra.</p>
+      <p><em>Hệ thống làm gì:</em> nếu run đang <code>RUNNING</code> và có <code>runtime_run_id</code>, nó
+      hỏi runtime trạng thái thật. Nếu runtime đã ở trạng thái terminal, nó xét xem callback có thực sự
+      hoàn tất chưa — hai trường hợp được coi là <strong>mất</strong>:</p>
+      <ol>
+        <li>Chưa từng có bản ghi callback nào (runtime chết trước khi kịp gửi).</li>
+        <li>Có bản ghi callback nhưng chưa ghi xong kết quả, và nó đã ở trạng thái đó
+        <strong>lâu hơn <code>VGOV_CALLBACK_GRACE_SECONDS</code></strong> (mặc định <strong>120
+        giây</strong>) — tức tiến trình xử lý callback đã chết giữa chừng.</li>
+      </ol>
+      <p><em>Kết quả:</em> run được đóng theo trạng thái runtime báo, với
+      <code>error_code = CALLBACK_LOST</code>. Hệ thống <strong>không</strong> tự tạo artifact revision —
+      nội dung nằm trong callback đã mất. Manifest vẫn còn nguyên nên vẫn audit và so sánh được.
+      <strong>Chạy lại</strong> là cách xử lý.</p>
+      <div class="callout warn">Grace period tồn tại vì “callback chưa ghi xong” cũng chính là trạng thái
+      <em>bình thường</em> của một callback đang chạy đúng (nó đang ghi blob lên MinIO). Đóng run ngay khi
+      thấy sẽ cướp quyền của callback khỏe mạnh. Ngưỡng cố định không phân biệt được “chậm” với “chết” —
+      một callback ghi file rất lớn, lâu hơn 120 giây, vẫn có thể bị đánh nhầm là
+      <code>CALLBACK_LOST</code>. Đây là đánh đổi có chủ ý; chỉnh <code>VGOV_CALLBACK_GRACE_SECONDS</code>
+      trong <code>.env</code> nếu payload của bạn lớn.</div>
+    </details>
+
+    <!-- ══════════════════ 11 ══════════════════ -->
+    <h2 id="s11">11. Đọc kết quả Explain Difference</h2>
+
+    <p>Kết quả được phân thành 7 category, luôn theo thứ tự cố định dưới đây. Mỗi category gồm nhiều
+    <em>facet</em> — một facet là một chi tiết cụ thể được so. Category được coi là “changed” nếu có ít
+    nhất một facet đổi.</p>
+
+    <table>
+      <thead>
+        <tr><th>#</th><th>Category</th><th>Nghĩa nghiệp vụ</th><th>Facet được so</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td><code>INPUT</code></td>
+          <td>RD đầu vào có đổi không</td>
+          <td><code>input_hash</code>, <code>input_source_ref</code></td>
+        </tr>
+        <tr>
+          <td>2</td><td><code>WORKFLOW_RELEASE</code></td>
+          <td>Quy trình chạy có phải bản khác không</td>
+          <td><code>workflow_release_id</code>, <code>release_version</code>, <code>git_commit</code>, <code>entrypoint</code>, <code>state_schema_version</code></td>
+        </tr>
+        <tr>
+          <td>3</td><td><code>PROMPT</code></td>
+          <td>Lời nhắc gửi cho model có đổi không</td>
+          <td>mỗi prompt reference → exact version, ví dụ <code>mlflow://api-bd-generator</code></td>
+        </tr>
+        <tr>
+          <td>4</td><td><code>MODEL</code></td>
+          <td>Model / cấu hình model có đổi không</td>
+          <td><code>model_profile</code> + các component kind <code>MODEL</code></td>
+        </tr>
+        <tr>
+          <td>5</td><td><code>TOOL</code></td>
+          <td>Công cụ và agent tham gia có đổi không</td>
+          <td>các component kind <code>TOOL</code> và <code>AGENT</code></td>
+        </tr>
+        <tr>
+          <td>6</td><td><code>RUNTIME</code></td>
+          <td>Môi trường thực thi có đổi không</td>
+          <td><code>runtime_adapter_id</code>, <code>environment</code></td>
+        </tr>
+        <tr>
+          <td>7</td><td><code>HUMAN_EDIT</code></td>
+          <td>Bên nào có bàn tay con người</td>
+          <td><code>human_edit_present</code> (true/false mỗi bên)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Ví dụ thật — A vs B (đo ngày 2026-08-03)</h3>
+    <p>Run A và Run B dùng <strong>cùng một RD revision</strong>, cùng release <code>1.0.0</code>; khác biệt
+    duy nhất là alias <code>production</code> đã được chuyển từ prompt version 1 sang 2. Kết quả thật:</p>
+
+<pre><code><span class="diff-ctx">verdict       : DIFFERENT
+same_artifact : True</span><span class="diff-add">CHANGED
+  PROMPT   mlflow://api-bd-generator   1 -&gt; 2</span><span class="diff-ctx">unchanged
+  HUMAN_EDIT, INPUT, MODEL, RUNTIME, WORKFLOW_RELEASE</span></code></pre>
+
+    <p><strong>Cách đọc:</strong> “Output B khác A vì prompt đã đi từ version 1 lên version 2. RD input,
+    quy trình, model, môi trường đều y nguyên, và không ai sửa tay.” Đó là câu trả lời cho reviewer.</p>
+
+    <p>Chi tiết từng facet ở phía unchanged trông như sau:</p>
+<pre><code>INPUT              input_hash            sha256:...
+INPUT              input_source_ref      artifact_revision:...
+WORKFLOW_RELEASE   release_version       1.0.0
+WORKFLOW_RELEASE   git_commit            &lt;40-hex&gt;
+WORKFLOW_RELEASE   entrypoint            graph:build_graph
+WORKFLOW_RELEASE   state_schema_version  v1
+MODEL              model_profile         &lt;model profile cua release&gt;
+RUNTIME            runtime_adapter_id    langgraph
+RUNTIME            environment           PROD
+HUMAN_EDIT         human_edit_present    false</code></pre>
+
+    <h3>Ví dụ — nhiều thay đổi cùng lúc (A vs C)</h3>
+    <p>Run C dùng RD revision 2 <em>và</em> prompt version 2. Bảng Changed lúc này có
+    <strong>đồng thời</strong> hai dòng — <code>INPUT / input_hash</code> và <code>PROMPT</code> — chứ
+    không phải chỉ báo cái đầu tiên tìm thấy.</p>
+
+    <h3>Ba lưu ý khi đọc</h3>
+    <ul>
+      <li><strong>Category vắng mặt hoàn toàn là hợp lệ.</strong> Release demo không khai báo tool nào, nên
+      <code>TOOL</code> không có facet nào để so và không xuất hiện ở cả hai bảng. Không phải lỗi.</li>
+      <li><strong><code>verdict: IDENTICAL</code></strong> nghĩa là bảng Changed rỗng — hai run có cấu hình
+      tương đương hoàn toàn. Đây cũng là cách kiểm tra tính tái lập: chạy lại cùng cấu hình phải cho cùng
+      <code>manifest_hash</code> (chính là tiêu chí DoD số 12, đã PASS).</li>
+      <li><strong>Explain Difference so cấu hình, không so văn bản.</strong> Nó không nói “đoạn 3 của tài
+      liệu đã đổi”; nó nói “thành phần nào trong dây chuyền sản xuất đã đổi”. Semantic diff bằng LLM nằm
+      ngoài phạm vi POC.</li>
+    </ul>
+
+    <div class="callout">Nếu một bên là revision <code>HUMAN_EDITED</code>, hệ thống tự đi ngược chuỗi
+    <code>parent_revision_id</code> tới bản AI gần nhất để lấy manifest, đồng thời đánh dấu
+    <code>human_edit_present = true</code> cho bên đó. Nhờ vậy so một bản đã chỉnh tay với một bản AI vẫn
+    ra kết quả có nghĩa. Nếu đi hết chuỗi mà gốc là bản <code>IMPORTED</code> thì không có manifest nào để
+    so → 422 <code>NO_MANIFEST_FOR_REVISION</code>.</div>
+
+    <!-- ══════════════════ 12 ══════════════════ -->
+    <h2 id="s12">12. Bảng tra lỗi</h2>
+
+    <table>
+      <thead>
+        <tr><th>Mã</th><th>HTTP</th><th>Nghĩa là gì</th><th>Làm gì tiếp</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>PROMPT_UNRESOLVED</code></td><td>422</td>
+          <td>Không tra được prompt trong MLflow — alias khai trong release không tồn tại, prompt bị xoá,
+          binding thiếu cả <code>prompt_alias</code> lẫn <code>prompt_version</code>, hoặc
+          <code>prompt_ref</code> không bắt đầu bằng <code>mlflow://</code>.</td>
+          <td>Kiểm tra alias trong MLflow (<code>http://127.0.0.1:8812</code>). Run bị đánh
+          <code>FAILED_PRECONDITION</code> và <strong>không</strong> tạo manifest (đo thật:
+          <code>manifests=0</code>) — sửa alias rồi chạy lại là sạch.</td>
+        </tr>
+        <tr>
+          <td><code>NO_RELEASE_FOR_ENVIRONMENT</code></td><td>422</td>
+          <td>Environment bạn chọn chưa trỏ vào release nào cho workflow này — hoặc
+          <code>release_id</code> bạn truyền vào không tồn tại.</td>
+          <td>Mở <code>/vgov/releases</code>, promote một release đã PUBLISHED vào DEV/PROD rồi chạy lại.
+          Seed demo chỉ trỏ PROD, nên chọn DEV mà chưa promote sẽ gặp mã này.</td>
+        </tr>
+        <tr>
+          <td><code>RELEASE_NOT_PUBLISHED</code></td><td>422</td>
+          <td>Đang cố dùng hoặc trỏ environment vào một release còn <code>DRAFT</code>.</td>
+          <td>Bấm <strong>Publish</strong> cho release đó trước. Publish mới là lúc git commit được ghim.</td>
+        </tr>
+        <tr>
+          <td><code>IMMUTABLE_OBJECT</code></td><td>409</td>
+          <td>Có thao tác cố sửa hoặc xoá một đối tượng bất biến: release đã publish, run manifest, run
+          component, artifact revision, hoặc cột không được phép của baseline. Đây là trigger ở tầng
+          database, không phải kiểm tra ở code.</td>
+          <td>Không sửa — <strong>tạo bản mới</strong>. Release mới, hoặc revision mới. Nếu gặp mã này từ
+          UI thì đó là dấu hiệu bug, hãy báo lại.</td>
+        </tr>
+        <tr>
+          <td><code>VALIDATION_ERROR</code></td><td>422</td>
+          <td>Vi phạm ràng buộc dữ liệu: ghi alias vào chỗ đòi exact version, prompt version không phải số,
+          business key chứa ký tự không hợp lệ, environment lạ ngoài DEV/PROD, approve revision không
+          thuộc artifact, hoặc release thuộc workflow khác.</td>
+          <td>Đọc thông điệp kèm theo — nó nói rõ ràng buộc nào bị vi phạm. Với business key, ràng buộc là
+          <code>[A-Za-z0-9._-]{1,128}</code>.</td>
+        </tr>
+        <tr>
+          <td><code>CONFLICT</code></td><td>409</td>
+          <td>Trùng khoá duy nhất: tạo lại release với cùng <code>(workflow_id, release_version)</code>,
+          hai baseline active cùng một scope, hoặc đụng độ khi cấp <code>revision_no</code>.</td>
+          <td>Đổi <code>release_version</code>. Với revision, hệ thống tự retry 3 lần trước khi báo lỗi —
+          gặp mã này nghĩa là có tranh chấp bất thường.</td>
+        </tr>
+        <tr>
+          <td><code>NO_MANIFEST_FOR_REVISION</code></td><td>422</td>
+          <td>Bạn đang so một revision không có cấu hình để so: bản <code>IMPORTED</code> (RD bạn upload),
+          hoặc một chuỗi human-edit mà gốc là bản import.</td>
+          <td>Chọn một revision <code>AI_GENERATED</code> (hoặc bản human edit có tổ tiên AI). RD input
+          không so bằng Explain Difference — nó đã là input rồi.</td>
+        </tr>
+        <tr>
+          <td><code>RUNTIME_UNAVAILABLE</code></td><td>502</td>
+          <td>Không gọi được LangGraph runtime. Manifest <strong>đã</strong> được đóng băng, run ở trạng
+          thái <code>FAILED</code> và manifest được giữ lại có chủ đích (đo thật:
+          <code>run=FAILED:RUNTIME_UNAVAILABLE, manifests=1</code>).</td>
+          <td>Kiểm tra <code>docker compose ps</code> và <code>curl http://127.0.0.1:8810/health</code>.
+          Khởi động lại <code>vgov-runtime</code> rồi chạy run mới. Harness Hub cũng trả mã này khi cả
+          stack vgov đang tắt.</td>
+        </tr>
+        <tr>
+          <td><code>CALLBACK_IN_PROGRESS</code></td><td>409</td>
+          <td>Runtime gửi kết quả về hai lần và lần thứ hai đến khi lần đầu chưa xử lý xong. Đây là cơ chế
+          chống tạo trùng revision, không phải hỏng.</td>
+          <td>Không cần làm gì — runtime tự retry (backoff, 3 lần). Nếu run kẹt <code>RUNNING</code> quá
+          lâu, xem <a href="#s10">§10.10</a>.</td>
+        </tr>
+        <tr>
+          <td><code>CALLBACK_LOST</code></td><td>—</td>
+          <td>Không phải lỗi HTTP mà là <code>error_code</code> trên run. Runtime đã kết thúc nhưng kết quả
+          không bao giờ về tới nơi (container bị kill, tiến trình xử lý callback chết giữa chừng quá grace
+          period). Nội dung output đã mất.</td>
+          <td>Run được đóng lại khi bạn mở nó ra xem — không có job nền. <strong>Chạy lại</strong>.
+          Manifest cũ vẫn còn nguyên nên vẫn so sánh và audit được.</td>
+        </tr>
+        <tr>
+          <td><code>CONFLICTING_COMPONENT_VERSION</code></td><td>422</td>
+          <td>Cùng một prompt/tool/agent được khai ở nhiều node với version khác nhau — mâu thuẫn thật trong
+          release, hệ thống fail closed thay vì chọn bừa. Mã kèm theo <code>:kind:ref</code>.</td>
+          <td>Sửa <code>bindings</code> cho thống nhất rồi tạo release mới.</td>
+        </tr>
+        <tr>
+          <td><code>RUNTIME_OUTPUT_MISSING</code></td><td>—</td>
+          <td><code>error_code</code> trên run: runtime báo thành công nhưng callback không kèm
+          <code>output.content</code> dạng chuỗi. Run bị đánh <code>FAILED</code>, không tạo revision.</td>
+          <td>Xem log <code>vgov-runtime</code>. Thường là lỗi phía graph hoặc phía LLM. Chạy lại.</td>
+        </tr>
+        <tr>
+          <td><code>CALLBACK_URL_NOT_ALLOWED</code></td><td>422</td>
+          <td>Lỗi do <strong>vgov-runtime</strong> trả về, không phải vgov-api: <code>callback_url</code>
+          trong request không trỏ đúng origin của vgov-api đã cấu hình. Đây là hàng rào chống SSRF.</td>
+          <td>Bạn sẽ chỉ gặp mã này khi tự gọi thẳng <code>vgov-runtime:8811</code>. Kiểm tra
+          <code>VGOV_CALLBACK_BASE_URL</code> của cả hai service phải khớp nhau.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <details>
+      <summary>Các mã ít gặp hơn</summary>
+      <table>
+        <thead><tr><th>Mã</th><th>HTTP</th><th>Nghĩa</th></tr></thead>
+        <tbody>
+          <tr><td><code>INPUT_NOT_FOUND</code></td><td>422</td><td><code>input_revision_id</code> không tồn tại.</td></tr>
+          <tr><td><code>GIT_COMMIT_NOT_FOUND</code></td><td>422</td><td>Commit đã ghim trong release không còn tìm thấy trong repo được mount vào container.</td></tr>
+          <tr><td><code>INVALID_BINDING:&lt;node&gt;</code></td><td>422</td><td>Binding của node đó không phải object JSON.</td></tr>
+          <tr><td><code>MISSING_AGENT_VERSION</code> / <code>MISSING_TOOL_VERSION</code></td><td>422</td><td>Khai <code>agent_ref</code> hoặc tool mà thiếu version tương ứng.</td></tr>
+          <tr><td><code>INVALID_TOOL_REFS</code></td><td>422</td><td><code>tool_refs</code> không phải dict hay list.</td></tr>
+          <tr><td><code>RUNTIME_STATUS_UNKNOWN</code></td><td>—</td><td><code>error_code</code> trên run: runtime trả trạng thái không nhận diện được; run bị coi là FAILED.</td></tr>
+          <tr><td><code>PRECONDITION_FAILED</code></td><td>422</td><td>Lỗi trước freeze không rơi vào nhóm nào ở trên.</td></tr>
+          <tr><td><code>DATABASE_ERROR</code></td><td>500</td><td>Lỗi DB chưa được map. Chi tiết chỉ ghi ở log server, không trả ra client (tránh lộ câu SQL và tham số).</td></tr>
+          <tr><td><code>NOT_FOUND</code></td><td>404</td><td>UUID không tồn tại.</td></tr>
+        </tbody>
+      </table>
+    </details>
+
+    <!-- ══════════════════ 13 ══════════════════ -->
+    <h2 id="s13">13. Giới hạn hiện tại — đừng trông đợi sai</h2>
+
+    <div class="callout risk"><strong>Chưa có authentication.</strong> Header <code>X-Actor</code> chỉ là
+    một chuỗi do client tự khai, <strong>không được xác thực</strong> bằng bất kỳ cơ chế nào; thiếu header
+    thì mặc định <code>local-user</code>. Nghĩa là các trường “ai approve”, “ai promote” chỉ có giá trị
+    ghi chép nội bộ, <strong>không</strong> có giá trị chống chối bỏ. Cũng chưa có phân quyền: ai mở được
+    UI thì làm được mọi thao tác. Hàng rào duy nhất là toàn bộ stack bind vào
+    <code>127.0.0.1</code>.</div>
+
+    <p>Đây là POC. Những thứ sau <strong>cố tình không làm</strong> — muốn thêm phải viết ADR mới, không
+    đưa vào âm thầm:</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Phạm vi nghiệp vụ</h3>
+        <p>Chỉ một luồng RD → API Basic Design. Không Screen Design, DB Design, Batch Design, Coding.
+        Chỉ hai environment DEV và PROD.</p>
+      </div>
+      <div class="card">
+        <h3>So sánh</h3>
+        <p>Chỉ deterministic structural comparison. <strong>Không</strong> semantic diff bằng LLM — hệ
+        thống không nói cho bạn biết <em>nội dung</em> khác chỗ nào.</p>
+      </div>
+      <div class="card">
+        <h3>Phê duyệt</h3>
+        <p>Chỉ một bước: chọn revision → cập nhật pointer + audit. <strong>Không</strong> có review chain
+        nhiều cấp, không multi-approver, không legal hold, không retention policy.</p>
+      </div>
+      <div class="card">
+        <h3>Runtime</h3>
+        <p>Chỉ một adapter LangGraph. <code>resume</code> và <code>cancel</code> có trong interface nhưng
+        <strong>chưa</strong> hoạt động (gọi vào sẽ ném lỗi không hỗ trợ). Không multi-runtime.</p>
+      </div>
+      <div class="card">
+        <h3>Phục hồi run</h3>
+        <p>Không có job nền quét run mồ côi. Run kẹt chỉ được đóng khi có người gọi
+        <code>GET /runs/{id}</code>. Grace period là ngưỡng cố định, không phân biệt được “chậm” với
+        “chết”.</p>
+      </div>
+      <div class="card">
+        <h3>Registry</h3>
+        <p>Không Prompt Registry riêng (dùng MLflow), không trace backend riêng, không evaluation engine,
+        không Capability Registry đầy đủ, không agent marketplace.</p>
+      </div>
+      <div class="card">
+        <h3>Hạ tầng</h3>
+        <p>Không graph database, không Kafka/event streaming, không Git sync hai chiều, không
+        multi-tenancy hardening, không DR/multi-region.</p>
+      </div>
+      <div class="card">
+        <h3>UI</h3>
+        <p>Không Registry UI riêng, không control-plane thứ hai, không visual workflow editor mới. Upload
+        RD input và tạo release draft hiện <strong>chỉ có qua API</strong>.</p>
+      </div>
+      <div class="card">
+        <h3>Truy vấn</h3>
+        <p>Lineage chỉ đi ngược lên. Không có truy vấn xuôi kiểu “prompt version 2 đã sinh ra những output
+        nào”. Không auto-rollback theo điểm evaluation, không policy engine nhiều cấp, không
+        cross-workspace sharing.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════ 14 ══════════════════ -->
+    <h2 id="s14">14. Tham chiếu API</h2>
+
+    <p>Hai base URL, cùng path:</p>
+    <table>
+      <thead><tr><th>Đường</th><th>Base URL</th><th>Header bắt buộc</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Thẳng vào vgov-api</td>
+          <td><code>http://127.0.0.1:8810/api/vgov</code></td>
+          <td>Không có. <code>X-Actor</code> tuỳ chọn (mặc định <code>local-user</code>).</td>
+        </tr>
+        <tr>
+          <td>Qua Harness Hub (đường UI đi)</td>
+          <td><code>http://127.0.0.1:8799/api/vgov</code></td>
+          <td>Mọi method <strong>không phải GET</strong> phải có
+          <code>X-Hub-Client: harness-hub</code>, nếu không sẽ bị CSRF middleware của Hub chặn với
+          <strong>403</strong>.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="text-small text-muted">Hub chỉ chuyển tiếp hai header lên vgov-api: <code>X-Actor</code> và
+    <code>Content-Type</code> (bản thân <code>X-Hub-Client</code> chỉ dùng để qua cửa Hub). Timeout proxy
+    15 giây; vgov tắt → Hub trả 502 <code>RUNTIME_UNAVAILABLE</code> chứ không sập.</p>
+
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Path</th><th>Tham số chính</th><th>Trả về</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/health</code> <em>và</em> <code>/api/vgov/health</code></td><td>—</td><td>200 trạng thái từng dependency; 503 nếu có cái lỗi</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/releases</code></td><td>workflow_id, release_version, git_repo, git_ref, entrypoint, state_schema_version, bindings, runtime_adapter_id, model_profile</td><td>201 release DRAFT</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/releases/{id}/publish</code></td><td>—</td><td>200 release PUBLISHED, git_commit đã resolve (40 hex)</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/releases</code></td><td><code>workflow_id</code>, <code>status</code> (đều tuỳ chọn)</td><td>200 list</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/releases/{id}</code></td><td>—</td><td>200 release</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/environments</code></td><td><code>workflow_id</code> (bắt buộc)</td><td>200 <code>{DEV: release, PROD: release}</code> — env chưa trỏ thì vắng mặt</td></tr>
+        <tr><td><span class="badge gray">PUT</span></td><td><code>/environments/{env}</code></td><td>workflow_id, release_id, reason</td><td>200 mapping + audit row</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/environments/{env}/audit</code></td><td><code>workflow_id</code></td><td>200 lịch sử promote/rollback</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/inputs</code></td><td>multipart: project_key, business_key, file</td><td>201 revision IMPORTED</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/inputs</code></td><td><code>project_key</code></td><td>200 list RD revision</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/runs</code></td><td>project_key, workflow_id, input_revision_id, output_business_key, output_artifact_type, environment | release_id</td><td>201 run RUNNING · 422 fail-closed · 502 runtime chết</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/runs</code></td><td><code>project_key</code> (bắt buộc), <code>workflow_id</code> (tuỳ chọn)</td><td>200 list run, mới nhất trước; <em>không</em> reconcile</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/runs/{id}</code></td><td>—</td><td>200 run — tự reconcile nếu đang RUNNING</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/runs/{id}/manifest</code></td><td>—</td><td>200 manifest_hash + danh sách component</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/runs/{id}/callback</code></td><td>status, output{content, mime}, trace_id, error</td><td>200 idempotent · 409 đang xử lý — <em>runtime gọi, không phải bạn</em></td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/artifacts</code></td><td><code>project_key</code>, <code>artifact_type</code> (bắt buộc cả hai)</td><td>200 list + baseline hiện tại</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/artifacts/{id}/revisions</code></td><td>—</td><td>200 list revision theo thứ tự revision_no</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/revisions/{id}</code></td><td>—</td><td>200 metadata</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/revisions/{id}/content</code></td><td>—</td><td>200 nội dung thô theo mime_type</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/revisions/{id}/edit</code></td><td>content, mime_type</td><td>201 revision mới HUMAN_EDITED</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/revisions/{id}/lineage</code></td><td>—</td><td>200 upstream chain</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/baselines</code></td><td>artifact_id, revision_id, scope</td><td>201 baseline mới, bản cũ active=false</td></tr>
+        <tr><td><span class="badge navy">GET</span></td><td><code>/baselines</code></td><td><code>artifact_id</code></td><td>200 lịch sử phê duyệt, mới nhất trước</td></tr>
+        <tr><td><span class="badge">POST</span></td><td><code>/explain-difference</code></td><td>left{run_id | revision_id}, right{...}</td><td>200 kết quả so sánh</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn"><strong>Không có endpoint <code>PUT</code> hay <code>DELETE</code></strong>
+    cho release, manifest, component, revision. API đơn giản là không hở đường sửa; tính bất biến còn được
+    chặn thêm một lớp ở database. Cũng <strong>không có</strong> endpoint nào tạo/sửa prompt hay alias —
+    việc đó thuộc MLflow, bạn không phải publish hai nơi (đây là tiêu chí DoD số 10, được kiểm tự động
+    bằng cách quét OpenAPI).</div>
+
+    <h3>Ví dụ curl</h3>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab(event,'c1')">Chạy run</button>
+      <button class="tab-btn" onclick="showTab(event,'c2')">So sánh</button>
+      <button class="tab-btn" onclick="showTab(event,'c3')">Provenance</button>
+      <button class="tab-btn" onclick="showTab(event,'c4')">Release &amp; environment</button>
+      <button class="tab-btn" onclick="showTab(event,'c5')">Approve</button>
+      <button class="tab-btn" onclick="showTab(event,'c6')">Qua Hub 8799</button>
+    </div>
+
+    <div id="c1" class="tab-panel active">
+<pre><code># 1. Lấy danh sách RD input đã nạp
+curl "http://127.0.0.1:8810/api/vgov/inputs?project_key=demo-api"
+
+# 2. Chạy run trên PROD
+curl -X POST http://127.0.0.1:8810/api/vgov/runs \
+  -H "Content-Type: application/json" \
+  -H "X-Actor: your.name" \
+  -d '{
+        "project_key": "demo-api",
+        "workflow_id": "rd-to-bd-api",
+        "input_revision_id": "&lt;input-revision-uuid&gt;",
+        "output_business_key": "F001",
+        "output_artifact_type": "API_BASIC_DESIGN",
+        "environment": "PROD"
+      }'
+
+# 3. Theo dõi tới khi SUCCEEDED (endpoint này cũng tự reconcile run kẹt)
+curl http://127.0.0.1:8810/api/vgov/runs/&lt;run-uuid&gt;
+
+# 4. Xem cấu hình đã bị đóng băng cho run đó
+curl http://127.0.0.1:8810/api/vgov/runs/&lt;run-uuid&gt;/manifest
+
+# 5. Liệt kê run cũ của project
+curl "http://127.0.0.1:8810/api/vgov/runs?project_key=demo-api&amp;workflow_id=rd-to-bd-api"</code></pre>
+    </div>
+
+    <div id="c2" class="tab-panel">
+<pre><code># Lấy revision của artifact
+curl "http://127.0.0.1:8810/api/vgov/artifacts?project_key=demo-api&amp;artifact_type=API_BASIC_DESIGN"
+curl http://127.0.0.1:8810/api/vgov/artifacts/&lt;artifact-uuid&gt;/revisions
+
+# So hai output revision
+curl -X POST http://127.0.0.1:8810/api/vgov/explain-difference \
+  -H "Content-Type: application/json" \
+  -d '{"left":  {"revision_id": "&lt;uuid-a&gt;"},
+       "right": {"revision_id": "&lt;uuid-b&gt;"}}'
+
+# Hoặc so trực tiếp hai run
+curl -X POST http://127.0.0.1:8810/api/vgov/explain-difference \
+  -H "Content-Type: application/json" \
+  -d '{"left":  {"run_id": "&lt;run-a&gt;"},
+       "right": {"run_id": "&lt;run-b&gt;"}}'</code></pre>
+      <p>Mỗi bên phải có <strong>đúng một</strong> trong hai khoá <code>run_id</code> hoặc
+      <code>revision_id</code>; đưa cả hai hoặc không đưa gì → 422.</p>
+    </div>
+
+    <div id="c3" class="tab-panel">
+<pre><code># Chuỗi upstream đầy đủ của một output
+curl http://127.0.0.1:8810/api/vgov/revisions/&lt;revision-uuid&gt;/lineage
+
+# Đọc nội dung thô
+curl http://127.0.0.1:8810/api/vgov/revisions/&lt;revision-uuid&gt;/content</code></pre>
+      <p>Response lineage gồm: <code>revision</code>, <code>parent_chain</code>, <code>run</code>,
+      <code>manifest</code> (manifest_hash, git_commit, input_source_ref, input_hash),
+      <code>input_revision</code>, <code>workflow_release</code>, và <code>components</code>.</p>
+    </div>
+
+    <div id="c4" class="tab-panel">
+<pre><code># Tạo release draft
+curl -X POST http://127.0.0.1:8810/api/vgov/releases \
+  -H "Content-Type: application/json" -H "X-Actor: your.name" \
+  -d '{
+        "workflow_id": "rd-to-bd-api",
+        "release_version": "1.1.0",
+        "git_repo": "ai-project-opus",
+        "git_ref": "HEAD",
+        "entrypoint": "graph:build_graph",
+        "state_schema_version": "v1",
+        "bindings": {"generate_bd": {"prompt_ref": "mlflow://api-bd-generator",
+                                     "prompt_alias": "production"}},
+        "runtime_adapter_id": "langgraph",
+        "model_profile": "&lt;model profile&gt;"
+      }'
+
+# Publish (git commit được ghim tại đây)
+curl -X POST http://127.0.0.1:8810/api/vgov/releases/&lt;release-uuid&gt;/publish \
+  -H "X-Actor: your.name"
+
+# Promote — hoặc rollback, cùng một lệnh
+curl -X PUT http://127.0.0.1:8810/api/vgov/environments/PROD \
+  -H "Content-Type: application/json" -H "X-Actor: your.name" \
+  -d '{"workflow_id": "rd-to-bd-api",
+       "release_id": "&lt;release-uuid&gt;",
+       "reason": "rollback ve ban on dinh"}'
+
+# Lịch sử pointer
+curl "http://127.0.0.1:8810/api/vgov/environments/PROD/audit?workflow_id=rd-to-bd-api"</code></pre>
+    </div>
+
+    <div id="c5" class="tab-panel">
+<pre><code># Sửa tay -> revision mới HUMAN_EDITED
+curl -X POST http://127.0.0.1:8810/api/vgov/revisions/&lt;revision-uuid&gt;/edit \
+  -H "Content-Type: application/json" -H "X-Actor: your.name" \
+  -d '{"content": "# API Basic Design\n...", "mime_type": "text/markdown"}'
+
+# Approve baseline
+curl -X POST http://127.0.0.1:8810/api/vgov/baselines \
+  -H "Content-Type: application/json" -H "X-Actor: your.name" \
+  -d '{"artifact_id": "&lt;artifact-uuid&gt;",
+       "revision_id": "&lt;revision-uuid&gt;",
+       "scope": "default"}'
+
+# Lịch sử baseline
+curl "http://127.0.0.1:8810/api/vgov/baselines?artifact_id=&lt;artifact-uuid&gt;"</code></pre>
+    </div>
+
+    <div id="c6" class="tab-panel">
+      <p>Đây là đường UI thật sự đi. <strong>GET không cần header</strong>:</p>
+<pre><code>curl "http://127.0.0.1:8799/api/vgov/health"
+curl "http://127.0.0.1:8799/api/vgov/inputs?project_key=demo-api"
+curl "http://127.0.0.1:8799/api/vgov/runs?project_key=demo-api"</code></pre>
+      <p>Mọi method <strong>không phải GET</strong> bắt buộc có <code>X-Hub-Client: harness-hub</code>,
+      thiếu là 403:</p>
+<pre><code>curl -X POST http://127.0.0.1:8799/api/vgov/runs \
+  -H "Content-Type: application/json" \
+  -H "X-Hub-Client: harness-hub" \
+  -H "X-Actor: your.name" \
+  -d '{
+        "project_key": "demo-api",
+        "workflow_id": "rd-to-bd-api",
+        "input_revision_id": "&lt;input-revision-uuid&gt;",
+        "output_business_key": "F001",
+        "environment": "PROD"
+      }'
+
+curl -X PUT http://127.0.0.1:8799/api/vgov/environments/PROD \
+  -H "Content-Type: application/json" \
+  -H "X-Hub-Client: harness-hub" \
+  -H "X-Actor: your.name" \
+  -d '{"workflow_id": "rd-to-bd-api", "release_id": "&lt;release-uuid&gt;", "reason": "promote"}'</code></pre>
+      <p class="text-small text-muted">Gọi thẳng cổng 8810 thì <strong>không</strong> cần
+      <code>X-Hub-Client</code> — CSRF guard là của Hub, không phải của vgov-api.</p>
+    </div>
+
+    <h3>Ghi chú vận hành</h3>
+    <ul>
+      <li><code>/health</code> phục vụ ở <strong>cả hai</strong> đường:
+      <code>http://127.0.0.1:8810/health</code> (docker healthcheck dùng) và
+      <code>http://127.0.0.1:8810/api/vgov/health</code> (đường đi qua Hub proxy). Nhờ vậy
+      <code>curl http://127.0.0.1:8799/api/vgov/health</code> trả 200 khi stack chạy, và 502 khi stack tắt.</li>
+      <li>Nếu <code>docker compose down -v</code>, database <code>vgov_test</code> dùng cho test được tạo
+      lại từ <code>init-postgres.sql</code>. Nếu volume postgres đã tồn tại từ trước, script init
+      <strong>không</strong> chạy — đó là hành vi của Postgres, không phải lỗi cấu hình.</li>
+      <li>MinIO không mở port ra host. Muốn xem object trực tiếp thì <code>docker compose exec</code> vào
+      container, hoặc đọc qua <code>GET /revisions/{id}/content</code>.</li>
+    </ul>
+
+    <hr>
+    <p class="meta">Version Governance POC · Harness Hub · tài liệu bám theo RD v1.1, SD v1.1, BD v1.1,
+    ADR-009 và ADR-010, đối chiếu trực tiếp với code đang chạy.
+    Trạng thái build: <span class="badge green">DoD 12/12 PASS</span>
+    <span class="badge green">vgov 42 test</span> <span class="badge green">hub 334 test</span> — 2026-08-03.</p>
+
+  </main>
+
+  <script>
+    function showTab(e, id) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

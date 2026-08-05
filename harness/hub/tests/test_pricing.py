@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import config
 from services import pricing, usage
 
@@ -59,7 +61,8 @@ def test_rollup_preserves_legacy_fields() -> None:
 
 
 def test_cockpit_quota_pct_and_zero_quota(monkeypatch) -> None:
-    events = [{"model": "cli:codex", "ts": "2026-07-22T00:00:00Z", "calls": 2, "total_tokens": 0}]
+    today = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    events = [{"model": "cli:codex", "ts": today, "calls": 2, "total_tokens": 0}]
     monkeypatch.setattr(usage, "_collect_all", lambda: (events, []))
     monkeypatch.setattr(config, "QUOTA_WARN_PER_DAY", 4)
     stats = usage.cockpit_stats()

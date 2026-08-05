@@ -49,6 +49,49 @@ def test_list_skills_covers_all_sources_and_computes_coverage(fixture_sources: d
     assert lonewolf_entry["coverage"] == ["codex_user"]
 
 
+def test_list_skills_warm_cache_does_not_recursively_walk_sources(
+    fixture_sources: dict[str, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sl._clear_cache()
+    sl.list_skills()
+    probe = 0
+    original = sl._iter_skill_dirs
+
+    def counted(root: Path) -> list[tuple[str, Path]]:
+        nonlocal probe
+        probe += 1
+        return original(root)
+
+    monkeypatch.setattr(sl, "_iter_skill_dirs", counted)
+    sl.list_skills()
+
+    assert probe == 0
+
+
+def test_list_skills_detects_external_add_and_delete(fixture_sources: dict[str, Path]) -> None:
+    sl._clear_cache()
+    assert "claude_user/new-skill" not in {item["id"] for item in sl.list_skills()}
+
+    path = fixture_sources["claude_user"] / "new-skill"
+    path.mkdir()
+    (path / "SKILL.md").write_text("---\nname: new-skill\n---\nnew", encoding="utf-8")
+    assert "claude_user/new-skill" in {item["id"] for item in sl.list_skills()}
+
+    shutil.rmtree(path)
+    assert "claude_user/new-skill" not in {item["id"] for item in sl.list_skills()}
+
+
+def test_list_skills_detects_external_skill_edit(fixture_sources: dict[str, Path]) -> None:
+    sl._clear_cache()
+    before = next(item for item in sl.list_skills() if item["id"] == "claude_user/skillspector")
+    path = fixture_sources["claude_user"] / "skillspector" / "SKILL.md"
+    path.write_text("---\nname: renamed\ndescription: changed\n---\nbody", encoding="utf-8")
+
+    after = next(item for item in sl.list_skills() if item["id"] == "claude_user/skillspector")
+    assert before["content_hash"] != after["content_hash"]
+    assert after["name"] == "renamed"
+
+
 def test_drift_detects_content_mismatch_and_flags_unique_skill_in_sync(fixture_sources: dict[str, Path]) -> None:
     entries = sl.drift()
     by_name = {entry["name"]: entry for entry in entries}

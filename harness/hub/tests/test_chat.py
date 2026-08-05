@@ -233,6 +233,33 @@ def test_chat_agent_with_null_model_uses_client_model(
     assert calls[0]["messages"][0] == {"role": "system", "content": "Review."}
 
 
+def test_chat_surfaces_tool_events_and_threads_agent_policy(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeProvider:
+        def stream_chat(self, _messages: list[dict[str, str]], **kwargs: object):
+            assert kwargs["tool_policy"] == {
+                "permission": "workspace_write", "allowed_tools": ["Read"], "allowed_paths": ["harness/hub"],
+            }
+            yield {"type": "tool_call", "tool_name": "Read", "tool_input": {"file_path": "x"}, "tool_use_id": "toolu_1"}
+            yield {"type": "tool_result", "tool_use_id": "toolu_1", "tool_output": "ok"}
+            yield {"type": "done", "usage": {}}
+
+    monkeypatch.setattr(server.runtime_agents, "get_agent", lambda _agent_id: {
+        "id": "tool-agent", "provider": "fake", "model": None, "system_prompt": "Tools.", "skills": [],
+        "permission": "workspace_write", "allowed_tools": ["Read"], "allowed_paths": ["harness/hub"],
+        "budget": {"seconds": 60, "max_calls": 1}, "risk_tier": "write",
+    })
+    monkeypatch.setitem(server.runtime_agents.registry, "fake", FakeProvider())
+    monkeypatch.setattr(server, "get_provider", lambda _provider_id: FakeProvider())
+
+    response = client.post("/api/chat", json={"agent_id": "tool-agent", "messages": _messages()})
+
+    assert _sse_events(response.text) == [
+        ("tool_call", {"tool_name": "Read", "tool_input": {"file_path": "x"}, "tool_use_id": "toolu_1"}),
+        ("tool_result", {"tool_use_id": "toolu_1", "tool_output": "ok"}),
+        ("done", {"usage": {}, "model": "fake", "session_id": None}),
+    ]
+
+
 def test_chat_rejects_client_system_message(client: TestClient) -> None:
     response = client.post("/api/chat", json={"messages": [{"role": "system", "content": "spoof"}]})
 

@@ -3,8 +3,9 @@
 > Web UI (localhost) giám sát + điều khiển các AI agent: theo dõi usage/hành vi, chạy eval suites, quản lý git-jobs của Codex, và một cửa sổ Chat gắn NVIDIA.
 
 - **Chạy:** `.ih\Scripts\python.exe harness\hub\server.py` → `http://127.0.0.1:8799`
-- **Stack:** FastAPI + Uvicorn (backend) · SPA vanilla JS + CSS thuần (frontend). **Không** framework, **không** CDN, **không** build step.
-- **Kiểm thử:** `.ih\Scripts\python.exe -m pytest harness/hub/tests -q` (~76+ test, provider luôn được mock).
+- **Stack:** FastAPI + Uvicorn (backend) · React 19 + TypeScript + Vite 6 + Tailwind v4 (frontend `web-v3/`). Có build step; server phục vụ bundle đã build trong `web-v3/dist`.
+- **Build frontend:** `cd harness/hub/web-v3 && pnpm build` (= check-encoding → `tsc -b` → `vite build`). Lint: `pnpm lint` (**oxlint**, không phải eslint).
+- **Kiểm thử backend:** `.ih\Scripts\python.exe -m pytest harness/hub/tests -q` (235 test, provider luôn được mock).
 
 ---
 
@@ -12,14 +13,15 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Browser SPA  (web/index.html + app.js + charts.js + CSS)   │
-│  HUD shell: topbar chips · sidebar nav · content zone        │
-│  Hash-routing 12 trang · fetch JSON · SSE cho stream/chat    │
+│  Browser SPA  (web-v3/dist — React 19 + Vite + Tailwind v4) │
+│  Shell: sidebar zones · topbar tab nav · content zone        │
+│  HashRouter · fetch JSON · SSE cho stream/chat/workflow run  │
 └───────────────┬─────────────────────────────────────────────┘
                 │  HTTP / Server-Sent Events (text/event-stream)
 ┌───────────────▼─────────────────────────────────────────────┐
 │  server.py  (FastAPI)                                        │
-│  - REST /api/* + StaticFiles /static                         │
+│  - REST /api/* + StaticFiles /assets (bundle Vite)           │
+│  - GET / → FileResponse(web-v3/dist/index.html)              │
 │  - startup: warm cache (usage + behavior) trên daemon thread │
 └───────────────┬─────────────────────────────────────────────┘
                 │  gọi trực tiếp (in-process)
@@ -42,7 +44,7 @@ Kiến trúc **monolith in-process**: server import thẳng module `services`, k
 
 ## 2. Backend — `server.py`
 
-FastAPI app, mount `web/` tại `/static`, phục vụ SPA tại `/`. Nhóm endpoint chính:
+FastAPI app, mount `web-v3/dist/assets` tại `/assets`, phục vụ SPA tại `/`. Nhóm endpoint chính:
 
 | Nhóm | Endpoint | Service |
 |---|---|---|
@@ -57,6 +59,16 @@ FastAPI app, mount `web/` tại `/static`, phục vụ SPA tại `/`. Nhóm endp
 | Sessions | `GET /api/sessions`, `/loops`, `/entropy`, `/{id}/replay` | `replay`, `behavior` |
 | Inspect | `GET /api/inspect/logs`, `/api/inspect/mep` | `inspect_evals` |
 | Board | `GET /api/board` | `board` |
+| **Workflows** | `GET /api/workflows`, `/{id}/source`, `/{id}/layout`; `PUT /{id}`, `/{id}/model`, `/{id}/layout`; `POST /api/workflows/validate` | `workflow` |
+| **Workflow runs** | `POST /api/workflows/{id}/runs` (SSE), `GET /api/workflows/runs/{id}/artifacts[/{name}]`, `POST .../interrupts/{id}/resume` | `workflow_exec`, `runtime_*` |
+| **Agent runs** | `GET/POST /api/agent/runs`, `/{id}`, `/{id}/events`, `POST /{id}/interrupts/{id}/resume` | `runtime_pipeline`, `runtime_children` |
+| **Agents** | `GET/POST /api/agents`, `DELETE /api/agents/{id}` | `runtime_agents` |
+| **Providers** | `GET /api/providers`, `/api/model-classes`, `/api/risk-tiers` | `services/providers/*`, `config` |
+| **Skills** | `GET /api/skills`, `/names`, `/{id}`, `/{id}/usage` | `runtime_skills` |
+| **Skill library** | `GET /api/skill-library`, `/drift`, `/deploy-log`, `/{id}`; `POST /{id}/deploy` | `skill_library` |
+| **Memory** | `GET /api/memory`, `/candidates`; `POST /candidates/{id}/accept|reject` | `runtime_memory` |
+| **Guardrails** | `GET /api/guardrails/decisions`, `POST /api/guardrails/decisions/command` | `runtime_policy` |
+| Usage cockpit | `GET /api/usage/cockpit` | `usage`, `pricing` |
 
 **Quy ước lỗi:** `_http_error()` map `PermissionError→403`, `FileNotFoundError→404`, còn lại `500`. Stream (SSE) không trả 500 — lỗi được bọc thành `event: error`.
 
@@ -81,6 +93,12 @@ Mỗi service là logic thuần, đọc filesystem, không giữ state toàn c�
 | `replay` | Liệt kê phiên + replay từng bước |
 | `inspect_evals` | Đọc log Inspect + bản MEP mới nhất |
 | `board` | Bảng task (parse `status.md`) |
+| `workflow` | Parse/validate `workflows/*.yaml` → IR. **Ràng buộc thật:** chỉ chấp nhận **một chuỗi tuyến tính** (`_walk_chain` bắt in/out-degree ≤ 1, đúng 1 start + 1 end); edge là tuple 2 phần tử `[from, to]`, không có field phụ; node type chỉ `agent` \| `validate` |
+| `workflow_exec` | Chạy IR, phát SSE (`debug`, `assistant_delta`, `reasoning`, `node_update`, `validation_pass/fail`, `artifact_written`, `child_run`, `interrupt`, `state_snapshot`, `done`, `error`). `gate: approval` tạo interrupt và **dừng trước** khi node đó chạy |
+| `runtime_*` (13 module) | Nền runtime: `agents` (profile + resolve provider/model-class), `pipeline`, `state`, `checkpoint`, `events`, `interrupts`, `children`, `skills`, `memory`, `policy`, `reducers`, `validate`, `artifacts` |
+| `skill_library` | Index skill đa nguồn (`claude_project`/`claude_user`/`codex_user`), phát hiện drift giữa các bản sao, deploy sang target + deploy-log |
+| `providers/` | Adapter thực thi: `claude_cli`, `codex_cli`, `gemini_cli`, `nvidia_api` (+ `base`, `procs`). `provider` của agent có thể là id thật hoặc alias model-class (`cheap`/`code`/`smart`) — resolve phía server |
+| `pricing` | Quy đổi token → chi phí cho usage cockpit |
 | `risk`, `boundary`, `inform`, `verify` | Phân tầng rủi ro, ranh giới, thông báo, kiểm định (dùng nội bộ) |
 
 ### Cache incremental (điểm hiệu năng cốt lõi)
@@ -99,19 +117,36 @@ Chuẩn hoá log agent thành event thống nhất. Mỗi parser expose `paths()
 
 ---
 
-## 5. Frontend (`web/`)
+## 5. Frontend (`web-v3/`)
 
-- `index.html` — HUD shell: **grid** `232px | 1fr` (sidebar tối + content sáng), topbar status chips. Sidebar nhóm nav: MONITOR / CONTROL / AI / SYSTEM.
-- `app.js` — SPA: hash-routing 12 trang (`#/`, `#/runs`, `#/sessions`, `#/jobs`, `#/governance`, `#/violations`, `#/chat`, `#/usage`, `#/suites`, `#/tools`, `#/inspect`, `#/board`), fetch JSON, tiêu thụ SSE.
-- `charts.js` — vẽ chart (SVG/canvas thuần).
-- `styles-hub.css` — token HUD trong `:root` (`--hud-bg/-surface/-border/-text/-accent`, `--status-ok/warn/danger`, `--font-mono`). **Không sửa** `styles.css` (html-kit chung).
-- `DESIGN.md` — hợp đồng thiết kế; đọc trước khi sửa UI.
+SPA React 19 + TypeScript, build bằng Vite 6, style bằng Tailwind v4. Thư mục `web/` (SPA vanilla JS cũ) **đã bị gỡ bỏ**; server chỉ phục vụ `web-v3/dist`.
+
+```
+web-v3/
+├─ src/main.tsx          # HashRouter + mount
+├─ src/index.css         # @theme Tailwind v4 — nguồn token đang dùng thật
+├─ src/styles/tokens.css # bảng token --hub-* (chưa import)
+├─ src/components/       # Layout, Sidebar, Topbar, RunSpine, GateCard, ArtifactRail
+├─ src/lib/              # api.ts, sse.ts, runsApi.ts, artifact.ts, markdown.tsx, ui.tsx, Table, Chart
+├─ src/pages/            # 14 trang + index.tsx (bảng route)
+├─ scripts/              # check-encoding.mjs (chặn mojibake tiếng Việt lúc build)
+└─ dist/                 # bundle server phục vụ — phải build lại sau khi sửa src
+```
+
+- **Shell** (`components/Layout.tsx`): sidebar zone (`TỔNG QUAN` / `TRÒ CHUYỆN` / `ĐIỀU PHỐI` / `GIÁM SÁT` / `HỆ THỐNG`) + mục `RECENT` (artifact thật đọc từ `localStorage['hub-v3-chats']`) · topbar breadcrumb + tab nav ngang + popover search/provider-status.
+- **Route** (`pages/index.tsx`): `overview`, `chat`, `sessions`, `workflows`, `runs`, `artifacts`, `agents`, `skills`, `hooks`, `files`, `approvals`, `usage`, `settings`.
+- **`lib/ui.tsx`** — primitive dùng chung: `Button`, `IconButton`, `Input`, `Select`, `Textarea`, `Chip`, `Status`, `ProviderDot`, `EmptyState`, `Popover`. UI mới phải tái dùng, không tự dựng biến thể riêng.
+- **`web-v3/DESIGN.md`** — hợp đồng thiết kế (dark technical workbench: 4 tầng bề mặt, accent tím duy nhất, màu provider chỉ dùng cho chấm 6-8px). Đọc trước khi sửa UI.
+- **Quy ước dữ liệu:** mọi số/hàng hiển thị phải đến từ API thật; thiếu nguồn thì hiện `—` hoặc empty-state ghi rõ `TODO(backend)`. Không dựng dữ liệu mẫu trông-như-thật.
+
+### Trang chưa có backend
+`hooks` và `files` hiện chỉ là vỏ giao diện (bảng 0 dòng + control disabled + empty-state `TODO(backend)`) — chưa có `/api/hooks` hay `/api/files`. Hub cũng **không có** khái niệm workspace hay storage-quota.
 
 ### Trang Chat (`#/chat`)
-- Chọn model qua **selector tùy biến** (dropdown ngắn + filter category + ô search + panel chi tiết + nút copy ID) đọc từ `chatState.modelCatalog`.
-- Stream: hiển thị plain text khi đang chạy, **render Markdown an toàn** (escape-first + whitelist, link chỉ http/https, code block có nút Copy) chỉ khi `done`.
-- Tính năng: New chat, Export **Markdown/JSON** + Copy transcript (dùng text gốc), copy/regenerate mỗi message, Stop khi đang stream, autoscroll + jump-to-latest, Enter/Shift+Enter, lưu `localStorage` (`harness-hub-chat`), show/hide "thinking".
-- Model EOL trả **HTTP 410** → error event mang `{message, code:410}`, frontend đánh dấu row `unavailable` (session-only) và chuyển về model default.
+- Layout 3 panel: sidebar (Chats/Files/Artifacts) · khung hội thoại · panel artifact; có Focus mode ẩn panel giữa.
+- Chọn model qua `ModelSelector` đọc `/api/chat/models` + `/api/providers`.
+- Stream SSE: plain text khi đang chạy, render Markdown khi `done`; lưu `localStorage` (`hub-v3-chats`).
+- Panel artifact: chọn vùng văn bản → toolbar nổi (Hỏi AI / Viết lại / Rút gọn / Comment / Copy); toggle nạp artifact vào bối cảnh prompt.
 
 ---
 
@@ -148,8 +183,14 @@ Nguồn chân lý cho path và model:
 
 ## 9. Mở rộng: Super Agent Harness
 
-Harness Hub hiện là **control-plane**: giám sát, chat, usage, replay, suites,
-governance và git-jobs. Lớp mở rộng tiếp theo là **orchestration-plane** cho
+> **Trạng thái:** orchestration-plane đã chạy in-process trong FastAPI. Mã runtime
+> nằm ở `services/workflow.py`, `services/workflow_exec.py` và các module
+> `services/runtime_*.py`; endpoint thật được liệt kê dưới đây. Không có module
+> `orchestrator.py`, `blackboard.py`, `agents.py`, `skills.py`, hay route
+> `/api/blackboard/{run_id}`.
+
+Harness Hub khởi đầu là **control-plane**: giám sát, chat, usage, replay, suites,
+governance và git-jobs. Lớp mở rộng là **orchestration-plane** cho
 workflow khai báo, thư viện skill, và sub-agent có quản trị. Mục tiêu là giữ
 kiến trúc ghép nối lỏng: UI, cấu hình, runtime và execution backend tách nhau
 bằng file/schema rõ ràng.
@@ -183,19 +224,18 @@ harness/hub/
 │  └─ reviewer.agent.yaml        # model, tools, skills, budget, scope
 ├─ skills/
 │  └─ <skill-name>/SKILL.md      # skill package + scripts/references
-├─ blackboard/
-│  └─ <run_id>/
-│     ├─ state.json              # typed shared state
-│     ├─ events.jsonl            # append-only timeline
-│     ├─ claims.jsonl            # findings/claims with provenance
-│     ├─ decisions.md            # human/agent decisions
-│     └─ artifacts/              # diffs, reports, generated files
+├─ runtime/
+│  └─ runs/<run_id>/
+│     ├─ state.json              # runtime state
+│     ├─ events.jsonl            # append-only runtime events
+│     └─ artifacts/              # task packets and generated artifacts
 └─ services/
-   ├─ workflow.py                # parse/validate/execute workflow IR
-   ├─ agents.py                  # agent profiles + child task packets
-   ├─ skills.py                  # metadata index + progressive disclosure
-   ├─ orchestrator.py            # node execution + handoff + HITL gates
-   └─ blackboard.py              # append/read state/events/artifacts
+   ├─ workflow.py                # parse/validate workflow model
+   ├─ workflow_exec.py           # workflow node execution + handoff + gates
+   ├─ runtime_agents.py          # agent profiles + provider resolution
+   ├─ runtime_skills.py          # skill metadata and usage
+   ├─ runtime_children.py        # child task packets and child-run lifecycle
+   └─ runtime_state/events/artifacts.py # persisted state, events, artifacts
 ```
 
 Các thư mục trên là extension target, không thay thế `runs/`, `jobs/`,
@@ -221,8 +261,9 @@ Endpoint tương lai:
 | Nhóm | Endpoint | Vai trò |
 |---|---|---|
 | Workflows | `GET /api/workflows`, `POST /api/workflows/validate` | đọc/validate workflow |
-| Workflow runs | `POST /api/workflows/{id}/runs`, `GET /api/workflows/runs/{id}/stream` | chạy + SSE |
-| Blackboard | `GET /api/blackboard/{run_id}` | đọc state/events/artifacts |
+| Workflow runs | `POST /api/workflows/{id}/runs` | chạy, trả SSE response |
+| Workflow artifacts | `GET /api/workflows/runs/{id}/artifacts` | liệt kê artifacts |
+| Workflow gate | `POST /api/workflows/runs/{id}/interrupts/{interrupt_id}/resume` | resume/approve gate |
 
 LangGraph có thể được thêm sau như `services/langgraph_adapter.py`, nhận IR đã
 validate từ `workflow.py`. Không để UI hoặc config phụ thuộc trực tiếp vào
@@ -234,10 +275,10 @@ Skill là package tái sử dụng, không chỉ là prompt:
 
 - `SKILL.md` chứa metadata, trigger rules, usage instructions, scripts và
   references.
-- `skills.py` tạo index nhẹ: name, description, path, required tools, risk tier.
+- `runtime_skills.py` tạo index nhẹ: name, description, path và usage.
 - Progressive disclosure: prompt ban đầu chỉ thấy metadata. Khi workflow/agent
   chọn skill, runtime mới đọc full `SKILL.md` và các resource cần thiết.
-- Telemetry: mỗi skill call ghi result/failure vào blackboard hoặc usage log.
+- Telemetry: usage được đọc qua runtime skill usage log.
 - Evolution: failure-mode patch phải đi qua proposed diff/git-job/review, không
   auto-edit skill package.
 
@@ -266,17 +307,20 @@ Sub-agent được tạo từ **child task packet**:
 }
 ```
 
-Lead agent không tự cấp quyền mới cho child agent. `governance` kiểm tra
-profile, risk tier, blocked tiers, path scope và HITL trước khi launch. Child
-agent báo cáo bằng blackboard artifacts/events; parent tổng hợp từ đó.
+`runtime_children.create_child_run` chỉ cho lead runtime spawn, giới hạn số child
+run, yêu cầu objective và chặn child mở rộng `allowed_paths`/`allowed_tools` so
+với parent. Hàm này **không** kiểm tra `risk_tier` hoặc HITL trước khi launch.
+Child ghi task packet, state, events và artifacts vào runtime; parent tổng hợp
+child summary/artifacts qua `runtime_state` và `runtime_events`.
 
 Endpoint tương lai:
 
 | Nhóm | Endpoint | Vai trò |
 |---|---|---|
 | Agents | `GET /api/agents` | agent profiles |
-| Child run | `POST /api/agents/runs` | tạo sub-agent managed run |
-| Child stream | `GET /api/agents/runs/{id}/stream` | SSE tiến trình |
+| Child/agent run | `POST /api/agent/runs` | tạo managed runtime, trả SSE response |
+| Run detail/events | `GET /api/agent/runs/{id}`, `GET /api/agent/runs/{id}/events` | state và event history |
+| Resume gate | `POST /api/agent/runs/{id}/interrupts/{interrupt_id}/resume` | tiếp tục runtime interrupt |
 
 ### Visual Workflow Builder
 
@@ -288,9 +332,13 @@ Canvas kéo-thả là editor/visualizer cho file cấu hình, không phải ngu�
 - Save -> generate/patch YAML + validate schema + show diff.
 - Run -> gọi workflow run API.
 
-Frontend nên thêm sau khi headless runtime chạy ổn. Với constraint hiện tại
-(vanilla JS, không CDN/build step), phase đầu có thể dùng SVG/HTML thuần cho
-canvas đơn giản; không đưa dependency đồ thị nặng vào Hub.
+**Đã ship** trong `web-v3/src/pages/WorkflowsPage.tsx`: canvas pan/zoom + kéo-thả
+node + nối edge port-to-port, viết bằng React/SVG thuần — không thêm thư viện đồ
+thị nào. Save gọi `PUT /{id}/model` + `PUT /{id}/layout`, validate gọi
+`POST /api/workflows/validate`, run gọi `POST /api/workflows/{id}/runs` và gate
+dùng route resume workflow.
+Lưu ý: UI cho phép vẽ tự do nhưng backend vẫn chỉ nhận **chuỗi tuyến tính** —
+đồ thị rẽ nhánh sẽ bị `validate_workflow` từ chối.
 
 ### Roadmap khuyến nghị
 
@@ -317,12 +365,21 @@ harness/hub/
 ├─ config.py            # paths, CHAT_MODEL_CATALOG, guardrails
 ├─ risk_tiers.json      # phân tầng rủi ro
 ├─ services/            # logic: chat, usage, behavior, runs, trigger,
-│                       #        gitjobs, suites, integrity, governance,
-│                       #        replay, inspect_evals, board, risk...
+│  │                    #        gitjobs, suites, integrity, governance,
+│  │                    #        replay, inspect_evals, board, pricing, risk...
+│  ├─ workflow.py       # parse/validate/IR (chuỗi tuyến tính)
+│  ├─ workflow_exec.py  # thực thi + SSE
+│  ├─ runtime_*.py      # state, checkpoint, events, interrupts, children,
+│  │                    # agents, skills, memory, policy, reducers, validate...
+│  ├─ skill_library.py  # index + drift + deploy
+│  └─ providers/        # claude_cli, codex_cli, gemini_cli, nvidia_api, base, procs
 ├─ parsers/             # claude_sessions, codex_sessions, inspect_eval, common
-├─ web/                 # index.html, app.js, charts.js, styles-hub.css, DESIGN.md
-├─ tests/               # pytest (provider mock, không gọi API thật)
-├─ docs/                # chat.md, safeharness-*.md
+├─ web-v3/              # frontend React/Vite (src/, dist/, DESIGN.md) — `web/` cũ đã gỡ
+├─ workflows/           # *.yaml + *.layout.json
+├─ agents/              # agent profile
+├─ runtime/             # state/events/artifact của agent + workflow run
+├─ tests/               # pytest 235 test (provider mock, không gọi API thật)
+├─ docs/                # chat.md, safeharness-*.md, harness_hub_backend_docs_v0_1/
 ├─ jobs/                # git-job state (runtime)
 └─ .cache/              # cache incremental + usage chat (gitignore)
 ```

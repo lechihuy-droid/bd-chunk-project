@@ -10,7 +10,7 @@ from typing import Any, Iterator
 
 import config
 from services.providers import procs
-from services.providers.base import ChatEvent, ProviderStatus
+from services.providers.base import ChatEvent, ProviderStatus, ToolPolicy, turn_prompt
 
 PROVIDER_ID = "claude"
 _STATUS_TTL = 60.0
@@ -26,7 +26,13 @@ def _base_cmd() -> list[str]:
     return ["claude"]
 
 
-def _build_cmd(prompt: str, session_id: str | None, model: str | None = None, system_prompt: str | None = None) -> list[str]:
+def _build_cmd(
+    prompt: str,
+    session_id: str | None,
+    model: str | None = None,
+    system_prompt: str | None = None,
+    tool_policy: ToolPolicy | None = None,
+) -> list[str]:
     cmd = _base_cmd()
     cmd += [
         "-p",
@@ -34,15 +40,16 @@ def _build_cmd(prompt: str, session_id: str | None, model: str | None = None, sy
         "--output-format",
         "stream-json",
         "--verbose",
-        "--permission-mode",
-        "plan",
-        "--disallowed-tools",
-        "Edit",
-        "--disallowed-tools",
-        "Write",
-        "--disallowed-tools",
-        "Bash",
     ]
+    if tool_policy is None:
+        # Preserve existing chat-only restrictions when no agent policy applies.
+        cmd += ["--permission-mode", "plan", "--disallowed-tools", "Edit", "--disallowed-tools", "Write", "--disallowed-tools", "Bash"]
+    else:
+        cmd += ["--permission-mode", "acceptEdits" if tool_policy.get("permission") == "workspace_write" else "plan"]
+        for tool in tool_policy.get("allowed_tools", []):
+            cmd += ["--allowedTools", tool]
+        for path in tool_policy.get("allowed_paths", []):
+            cmd += ["--add-dir", path]
     if model:
         cmd += ["--model", model]
     if system_prompt:
@@ -121,6 +128,27 @@ def _text_from_assistant(data: dict[str, Any]) -> str:
     return ""
 
 
+def _tool_events(data: dict[str, Any]) -> Iterator[ChatEvent]:
+    """Map Claude stream-json content blocks into provider-neutral tool events."""
+    message = data.get("message")
+    if not isinstance(message, dict):
+        return
+    content = message.get("content")
+    if not isinstance(content, list):
+        return
+    for block in content:
+        if not isinstance(block, dict):
+            continue
+        if block.get("type") == "tool_use":
+            name, tool_use_id = block.get("name"), block.get("id")
+            if isinstance(name, str) and isinstance(tool_use_id, str):
+                yield {"type": "tool_call", "tool_name": name, "tool_input": block.get("input"), "tool_use_id": tool_use_id}
+        elif block.get("type") == "tool_result":
+            tool_use_id = block.get("tool_use_id")
+            if isinstance(tool_use_id, str):
+                yield {"type": "tool_result", "tool_use_id": tool_use_id, "tool_output": block.get("content")}
+
+
 def _usage_from_result(data: dict[str, Any]) -> dict[str, int]:
     result_usage = data.get("usage")
     if not isinstance(result_usage, dict):
@@ -168,9 +196,10 @@ def stream_chat(
     session_id: str | None = None,
     model: str | None = None,
     system_prompt: str | None = None,
+    tool_policy: ToolPolicy | None = None,
 ) -> Iterator[ChatEvent]:
-    prompt = _latest_user_prompt(messages)
-    cmd = _build_cmd(prompt, session_id, model=model, system_prompt=system_prompt)
+    prompt = turn_prompt(messages)
+    cmd = _build_cmd(prompt, session_id, model=model, system_prompt=system_prompt, tool_policy=tool_policy)
     env = os.environ.copy()
     env.setdefault("PYTHONIOENCODING", "utf-8")
     timeout = float(getattr(config, "CHAT_CLI_TIMEOUT", 300))
@@ -215,6 +244,7 @@ def stream_chat(
             data_type = data.get("type")
             if data_type == "assistant":
                 saw_assistant_or_result = True
+                yield from _tool_events(data)
                 text = _text_from_assistant(data)
                 if text:
                     yield {"type": "delta", "text": text}
@@ -227,6 +257,8 @@ def stream_chat(
                 subtype = str(data.get("subtype") or "").lower()
                 if data.get("is_error") is True or subtype in {"error", "failed", "failure"}:
                     result_error = data
+            elif data_type == "user":
+                yield from _tool_events(data)
     finally:
         timed_out = procs.registry.is_timed_out(proc_id)
         returncode = process.returncode

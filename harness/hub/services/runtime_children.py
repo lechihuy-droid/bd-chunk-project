@@ -4,7 +4,7 @@ import json
 from typing import Any
 
 import config
-from services import runtime_checkpoint, runtime_events, runtime_state
+from services import governance, runtime_agents, runtime_checkpoint, runtime_events, runtime_state
 
 
 def _as_str_list(value: Any) -> list[str]:
@@ -36,6 +36,7 @@ def _packet(parent: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
     return {
         "objective": objective,
         "agent_id": str(raw.get("agent_id") or raw.get("agent") or "researcher"),
+        "risk_tier": str(raw.get("risk_tier") or ""),
         "allowed_paths": child_paths,
         "allowed_tools": child_tools,
         "skills": _as_str_list(raw.get("skills")),
@@ -60,6 +61,17 @@ def create_child_run(parent_run_id: str, raw_packet: dict[str, Any]) -> dict[str
         raise ValueError("child run limit exceeded")
 
     packet = _packet(parent, raw_packet)
+    try:
+        child_agent = runtime_agents.get_agent(packet["agent_id"])
+        tier = str(child_agent["risk_tier"])
+    except FileNotFoundError:
+        # Workflow-defined children carry their validated tier explicitly.  Keep
+        # legacy direct packets without a registered profile compatible.
+        tier = str(packet.get("risk_tier") or "")
+    if tier and tier in governance.effective_blocked_tiers():
+        reason = f"risk_tier '{tier}' blocked for agent '{packet['agent_id']}'"
+        governance.record_denial(parent_run_id, [reason])
+        raise PermissionError(f"child spawn denied: {reason}")
     child = runtime_state.create_run(
         agent_id=packet["agent_id"],
         messages=[{"id": "task", "role": "user", "content": packet["objective"]}],

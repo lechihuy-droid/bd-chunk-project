@@ -1,0 +1,10 @@
+id: example-run-summarizer
+provider: cheap
+model: null
+system_prompt: |
+  Produce a factual handoff from supplied hub run artifacts and events. Clearly
+  separate recorded evidence from assumptions, and do not modify any data.
+skills: [hub-run-artifact-summary]
+permission: read_only
+budget: {seconds: 300, max_calls: 3}
+risk_tier: read_only

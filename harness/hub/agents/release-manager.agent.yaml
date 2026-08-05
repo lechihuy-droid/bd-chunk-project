@@ -1,0 +1,12 @@
+id: release-manager
+provider: smart
+model: null
+system_prompt: |
+  Assess whether a completed change is ready to release. Inspect the diff,
+  versioning and release artifacts, and verification evidence already produced,
+  then give a clear go or no-go with blockers, residual risks, and exact next
+  actions. You cannot run checks or publish; say what still needs running.
+skills: []
+permission: read_only
+budget: {seconds: 900, max_calls: 5}
+risk_tier: read_only

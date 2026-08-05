@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import re
+import hashlib
+import threading
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -17,6 +19,31 @@ ID_PATTERNS = {
     "checkpoint": re.compile(r"^checkpoint-[0-9a-z-]+$"),
     "interrupt": re.compile(r"^interrupt-[0-9a-z-]+$"),
 }
+
+
+class StaleRunVersionError(ValueError):
+    pass
+
+
+class IdempotencyConflictError(ValueError):
+    pass
+
+
+class RuntimeJournalCorruptionError(ValueError):
+    pass
+
+
+_RUN_LOCKS: dict[str, threading.RLock] = {}
+_RUN_LOCKS_GUARD = threading.Lock()
+
+
+def _run_lock(run_id: str) -> threading.RLock:
+    with _RUN_LOCKS_GUARD:
+        return _RUN_LOCKS.setdefault(run_id, threading.RLock())
+
+
+def _canonical_hash(value: dict[str, Any]) -> str:
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
 def now_iso() -> str:
@@ -92,6 +119,10 @@ def run_state_path(run_id: str) -> Path:
     return run_dir(run_id) / "run.json"
 
 
+def run_journal_path(run_id: str) -> Path:
+    return run_dir(run_id) / "transactions.jsonl"
+
+
 def thread_state_path(thread_id: str) -> Path:
     return thread_dir(thread_id) / "state.json"
 
@@ -109,6 +140,108 @@ def _write_json(path: Path, data: dict[str, Any]) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     tmp.replace(path)
+
+
+def _append_journal(run_id: str, record: dict[str, Any]) -> dict[str, Any]:
+    stored = dict(record)
+    stored["checksum"] = _canonical_hash(stored)
+    with run_journal_path(run_id).open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(stored, ensure_ascii=False, sort_keys=True) + "\n")
+    return stored
+
+
+def _quarantine_journal_tail(run_id: str, tail: bytes) -> Path:
+    quarantine = run_dir(run_id) / "quarantine"
+    quarantine.mkdir(parents=True, exist_ok=True)
+    path = quarantine / f"transactions.tail-{datetime.now(UTC):%Y%m%d%H%M%S}-{uuid.uuid4().hex[:8]}.jsonl"
+    path.write_bytes(tail)
+    return path
+
+
+def _read_journal(run_id: str, repair_tail: bool = True) -> list[dict[str, Any]]:
+    path = run_journal_path(run_id)
+    if not path.is_file():
+        return []
+    raw = path.read_bytes()
+    lines = raw.splitlines(keepends=True)
+    records: list[dict[str, Any]] = []
+    offset = 0
+    previous_hash = ""
+    for line in lines:
+        line_end = offset + len(line)
+        try:
+            item = json.loads(line.decode("utf-8"))
+            if not isinstance(item, dict):
+                raise ValueError("journal record is not an object")
+            checksum = item.pop("checksum", None)
+            if not isinstance(checksum, str) or checksum != _canonical_hash(item):
+                raise ValueError("journal checksum mismatch")
+            if str(item.get("prior_transaction_hash") or "") != previous_hash:
+                raise ValueError("journal chain mismatch")
+            item["checksum"] = checksum
+            records.append(item)
+            previous_hash = checksum
+            offset = line_end
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+            tail = raw[offset:]
+            if not repair_tail:
+                raise RuntimeJournalCorruptionError(f"Corrupt transaction journal for {run_id}")
+            _quarantine_journal_tail(run_id, tail)
+            path.write_bytes(raw[:offset])
+            break
+    return records
+
+
+def _regenerate_derived_events(run_id: str, records: list[dict[str, Any]]) -> None:
+    """Restore missing transaction timeline entries; no provider or executor is invoked."""
+    path = runtime_path("run", run_id, "events.jsonl")
+    existing: list[dict[str, Any]] = []
+    valid: list[bytes] = []
+    if path.is_file():
+        raw = path.read_bytes()
+        offset = 0
+        for line in raw.splitlines(keepends=True):
+            try:
+                item = json.loads(line.decode("utf-8"))
+                if not isinstance(item, dict):
+                    raise ValueError("event is not an object")
+                existing.append(item)
+                valid.append(line)
+                offset += len(line)
+            except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+                _quarantine_journal_tail(run_id, raw[offset:])
+                path.write_bytes(b"".join(valid))
+                break
+    known = {str(item.get("event_id") or "") for item in existing}
+    with path.open("a", encoding="utf-8") as handle:
+        for record in records:
+            if record.get("phase") != "committed":
+                continue
+            event_id = f"event-{record['transaction_id']}"
+            if event_id in known:
+                continue
+            event = {
+                "event_id": event_id,
+                "type": "run.command_committed",
+                "run_id": run_id,
+                "sequence": record["target_state_version"],
+                "ts": record["occurred_at"],
+                "causation_id": record["command_id"],
+                "command_type": record["command_type"],
+            }
+            handle.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+
+
+def recover_run(run_id: str) -> dict[str, Any]:
+    """Repairs a corrupt transaction-journal tail; it never replays external work."""
+    run_id = validate_id("run", run_id)
+    with _run_lock(run_id):
+        state = runtime_reducers.normalize_state(_read_json(run_state_path(run_id)))
+        if "state_version" not in state:
+            state["runtime_compatibility"] = "legacy_unjournaled"
+            return state
+        _regenerate_derived_events(run_id, _read_journal(run_id, repair_tail=True))
+        return state
 
 
 def create_thread(metadata: dict[str, Any] | None = None, thread_id: str | None = None) -> dict[str, Any]:
@@ -193,6 +326,7 @@ def create_run(
         "created_at": ts,
         "updated_at": ts,
     }
+    state["state_version"] = 0
     path.mkdir(parents=True, exist_ok=False)
     (path / "artifacts").mkdir(parents=True, exist_ok=True)
     _write_json(path / "run.json", state)
@@ -207,7 +341,7 @@ def create_run(
 
 
 def read_run(run_id: str) -> dict[str, Any]:
-    return runtime_reducers.normalize_state(_read_json(run_state_path(run_id)))
+    return recover_run(run_id)
 
 
 def write_run_state(state: dict[str, Any]) -> dict[str, Any]:
@@ -232,10 +366,70 @@ def write_run_state(state: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def update_run_state(run_id: str, update: dict[str, Any]) -> dict[str, Any]:
-    state = read_run(run_id)
-    merged = runtime_reducers.merge_state(state, update)
-    return write_run_state(merged)
+def update_run_state(
+    run_id: str,
+    update: dict[str, Any],
+    *,
+    expected_version: int | None = None,
+    command_id: str | None = None,
+    idempotency_key: str | None = None,
+    command_type: str = "run.update",
+) -> dict[str, Any]:
+    """Atomically apply one local state command; legacy runs remain read-only compatible."""
+    run_id = validate_id("run", run_id)
+    request = {"type": command_type, "update": update, "expected_version": expected_version}
+    request_hash = _canonical_hash(request)
+    command_id = command_id or f"cmd-{uuid.uuid4().hex}"
+    key = idempotency_key or command_id
+    with _run_lock(run_id):
+        state = runtime_reducers.normalize_state(_read_json(run_state_path(run_id)))
+        if "state_version" not in state:
+            if expected_version is not None or idempotency_key is not None:
+                raise RuntimeJournalCorruptionError(f"Run {run_id} is legacy and has no command journal")
+            merged = runtime_reducers.merge_state(state, update)
+            return write_run_state(merged)
+        version = state["state_version"]
+        if not isinstance(version, int):
+            raise RuntimeJournalCorruptionError(f"Run {run_id} has invalid state version")
+        journal = _read_journal(run_id, repair_tail=True)
+        committed = [item for item in journal if item.get("phase") == "committed"]
+        for item in committed:
+            if item.get("command_type") == command_type and item.get("idempotency_key") == key:
+                if item.get("request_hash") != request_hash:
+                    raise IdempotencyConflictError(f"Idempotency key conflicts for {run_id}")
+                return runtime_reducers.normalize_state(_read_json(run_state_path(run_id)))
+        if expected_version is not None and expected_version != version:
+            raise StaleRunVersionError(f"Expected version {expected_version}, current version {version}")
+        prior_hash = str(journal[-1].get("checksum") if journal else "")
+        transaction_id = f"tx-{uuid.uuid4().hex}"
+        base = {
+            "schema_version": 1,
+            "transaction_id": transaction_id,
+            "command_id": command_id,
+            "command_type": command_type,
+            "idempotency_key": key,
+            "request_hash": request_hash,
+            "prior_state_version": version,
+            "target_state_version": version + 1,
+            "prior_transaction_hash": prior_hash,
+            "occurred_at": now_iso(),
+        }
+        prepared = _append_journal(run_id, {**base, "phase": "prepared"})
+        merged = runtime_reducers.merge_state(state, update)
+        merged["state_version"] = version + 1
+        persisted = write_run_state(merged)
+        _append_journal(
+            run_id,
+            {
+                **base,
+                "phase": "committed",
+                "prior_transaction_hash": prepared["checksum"],
+                "projection_hash": _canonical_hash(persisted),
+                "response_hash": _canonical_hash({"state_version": persisted["state_version"]}),
+            },
+        )
+        _regenerate_derived_events(run_id, _read_journal(run_id, repair_tail=False))
+        return persisted
 
 
 def set_run_status(run_id: str, status: str, error: str | None = None) -> dict[str, Any]:

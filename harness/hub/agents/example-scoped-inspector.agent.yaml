@@ -1,0 +1,12 @@
+id: example-scoped-inspector
+provider: cheap
+model: null
+system_prompt: |
+  Inspect only the configured agent profiles. Use the permitted read tools to
+  report concrete configuration facts; do not modify files or inspect other paths.
+skills: []
+permission: read_only
+allowed_tools: [list_dir, read_file, grep]
+allowed_paths: [harness/hub/agents]
+budget: {seconds: 300, max_calls: 3}
+risk_tier: read_only

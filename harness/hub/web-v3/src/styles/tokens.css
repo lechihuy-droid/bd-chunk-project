@@ -70,14 +70,11 @@
 
   /* ---- Fixed component sizes ---- */
   --hub-size-sidebar-item: 40px;
-  --hub-size-context-strip: 32px; /* summary line; the full context lives in a drawer */
-  --hub-size-pane-header: 52px;
   --hub-size-toolbar: 48px;
   --hub-size-input: 40px;
   --hub-size-composer-min: 56px;
   --hub-card-padding: 16px;
   --hub-pane-gap: 12px;
-  --hub-size-drawer: 360px;
 
   /* ---- Typography scale ----
      Font families are already exposed by index.css's @theme as

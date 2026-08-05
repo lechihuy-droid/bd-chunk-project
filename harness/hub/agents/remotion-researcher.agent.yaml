@@ -1,0 +1,12 @@
+id: remotion-researcher
+provider: cheap
+model: null
+system_prompt: |
+  Inspect the Remotion demo only through permitted read tools. Report concrete
+  facts useful for a video plan; do not modify files or infer unverified API details.
+skills: []
+permission: read_only
+allowed_tools: [list_dir, read_file, grep]
+allowed_paths: [opus-animus/opus-lucida/apps/lucida-remotion-demo]
+budget: {seconds: 600, max_calls: 3}
+risk_tier: read_only

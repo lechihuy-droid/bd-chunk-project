@@ -29,7 +29,7 @@ class FakeProvider:
     def __init__(self, scripts: list[list[dict[str, Any]]]) -> None:
         self.scripts = scripts
 
-    def stream_chat(self, messages: list[dict[str, str]], session_id: str | None = None, model: str | None = None) -> Iterator[dict[str, Any]]:
+    def stream_chat(self, messages: list[dict[str, str]], session_id: str | None = None, model: str | None = None, **_: Any) -> Iterator[dict[str, Any]]:
         yield from self.scripts.pop(0)
 
 

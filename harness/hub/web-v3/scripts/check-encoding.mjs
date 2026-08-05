@@ -51,7 +51,7 @@ for (const path of walk(ROOT)) {
   const text = readFileSync(path, "utf8");
   const lines = text.split(/\r?\n/);
   lines.forEach((line, i) => {
-    for (const [run] of line.matchAll(/[^\x00-\x7F]+/g)) {
+    for (const [run] of line.matchAll(/[\P{ASCII}]+/gu)) {
       const fixed = unwrap(run);
       if (fixed === null || fixed === run) continue;
       bad++;

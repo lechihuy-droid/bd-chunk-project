@@ -36,6 +36,10 @@ def normalize_state(value: dict[str, Any]) -> dict[str, Any]:
     for field in STATE_DICT_FIELDS:
         raw = value.get(field)
         state[field] = dict(raw) if isinstance(raw, dict) else {}
+    if isinstance(value.get("state_version"), int):
+        state["state_version"] = value["state_version"]
+    if isinstance(value.get("runtime_compatibility"), str):
+        state["runtime_compatibility"] = value["runtime_compatibility"]
     return state
 
 

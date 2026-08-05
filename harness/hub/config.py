@@ -21,7 +21,10 @@ RUNTIME_DIR = HUB_DIR / "runtime"
 RUNTIME_THREADS_DIR = RUNTIME_DIR / "threads"
 RUNTIME_RUNS_DIR = RUNTIME_DIR / "runs"
 RUNTIME_STORE_DIR = RUNTIME_DIR / "store"
+RUNTIME_FILE_MAX_BYTES = 10 * 1024 * 1024
+RUNTIME_FILES_MAX_BYTES = 100 * 1024 * 1024
 PORT = 8799
+VGOV_BASE_URL = "http://127.0.0.1:8810"
 STEP_CAP = 50
 JOB_AGENT_CMD = "codex"
 JOB_TIME_CAP_SECONDS = 1800
@@ -29,8 +32,21 @@ JOB_MAX_RUNS = 3
 RUNTIME_MAX_CHILD_RUNS = 3
 RUNTIME_CHILD_TIMEOUT_SECONDS = 900
 JOB_BLOCKED_TIERS = ["destructive"]
+RENDER_TARGETS: dict[str, dict[str, Any]] = {
+    "lucida-remotion": {
+        "cwd": ROOT / "opus-animus" / "opus-lucida" / "apps" / "lucida-remotion-demo",
+        "command": ["node", "scripts/render-run.mjs", "--props", "{props}"],
+        "timeout_seconds": 1800,
+        "risk_tier": "execute",
+        "env": {},
+        "output_hint": "output/render/flow-runs",
+    },
+}
 JOB_TTL_SECONDS = 3600
 JOB_ALLOW_AGENTS = {"codex"}
+RETENTION_DAYS_DEFAULT = 7
+RETENTION_DAYS_MIN = 1
+RETENTION_DAYS_MAX = 365
 GOV_RECOVERY_STEPS = 5
 LOOP_CONSECUTIVE_THRESHOLD = 12
 ENTROPY_WINDOW = 20
@@ -369,7 +385,6 @@ PROVIDERS: dict[str, Any] = {
     "claude": {"cmd": ["claude"]},
     "codex": {"cmd": [str(Path.home() / "AppData" / "Local" / "pnpm" / "codex")]},
     "nvidia": {},
-    "gemini": {"cmd": ["gemini"]},
 }
 
 MODEL_CLASS_ROUTING: dict[str, dict[str, Any]] = {
@@ -380,6 +395,7 @@ MODEL_CLASS_ROUTING: dict[str, dict[str, Any]] = {
 
 # Skill library sources (read + deploy targets)
 SKILL_SOURCES: dict[str, Path] = {
+    "hub_builtin": HUB_DIR / "skills",
     "claude_user": Path.home() / ".claude" / "skills",
     "claude_project": ROOT / ".claude" / "skills",
     "codex_user": Path.home() / ".codex" / "skills",

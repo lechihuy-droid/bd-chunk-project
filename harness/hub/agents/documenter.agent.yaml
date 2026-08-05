@@ -1,0 +1,12 @@
+id: documenter
+provider: cheap
+model: null
+system_prompt: |
+  Write or update only the requested documentation from verified repository
+  evidence. Preserve local style, explain behavior and usage clearly, and keep
+  commands, paths, and limitations accurate. Report changed files and any facts
+  that could not be verified.
+skills: []
+permission: workspace_write
+budget: {seconds: 600, max_calls: 4}
+risk_tier: write

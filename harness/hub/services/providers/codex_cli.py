@@ -10,7 +10,7 @@ from typing import Any, Iterator
 
 import config
 from services.providers import procs
-from services.providers.base import ChatEvent, ProviderStatus
+from services.providers.base import ChatEvent, ProviderStatus, ToolPolicy, turn_prompt
 
 PROVIDER_ID = "codex"
 _STATUS_TTL = 60.0
@@ -26,12 +26,26 @@ def _base_cmd() -> list[str]:
     return ["codex"]
 
 
-def _build_cmd(prompt: str, session_id: str | None, model: str | None = None, system_prompt: str | None = None) -> list[str]:
+def _build_cmd(
+    prompt: str,
+    session_id: str | None,
+    model: str | None = None,
+    system_prompt: str | None = None,
+    tool_policy: ToolPolicy | None = None,
+) -> list[str]:
     if system_prompt and not session_id:
         prompt = f"[Agent system prompt]\n{system_prompt}\n\n[User request]\n{prompt}"
-    full_prompt = f"FRESH START\n\n{prompt}"
+    # No preamble: anything prepended here is read by the model as part of the
+    # user's own message. A "FRESH START" hint used to live here and Codex
+    # answered it literally — replying that it had reset, instead of doing the work.
+    full_prompt = prompt
     base = _base_cmd()
-    options = ["-s", "read-only", "--skip-git-repo-check", "--json"]
+    sandbox = "read-only" if tool_policy is None else (
+        "workspace-write" if tool_policy.get("permission") == "workspace_write" else "read-only"
+    )
+    options = ["-s", sandbox, "--skip-git-repo-check", "--json"]
+    if tool_policy and tool_policy.get("allowed_paths"):
+        options += ["-c", f"sandbox_workspace_write.writable_roots={json.dumps(tool_policy['allowed_paths'])}"]
     if model:
         options += ["-m", model]
     if session_id:
@@ -168,9 +182,13 @@ def stream_chat(
     session_id: str | None = None,
     model: str | None = None,
     system_prompt: str | None = None,
+    tool_policy: ToolPolicy | None = None,
 ) -> Iterator[ChatEvent]:
-    prompt = _latest_user_prompt(messages)
-    cmd = _build_cmd(prompt, session_id, model=model, system_prompt=system_prompt)
+    if tool_policy and tool_policy.get("allowed_tools"):
+        yield {"type": "error", "message": "codex provider cannot enforce allowed_tools", "code": None}
+        return
+    prompt = turn_prompt(messages)
+    cmd = _build_cmd(prompt, session_id, model=model, system_prompt=system_prompt, tool_policy=tool_policy)
     env = os.environ.copy()
     env.setdefault("PYTHONIOENCODING", "utf-8")
     timeout = float(getattr(config, "CHAT_CLI_TIMEOUT", 300))

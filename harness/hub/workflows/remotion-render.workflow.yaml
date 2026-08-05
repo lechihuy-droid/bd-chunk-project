@@ -1,0 +1,29 @@
+id: remotion-render
+nodes:
+  - id: research
+    agent: remotion-researcher
+    prompt: "Inspect the Remotion demo for {{objective}}. Report renderer entry points, expected VideoMap fields, and reusable visual constraints."
+    gate: none
+  - id: script
+    agent: drafter
+    prompt: "Write a concise vertical-video script for {{objective}}, grounded in this research: {{research_output}}"
+    gate: none
+  - id: map
+    agent: remotion-mapper
+    prompt: "Create the VideoMap JSON for this script: {{script_output}}. Use these verified renderer facts: {{research_output}}"
+    gate: none
+  - id: check_map
+    type: validate
+    target: map
+    checks:
+      - {kind: json_parseable}
+      - {kind: min_length, value: 300}
+      - {kind: must_include, values: ['"video"', '"scenes"', '"width"', '"height"', '"fps"']}
+    on_fail: interrupt
+  - id: render_video
+    type: render
+    target: lucida-remotion
+    props_from: map
+    gate: approval
+edges: [[research, script], [script, map], [map, check_map], [check_map, render_video]]
+stop: {max_nodes: 10, max_seconds: 3600}

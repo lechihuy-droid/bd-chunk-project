@@ -1,0 +1,151 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: vgov
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  minio-init:
+    image: minio/mc
+    environment:
+      VGOV_S3_ENDPOINT: http://minio:9000
+      VGOV_S3_ACCESS_KEY: ${VGOV_S3_ACCESS_KEY}
+      VGOV_S3_SECRET_KEY: ${VGOV_S3_SECRET_KEY}
+    volumes:
+      - ./init-minio.sh:/init-minio.sh:ro
+    entrypoint: ["/bin/sh", "/init-minio.sh"]
+    depends_on:
+      minio:
+        condition: service_healthy
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: mlflow.Dockerfile
+    command: >-
+      sh -c "python -c \"import os, psycopg2; c=psycopg2.connect(os.environ['MLFLOW_ADMIN_DATABASE_URL']); c.autocommit=True; cur=c.cursor(); cur.execute('SELECT 1 FROM pg_database WHERE datname = %s', ('mlflow',)); cur.fetchone() or cur.execute('CREATE DATABASE mlflow'); cur.close(); c.close()\" &&
+      mlflow server --host 0.0.0.0 --port 8812
+      --backend-store-uri ${MLFLOW_DATABASE_URL}
+      --artifacts-destination s3://mlflow-artifacts
+      --allowed-hosts mlflow,mlflow:8812,localhost,localhost:8812,127.0.0.1,127.0.0.1:8812"
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${VGOV_S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${VGOV_S3_SECRET_KEY}
+      MLFLOW_ADMIN_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/vgov
+    ports:
+      - "127.0.0.1:8812:8812"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8812/health', timeout=2)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      # MLflow 3.15 mất ~2 phút để 4 worker boot xong. start_period phải phủ hết khoảng đó,
+      # nếu không container bị đánh unhealthy trước khi kịp sẵn sàng và cả chain depends_on chết theo.
+      start_period: 240s
+
+  vgov-api:
+    build:
+      context: ../app
+    command: >-
+      sh -c "alembic -c /app/alembic.ini upgrade head &&
+      uvicorn main:app --host 0.0.0.0 --port 8810"
+    environment:
+      VGOV_DATABASE_URL: ${VGOV_DATABASE_URL}
+      VGOV_TEST_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/vgov_test
+      VGOV_MLFLOW_TRACKING_URI: http://mlflow:8812
+      MLFLOW_TRACKING_URI: http://mlflow:8812
+      VGOV_RUNTIME_BASE_URL: http://vgov-runtime:8811
+      VGOV_CALLBACK_BASE_URL: http://vgov-api:8810
+      VGOV_S3_ENDPOINT: http://minio:9000
+      VGOV_S3_ACCESS_KEY: ${VGOV_S3_ACCESS_KEY}
+      VGOV_S3_SECRET_KEY: ${VGOV_S3_SECRET_KEY}
+      VGOV_GIT_REPO_PATH: /repo
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      VGOV_BASE_URL: http://127.0.0.1:8810
+      VGOV_CALLBACK_GRACE_SECONDS: ${VGOV_CALLBACK_GRACE_SECONDS:-120}
+    ports:
+      - "127.0.0.1:8810:8810"
+    volumes:
+      - ../../..:/repo:ro
+      - ../scripts:/scripts:ro
+      - ../scripts:/app/scripts:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+      vgov-runtime:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8810/health', timeout=2)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  vgov-runtime:
+    build:
+      context: ../runtime
+    environment:
+      VGOV_MLFLOW_TRACKING_URI: http://mlflow:8812
+      # SDK mlflow đọc đúng tên biến này. Thiếu nó thì mlflow.set_experiment ghi vào ./mlruns
+      # trong container thay vì tracking server -> trace_id trả về không tra được.
+      MLFLOW_TRACKING_URI: http://mlflow:8812
+      # Allowlist cho callback_url — chống SSRF qua body của POST /runs.
+      VGOV_CALLBACK_BASE_URL: http://vgov-api:8810
+      VGOV_LLM_BASE_URL: ${VGOV_LLM_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+    ports:
+      - "127.0.0.1:8811:8811"
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8811/health', timeout=2)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  postgres-data:
+  minio-data:

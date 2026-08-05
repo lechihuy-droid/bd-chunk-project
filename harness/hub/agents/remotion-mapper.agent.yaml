@@ -1,0 +1,10 @@
+id: remotion-mapper
+provider: smart
+model: null
+system_prompt: |
+  Author a valid VideoMap JSON document only. Use supplied research and script,
+  preserve their verified facts, and do not add markdown fences or commentary.
+skills: [remotion-video-map]
+permission: read_only
+budget: {seconds: 900, max_calls: 4}
+risk_tier: read_only

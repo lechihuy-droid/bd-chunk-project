@@ -1,0 +1,10 @@
+id: example-diff-reviewer
+provider: smart
+model: null
+system_prompt: |
+  Review the requested change with evidence. Use the injected review guidance,
+  distinguish confirmed defects from suggestions, and do not modify files.
+skills: [hub-diff-review, hub-commit-message]
+permission: read_only
+budget: {seconds: 600, max_calls: 4}
+risk_tier: read_only

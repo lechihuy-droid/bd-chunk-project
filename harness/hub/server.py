@@ -1,27 +1,39 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import logging
+import re
 import sys
 import threading
+import time
+import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
+
+import httpx
 
 
 HUB_DIR = Path(__file__).resolve().parent
 if str(HUB_DIR) not in sys.path:
     sys.path.insert(0, str(HUB_DIR))
 
-from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
+from fastapi import FastAPI, File, HTTPException, Query, Request, UploadFile
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 import config
 from services import (
     behavior,
+    artifact_comments,
     board,
+    chat_files,
     chat,
+    execution,
     gitjobs,
     governance,
+    hooks,
     inspect_evals,
     integrity,
     replay,
@@ -30,11 +42,15 @@ from services import (
     runtime_agents,
     runtime_artifacts,
     runtime_events,
+    runtime_files,
     runtime_interrupts,
     runtime_memory,
+    run_inputs,
     runtime_pipeline,
     runtime_policy,
+    retention,
     runtime_skills,
+    search,
     runtime_state,
     skill_library,
     suites,
@@ -43,15 +59,27 @@ from services import (
     workflow,
     workflow_exec,
 )
-from services.providers import get_provider, list_providers
+from services.providers import list_providers
+
+# Compatibility for existing in-process callers; API chat execution uses services.execution.
+get_provider = execution.get_provider
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     threading.Thread(target=usage.warm, name="usage-warm", daemon=True).start()
     threading.Thread(target=behavior.warm, name="behavior-warm", daemon=True).start()
+    # The first skill-library call parses the telemetry log and walks every skill
+    # source, so without this the Skills metric sits in its skeleton for seconds
+    # after each restart while the rest of the dashboard has already resolved.
+    threading.Thread(target=skill_library.list_skills, name="skills-warm", daemon=True).start()
+    threading.Thread(target=list_providers, name="providers-warm", daemon=True).start()
     try:
         gitjobs.reconcile_orphans()
+    except Exception:
+        pass
+    try:
+        retention.sweep()
     except Exception:
         pass
     yield
@@ -69,30 +97,171 @@ if WEB_V3_DIST.exists():
     app.mount("/assets", StaticFiles(directory=str(WEB_V3_DIST / "assets")), name="assets-v3")
 
 _CSRF_SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+_SCHEMA_VERSION = "1"
+_IDEMPOTENCY_LOCK = threading.Lock()
+_IDEMPOTENCY_RESULTS: dict[tuple[str, str], tuple[int, bytes, str]] = {}
+_IDEMPOTENT_COMMANDS = {
+    ("POST", "/api/jobs"),
+    ("POST", "/api/agent/runs"),
+    ("POST", "/api/runs/trigger"),
+}
+_LOGGER = logging.getLogger(__name__)
+
+
+def _is_idempotent_command(request: Request) -> bool:
+    if (request.method, request.url.path) in _IDEMPOTENT_COMMANDS:
+        return True
+    return request.method == "POST" and bool(re.fullmatch(
+        r"/api/(?:jobs/[^/]+/(?:approve|accept)|memory/candidates/[^/]+/accept|"
+        r"(?:agent|workflows)/runs/[^/]+/interrupts/[^/]+/resume|workflows/[^/]+/runs)",
+        request.url.path,
+    ))
+
+
+def _error_code(status_code: int) -> str:
+    return {
+        400: "INVALID_REQUEST", 403: "FORBIDDEN", 404: "NOT_FOUND", 409: "CONFLICT",
+        422: "VALIDATION_FAILED", 500: "INTERNAL_ERROR",
+    }.get(status_code, "REQUEST_FAILED")
+
+
+def _safe_error_message(value: object, status_code: int) -> str:
+    message = str(value or "Request failed")
+    # Exception strings are not a public contract: never echo paths, tracebacks, or likely secrets.
+    if "\n" in message or "\r" in message or re.search(r"(?:[A-Za-z]:[\\/]|(?:^|\s)/(?:[^\s]+))", message):
+        return {403: "Access denied", 404: "Resource not found"}.get(status_code, "Request failed")
+    if re.search(r"(?:token|secret|password|api[_-]?key)\s*[=:]", message, re.I):
+        return "Request failed"
+    return message[:500]
+
+
+def _http_error(exc: Exception, status_code: int | None = None) -> HTTPException:
+    """Only conversion point from application exceptions to public HTTP errors."""
+    if isinstance(exc, HTTPException):
+        status_code = exc.status_code
+        detail = exc.detail
+    elif status_code is None and isinstance(exc, PermissionError):
+        status_code, detail = 403, exc
+    elif status_code is None and isinstance(exc, FileNotFoundError):
+        status_code, detail = 404, exc
+    else:
+        status_code, detail = status_code or 500, exc
+    if isinstance(detail, dict):
+        code = detail.get("code")
+        message = _safe_error_message(detail.get("message"), status_code)
+        safe_details = detail.get("details") if isinstance(detail.get("details"), dict) else None
+        return HTTPException(status_code=status_code, detail={
+            "code": code if isinstance(code, str) and code else _error_code(status_code),
+            "message": message, "details": safe_details,
+        })
+    return HTTPException(status_code=status_code, detail=_safe_error_message(detail, status_code))
+
+
+def _etag(value: bytes) -> str:
+    return f'"{hashlib.sha256(value).hexdigest()}"'
+
+
+def _check_if_match(request: Request, current: bytes) -> None:
+    expected = request.headers.get("If-Match")
+    actual = _etag(current)
+    # Optional until web-v3 sends preconditions; supplied preconditions are strict.
+    if expected is not None and expected != actual:
+        raise HTTPException(status_code=409, detail={
+            "code": "STALE_DOCUMENT", "message": "Document changed; refresh and retry.",
+            "details": {"current_version": actual},
+        })
 
 
 @app.middleware("http")
 async def _csrf_guard(request: Request, call_next):
+    correlation_id = request.headers.get("X-Correlation-ID") or f"corr-{uuid.uuid4().hex}"
+    request.state.correlation_id = correlation_id
     if request.method not in _CSRF_SAFE_METHODS:
         origin = request.headers.get("origin") or request.headers.get("referer")
         if origin and not any(origin.startswith(allowed) for allowed in config.ALLOWED_ORIGINS):
-            return JSONResponse(status_code=403, content={"detail": "cross-origin blocked"})
+            return await _http_exception(request, _http_error(HTTPException(status_code=403, detail="cross-origin blocked")))
         if request.headers.get(config.HUB_CLIENT_HEADER) != config.HUB_CLIENT_VALUE:
-            return JSONResponse(status_code=403, content={"detail": "missing hub client header"})
+            return await _http_exception(request, _http_error(HTTPException(status_code=403, detail="missing hub client header")))
+    key = request.headers.get("Idempotency-Key")
+    cache_key = (request.url.path, key) if key and _is_idempotent_command(request) else None
+    if cache_key:
+        with _IDEMPOTENCY_LOCK:
+            cached = _IDEMPOTENCY_RESULTS.get(cache_key)
+        if cached:
+            status_code, body, content_type = cached
+            response = Response(content=body, status_code=status_code, media_type=content_type)
+            response.headers["Idempotency-Replayed"] = "true"
+            response.headers["X-Correlation-ID"] = correlation_id
+            response.headers["X-Schema-Version"] = _SCHEMA_VERSION
+            return response
     response = await call_next(request)
+    response.headers["X-Correlation-ID"] = correlation_id
+    response.headers["X-Schema-Version"] = _SCHEMA_VERSION
+    if response.media_type == "text/event-stream":
+        response.body_iterator = _correlated_sse(response.body_iterator, correlation_id)
+    if cache_key and response.status_code < 500:
+        response.body_iterator = _cache_response(response.body_iterator, cache_key, response.status_code, response.media_type or "application/json")
     # SPA assets change on every deploy; force revalidation so the browser
     # never runs stale app.js/workspace.js against a newer backend.
     if request.url.path == "/" or request.url.path.startswith("/static"):
         response.headers["Cache-Control"] = "no-cache"
+    _LOGGER.info("api_request correlation_id=%s method=%s path=%s status=%s", correlation_id, request.method, request.url.path, response.status_code)
     return response
 
 
-def _http_error(exc: Exception) -> HTTPException:
-    if isinstance(exc, PermissionError):
-        return HTTPException(status_code=403, detail=str(exc))
-    if isinstance(exc, FileNotFoundError):
-        return HTTPException(status_code=404, detail=str(exc))
-    return HTTPException(status_code=500, detail=str(exc))
+async def _cache_response(iterator, cache_key: tuple[str, str], status_code: int, content_type: str):
+    body: list[bytes] = []
+    async for chunk in iterator:
+        value = chunk.encode("utf-8") if isinstance(chunk, str) else chunk
+        body.append(value)
+        yield value
+    with _IDEMPOTENCY_LOCK:
+        _IDEMPOTENCY_RESULTS.setdefault(cache_key, (status_code, b"".join(body), content_type))
+
+
+async def _correlated_sse(iterator, correlation_id: str):
+    async for chunk in iterator:
+        text = chunk.decode("utf-8") if isinstance(chunk, bytes) else chunk
+        def decorate(match):
+            try:
+                data = json.loads(match.group(1))
+            except (TypeError, ValueError):
+                return match.group(0)
+            if not isinstance(data, dict):
+                return match.group(0)
+            data.setdefault("schema_version", 1)
+            data.setdefault("correlation_id", correlation_id)
+            return f"data: {json.dumps(data, ensure_ascii=False)}"
+        yield re.sub(r"data: (\{[^\n]*\})", decorate, text)
+
+
+@app.exception_handler(HTTPException)
+async def _http_exception(request: Request, exc: HTTPException) -> JSONResponse:
+    normalized = _http_error(exc)
+    correlation_id = getattr(request.state, "correlation_id", f"corr-{uuid.uuid4().hex}")
+    structured = normalized.detail if isinstance(normalized.detail, dict) else None
+    detail = str(structured["message"] if structured else normalized.detail)
+    error: dict[str, object] = {
+        "code": structured["code"] if structured else _error_code(normalized.status_code),
+        "message": detail, "correlation_id": correlation_id,
+    }
+    if structured and structured.get("details") is not None:
+        error["details"] = structured["details"]
+    return JSONResponse(
+        status_code=normalized.status_code,
+        content={"detail": detail, "schema_version": 1, "error": error},
+        headers={"X-Correlation-ID": correlation_id, "X-Schema-Version": _SCHEMA_VERSION},
+    )
+
+
+@app.exception_handler(Exception)
+async def _unexpected_exception(request: Request, exc: Exception) -> JSONResponse:
+    return await _http_exception(request, _http_error(exc))
+
+
+@app.exception_handler(RequestValidationError)
+async def _validation_exception(request: Request, _exc: RequestValidationError) -> JSONResponse:
+    return await _http_exception(request, _http_error(HTTPException(status_code=422, detail="Invalid request")))
 
 
 def _sse(event: str, data: dict[str, object]) -> str:
@@ -118,7 +287,7 @@ def _chat_messages(value: object) -> list[dict[str, str]]:
     return messages
 
 
-CHAT_SKILL_MAX_CHARS = 12000
+CHAT_SKILL_MAX_CHARS = skill_library.SKILL_PROMPT_MAX_CHARS
 
 
 def _chat_skills(value: object) -> tuple[list[str], bool]:
@@ -133,29 +302,12 @@ def _chat_skills(value: object) -> tuple[list[str], bool]:
     if unknown is not None:
         raise HTTPException(status_code=400, detail=f"Unknown skill: {unknown}")
 
-    contents: list[str] = []
-    used = 0
-    truncated = False
-    for name in requested:
-        content = skill_library.read_skill_content(name)
-        remaining = CHAT_SKILL_MAX_CHARS - used
-        if remaining <= 0:
-            truncated = True
-            break
-        if len(content) > remaining:
-            contents.append(content[:remaining])
-            truncated = True
-            break
-        contents.append(content)
-        used += len(content)
+    contents, truncated, _missing = skill_library.load_skill_prompt_contents(requested)
     return contents, truncated
 
 
 def _system_prompt_with_skills(system_prompt: str | None, contents: list[str]) -> str | None:
-    if not contents:
-        return system_prompt
-    skills_prompt = "\n\n[Activated skills]\n" + "\n\n---\n\n".join(contents)
-    return f"{system_prompt}{skills_prompt}" if system_prompt else skills_prompt.removeprefix("\n\n")
+    return skill_library.system_prompt_with_skills(system_prompt, contents)
 
 
 @app.get("/")
@@ -204,15 +356,20 @@ def api_chat(payload: dict[str, object]) -> StreamingResponse:
         except FileNotFoundError as exc:
             raise HTTPException(status_code=400, detail=f"Unknown agent: {agent_id}") from exc
 
-    provider_id = (runtime_agents.resolve_provider(agent)["provider"] if agent else payload.get("provider")) or "nvidia"
+    provider_id = (agent["provider"] if agent else payload.get("provider")) or "nvidia"
     if not isinstance(provider_id, str):
         raise HTTPException(status_code=400, detail="provider must be a string")
-    try:
-        provider = get_provider(provider_id)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
     messages = _chat_messages(payload.get("messages"))
+    chat_id = payload.get("chat_id")
+    if chat_id is not None and not isinstance(chat_id, str):
+        raise HTTPException(status_code=400, detail="chat_id must be a string")
+    if chat_id:
+        try:
+            file_context = chat_files.context(chat_id)
+        except (FileNotFoundError, PermissionError) as exc:
+            raise _http_error(exc) from exc
+        if file_context:
+            messages = [{"role": "system", "content": f"[Tệp đính kèm của chat]\n{file_context}"}, *messages]
     model = runtime_agents.resolve_provider(agent)["model"] if agent else payload.get("model")
     if agent and model is None:
         model = payload.get("model")
@@ -228,17 +385,33 @@ def api_chat(payload: dict[str, object]) -> StreamingResponse:
     system_prompt = _system_prompt_with_skills(system_prompt, skill_contents)
     skill_notice = "Một phần nội dung skill đã bị cắt do giới hạn prompt." if skills_truncated else None
 
+    tool_policy = (
+        {
+            "permission": agent["permission"],
+            "allowed_tools": list(agent.get("allowed_tools") or []),
+            "allowed_paths": list(agent.get("allowed_paths") or []),
+        }
+        if agent
+        else None
+    )
+    request = execution.ExecutionRequest(
+        correlation_id=session_id or "chat", provider_id=provider_id, model=model, messages=messages,
+        session_id=session_id, system_prompt=system_prompt, tool_policy=tool_policy,
+    )
+    route = execution.gateway(request)
+    if route.error is not None:
+        raise HTTPException(status_code=400, detail=route.error.message)
+
     def events():
         try:
-            stream_kwargs: dict[str, object] = {"session_id": session_id, "model": model}
-            if system_prompt:
-                stream_kwargs["system_prompt"] = system_prompt
-            for item in provider.stream_chat(messages, **stream_kwargs):
+            for item in execution.execute(request, result=route):
                 item_type = item.get("type")
                 if item_type == "reasoning":
                     yield _sse("reasoning", {"text": item.get("text", "")})
                 elif item_type == "delta":
                     yield _sse("delta", {"text": item.get("text", "")})
+                elif item_type in {"tool_call", "tool_result"}:
+                    yield _sse(item_type, {key: value for key, value in item.items() if key != "type"})
                 elif item_type == "done":
                     done_payload: dict[str, object] = {
                         "usage": item.get("usage", {}),
@@ -268,9 +441,19 @@ def api_risk_tiers() -> list[str]:
 
 
 @app.post("/api/agents")
-def api_agents_create_or_update(payload: dict[str, object]) -> dict[str, object]:
+def api_agents_create_or_update(payload: dict[str, object], request: Request, response: Response) -> dict[str, object]:
     try:
-        return runtime_agents.create_or_update_agent(payload)
+        agent_id = payload.get("id")
+        if isinstance(agent_id, str):
+            try:
+                current = runtime_agents.get_agent(agent_id)
+                current_path = runtime_agents.AGENTS_DIR / f"{current['id']}.agent.yaml"
+                _check_if_match(request, current_path.read_bytes())
+            except FileNotFoundError:
+                pass
+        result = runtime_agents.create_or_update_agent(payload)
+        response.headers["ETag"] = _etag((runtime_agents.AGENTS_DIR / f"{result['id']}.agent.yaml").read_bytes())
+        return result
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -286,13 +469,48 @@ def api_agents_delete(agent_id: str) -> dict[str, bool]:
 
 
 @app.get("/api/agent/runs")
-def api_agent_runs() -> list[dict[str, object]]:
-    return runtime_state.list_runs()
+def api_agent_runs(agent_id: str | None = None) -> list[dict[str, object]]:
+    rows = runtime_state.list_runs()
+    if agent_id is not None:
+        rows = [row for row in rows if (row.get("metadata") or {}).get("agent_id") == agent_id]
+    return rows
+
+
+@app.post("/api/agents/{agent_id}/test")
+def api_agent_test(agent_id: str) -> dict[str, object]:
+    try:
+        agent = runtime_agents.get_agent(agent_id)
+        started = time.monotonic(); output: list[str] = []; usage: dict[str, object] = {}
+        request = execution.ExecutionRequest(
+            correlation_id=f"agent-test-{agent_id}", provider_id=str(agent["provider"]), model=agent.get("model"),
+            messages=[{"role": "user", "content": "Trả lời ngắn: kết nối agent hoạt động."}],
+            tool_policy={"permission": agent["permission"], "allowed_tools": agent.get("allowed_tools", []), "allowed_paths": agent.get("allowed_paths", [])},
+        )
+        for item in execution.execute(request):
+            if item.get("type") == "delta": output.append(str(item.get("text") or ""))
+            elif item.get("type") == "done": usage = dict(item.get("usage") or {})
+            elif item.get("type") == "error": raise RuntimeError(str(item.get("message") or "Provider error"))
+        elapsed = time.monotonic() - started
+        if elapsed > agent["budget"]["seconds"]: raise RuntimeError("budget_exceeded: agent seconds")
+        return {"output": "".join(output), "elapsed_seconds": elapsed, "usage": usage}
+    except FileNotFoundError as exc:
+        raise _http_error(exc) from exc
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/api/agent/runs")
 def api_create_agent_run(payload: dict[str, object]) -> StreamingResponse:
-    return StreamingResponse(runtime_pipeline.create_run_stream(payload), media_type="text/event-stream")
+    try:
+        references, inputs = run_inputs.resolve_inputs(payload.get("inputs"))
+    except (ValueError, PermissionError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    forwarded = dict(payload)
+    if references:
+        metadata = dict(forwarded.get("metadata") or {}) if isinstance(forwarded.get("metadata"), dict) else {}
+        metadata.update({"inputs": inputs, "input_references": references})
+        forwarded["metadata"] = metadata
+    return StreamingResponse(runtime_pipeline.create_run_stream(forwarded), media_type="text/event-stream")
 
 
 @app.get("/api/agent/runs/{run_id}")
@@ -329,6 +547,11 @@ def api_skills() -> list[dict[str, object]]:
     return runtime_skills.list_skills()
 
 
+@app.get("/api/search")
+def api_search(q: str = "") -> list[dict[str, str]]:
+    return search.search(q)
+
+
 @app.get("/api/skills/names")
 def api_skill_names() -> list[str]:
     return sorted(skill_library.list_skill_names())
@@ -355,15 +578,30 @@ def api_memory() -> list[dict[str, object]]:
     return runtime_memory.list_memory()
 
 
+@app.get("/api/settings/retention")
+def api_retention_settings() -> dict[str, int]:
+    return retention.settings()
+
+
+@app.put("/api/settings/retention")
+def api_retention_update(payload: dict[str, object]) -> dict[str, int]:
+    try:
+        result = retention.update(payload.get("days"))
+        retention.sweep()
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @app.get("/api/memory/candidates")
 def api_memory_candidates() -> list[dict[str, object]]:
     return runtime_memory.list_candidates()
 
 
 @app.post("/api/memory/candidates/{candidate_id}/accept")
-def api_memory_candidate_accept(candidate_id: str) -> dict[str, object]:
+def api_memory_candidate_accept(candidate_id: str, payload: dict[str, object] | None = None) -> dict[str, object]:
     try:
-        return runtime_memory.accept_candidate(candidate_id)
+        return runtime_memory.accept_candidate(candidate_id, payload if isinstance(payload, dict) else None)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except (FileNotFoundError, PermissionError) as exc:
@@ -374,6 +612,16 @@ def api_memory_candidate_accept(candidate_id: str) -> dict[str, object]:
 def api_memory_candidate_reject(candidate_id: str) -> dict[str, object]:
     try:
         return runtime_memory.reject_candidate(candidate_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except (FileNotFoundError, PermissionError) as exc:
+        raise _http_error(exc) from exc
+
+
+@app.post("/api/memory/{memory_id}/revoke")
+def api_memory_revoke(memory_id: str, payload: dict[str, object]) -> dict[str, object]:
+    try:
+        return runtime_memory.revoke_memory(memory_id, str(payload.get("revoked_by") or ""), str(payload.get("reason") or ""))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except (FileNotFoundError, PermissionError) as exc:
@@ -605,6 +853,7 @@ def api_usage_rollup(
 
 
 @app.get("/api/tools")
+@app.get("/api/tools/usage")
 def api_tools(
     source: str | None = None,
     model: str | None = None,
@@ -648,6 +897,26 @@ def api_skill_library() -> list[dict[str, object]]:
     return skill_library.list_skills()
 
 
+@app.post("/api/skill-library")
+def api_skill_library_create(payload: dict[str, object]) -> dict[str, object]:
+    try: return skill_library.create_skill(payload)
+    except ValueError as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.put("/api/skill-library/{skill_id:path}")
+def api_skill_library_update(skill_id: str, payload: dict[str, object]) -> dict[str, object]:
+    try: return skill_library.update_skill(skill_id, payload)
+    except ValueError as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.delete("/api/skill-library/{skill_id:path}")
+def api_skill_library_delete(skill_id: str) -> dict[str, bool]:
+    try: skill_library.delete_skill(skill_id)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+    return {"ok": True}
+
+
 @app.get("/api/skill-library/drift")
 def api_skill_library_drift() -> list[dict[str, object]]:
     return skill_library.drift()
@@ -679,15 +948,127 @@ def api_skill_library_deploy(skill_id: str, payload: dict[str, object]) -> dict[
         raise _http_error(exc) from exc
 
 
+@app.get("/api/hooks")
+def api_hooks() -> list[dict[str, object]]: return hooks.list_hooks()
+
+
+@app.get("/api/hooks/events")
+def api_hook_events() -> list[str]: return hooks.events()
+
+
+@app.post("/api/hooks")
+def api_hooks_create(payload: dict[str, object]) -> dict[str, object]:
+    try: return hooks.create(payload)
+    except ValueError as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.put("/api/hooks/{hook_id}")
+def api_hooks_update(hook_id: str, payload: dict[str, object]) -> dict[str, object]:
+    try: return hooks.update(hook_id, payload)
+    except ValueError as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except FileNotFoundError as exc: raise _http_error(exc) from exc
+
+
+@app.delete("/api/hooks/{hook_id}")
+def api_hooks_delete(hook_id: str) -> dict[str, bool]:
+    try: hooks.delete(hook_id)
+    except FileNotFoundError as exc: raise _http_error(exc) from exc
+    return {"ok": True}
+
+
+@app.get("/api/hooks/{hook_id}/log")
+def api_hook_log(hook_id: str) -> list[dict[str, object]]: return hooks.log(hook_id)
+
+
+@app.get("/api/runs/{run_id}/files")
+def api_run_files(run_id: str) -> list[dict[str, object]]:
+    try: return runtime_files.list_files(run_id)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.post("/api/runs/{run_id}/files")
+async def api_run_files_upload(run_id: str, file: UploadFile = File(...)) -> dict[str, object]:
+    try: return runtime_files.upload(run_id, file.filename or "", await file.read())
+    except ValueError as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.get("/api/runs/{run_id}/files/{name:path}")
+def api_run_file_download(run_id: str, name: str) -> FileResponse:
+    try: return FileResponse(runtime_files.download(run_id, name), filename=Path(name).name)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.delete("/api/runs/{run_id}/files/{name:path}")
+def api_run_file_delete(run_id: str, name: str) -> dict[str, bool]:
+    try: runtime_files.delete(run_id, name)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+    return {"ok": True}
+
+
+@app.get("/api/chats/{chat_id}/files")
+def api_chat_files(chat_id: str) -> list[dict[str, object]]:
+    try: return chat_files.list_files(chat_id)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.get("/api/chat-files")
+def api_all_chat_files() -> list[dict[str, object]]:
+    try: return chat_files.list_all_files()
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.post("/api/chats/{chat_id}/files")
+async def api_chat_files_upload(chat_id: str, file: UploadFile = File(...)) -> dict[str, object]:
+    try: return chat_files.upload(chat_id, file.filename or "", await file.read())
+    except ValueError as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.get("/api/chats/{chat_id}/files/{name:path}")
+def api_chat_file_download(chat_id: str, name: str) -> FileResponse:
+    try: return FileResponse(chat_files.download(chat_id, name), filename=Path(name).name)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+
+
+@app.delete("/api/chats/{chat_id}/files/{name:path}")
+def api_chat_file_delete(chat_id: str, name: str) -> dict[str, bool]:
+    try: chat_files.delete(chat_id, name)
+    except (FileNotFoundError, PermissionError) as exc: raise _http_error(exc) from exc
+    return {"ok": True}
+
+
 # --- C2a workflow routes ---
 @app.get("/api/workflows")
 def api_workflows() -> list[dict[str, object]]:
     return workflow.list_workflows()
 
 
-@app.get("/api/workflows/{workflow_id}/layout")
-def api_workflow_layout(workflow_id: str) -> dict[str, object]:
+@app.post("/api/workflows", status_code=201)
+def api_workflow_create(payload: dict[str, object], response: Response) -> dict[str, object]:
+    workflow_id = payload.get("id")
+    yaml_text = payload.get("yaml_text")
+    agent = payload.get("agent")
+    if not isinstance(workflow_id, str):
+        raise HTTPException(status_code=400, detail="id must be a string")
+    if yaml_text is not None and not isinstance(yaml_text, str):
+        raise HTTPException(status_code=400, detail="yaml_text must be a string")
+    if agent is not None and not isinstance(agent, str):
+        raise HTTPException(status_code=400, detail="agent must be a string")
     try:
+        result = workflow.create_workflow(workflow_id, yaml_text, agent=agent)
+        response.headers["ETag"] = _etag(workflow.workflow_path(workflow_id).read_bytes())
+        return result
+    except workflow.WorkflowConflictError as exc:
+        raise _http_error(exc, 409) from exc
+    except (PermissionError, ValueError) as exc:
+        raise _http_error(exc, 400) from exc
+
+
+@app.get("/api/workflows/{workflow_id}/layout")
+def api_workflow_layout(workflow_id: str, response: Response) -> dict[str, object]:
+    try:
+        response.headers["ETag"] = _etag(workflow.workflow_layout_path(workflow_id).read_bytes()) if workflow.workflow_layout_path(workflow_id).exists() else '"empty"'
         return {"nodes": workflow.read_layout(workflow_id)}
     except (FileNotFoundError, PermissionError) as exc:
         raise _http_error(exc) from exc
@@ -696,9 +1077,13 @@ def api_workflow_layout(workflow_id: str) -> dict[str, object]:
 
 
 @app.put("/api/workflows/{workflow_id}/layout")
-def api_workflow_layout_save(workflow_id: str, payload: dict[str, object]) -> dict[str, object]:
+def api_workflow_layout_save(workflow_id: str, payload: dict[str, object], request: Request, response: Response) -> dict[str, object]:
     try:
-        return {"nodes": workflow.save_layout(workflow_id, payload)}
+        path = workflow.workflow_layout_path(workflow_id)
+        _check_if_match(request, path.read_bytes() if path.exists() else b"")
+        result = {"nodes": workflow.save_layout(workflow_id, payload)}
+        response.headers["ETag"] = _etag(path.read_bytes())
+        return result
     except (FileNotFoundError, PermissionError) as exc:
         raise _http_error(exc) from exc
     except ValueError as exc:
@@ -706,13 +1091,16 @@ def api_workflow_layout_save(workflow_id: str, payload: dict[str, object]) -> di
 
 
 @app.put("/api/workflows/{workflow_id}/model")
-def api_workflow_model_save(workflow_id: str, payload: dict[str, object]) -> dict[str, object]:
+def api_workflow_model_save(workflow_id: str, payload: dict[str, object], request: Request, response: Response) -> dict[str, object]:
     model = payload.get("model")
     if not isinstance(model, dict):
         raise HTTPException(status_code=400, detail="model must be a mapping")
     try:
+        _check_if_match(request, workflow.workflow_path(workflow_id).read_bytes())
         yaml_text = workflow.model_yaml_text(workflow_id, model)
-        return workflow.save_workflow(workflow_id, yaml_text)
+        result = workflow.save_workflow(workflow_id, yaml_text)
+        response.headers["ETag"] = _etag(workflow.workflow_path(workflow_id).read_bytes())
+        return result
     except (FileNotFoundError, PermissionError) as exc:
         raise _http_error(exc) from exc
     except ValueError as exc:
@@ -720,9 +1108,10 @@ def api_workflow_model_save(workflow_id: str, payload: dict[str, object]) -> dic
 
 
 @app.get("/api/workflows/{workflow_id}/source")
-def api_workflow_source(workflow_id: str) -> dict[str, str]:
+def api_workflow_source(workflow_id: str, response: Response) -> dict[str, str]:
     try:
         path = workflow.workflow_path(workflow_id)
+        response.headers["ETag"] = _etag(path.read_bytes())
         return {"id": workflow_id, "yaml_text": path.read_text(encoding="utf-8")}
     except (FileNotFoundError, PermissionError) as exc:
         raise _http_error(exc) from exc
@@ -751,16 +1140,28 @@ def api_workflow_validate(payload: dict[str, object]) -> dict[str, object]:
 
 
 @app.put("/api/workflows/{workflow_id}")
-def api_workflow_save(workflow_id: str, payload: dict[str, object]) -> dict[str, object]:
+def api_workflow_save(workflow_id: str, payload: dict[str, object], request: Request, response: Response) -> dict[str, object]:
     yaml_text = payload.get("yaml_text")
     if not isinstance(yaml_text, str):
         raise HTTPException(status_code=400, detail="yaml_text must be a string")
     try:
-        return workflow.save_workflow(workflow_id, yaml_text)
+        _check_if_match(request, workflow.workflow_path(workflow_id).read_bytes())
+        result = workflow.save_workflow(workflow_id, yaml_text)
+        response.headers["ETag"] = _etag(workflow.workflow_path(workflow_id).read_bytes())
+        return result
     except (FileNotFoundError, PermissionError) as exc:
         raise _http_error(exc) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.delete("/api/workflows/{workflow_id}")
+def api_workflow_delete(workflow_id: str) -> dict[str, bool]:
+    try:
+        workflow.delete_workflow(workflow_id)
+    except (FileNotFoundError, PermissionError) as exc:
+        raise _http_error(exc) from exc
+    return {"ok": True}
 
 
 # --- end C2a workflow routes ---
@@ -773,15 +1174,16 @@ def api_workflow_run(workflow_id: str, payload: dict[str, object]):
     if not isinstance(objective, str):
         raise HTTPException(status_code=400, detail="objective must be a string")
     try:
+        references, inputs = run_inputs.resolve_inputs(payload.get("inputs"))
         source = workflow.workflow_path(workflow_id).read_text(encoding="utf-8")
         errors = workflow.validate_workflow(workflow.parse_workflow(source))
     except (FileNotFoundError, PermissionError) as exc:
         raise _http_error(exc) from exc
     except ValueError as exc:
-        return JSONResponse(status_code=400, content={"errors": [str(exc)]})
+        raise _http_error(exc, 400) from exc
     if errors:
-        return JSONResponse(status_code=400, content={"errors": errors})
-    return StreamingResponse(workflow_exec.create_workflow_run_stream(workflow_id, objective), media_type="text/event-stream")
+        raise _http_error(ValueError("Workflow validation failed"), 422)
+    return StreamingResponse(workflow_exec.create_workflow_run_stream(workflow_id, objective, inputs, references), media_type="text/event-stream")
 
 
 @app.get("/api/workflows/runs/{run_id}/artifacts")
@@ -812,6 +1214,117 @@ def api_workflow_run_interrupt_resume(run_id: str, interrupt_id: str, payload: d
         media_type="text/event-stream",
     )
 # --- end C2b workflow run routes ---
+
+
+@app.get("/api/artifacts")
+def api_artifacts() -> dict[str, object]:
+    try:
+        return {"artifacts": runtime_artifacts.list_library_artifacts()}
+    except (PermissionError, ValueError) as exc:
+        raise _http_error(exc) from exc
+
+
+@app.get("/api/artifacts/{artifact_id}")
+def api_artifact(artifact_id: str) -> dict[str, object]:
+    try:
+        return runtime_artifacts.read_library_artifact(artifact_id)
+    except (FileNotFoundError, PermissionError) as exc:
+        raise HTTPException(status_code=404) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/artifacts")
+def api_artifact_save(payload: dict[str, object]) -> dict[str, object]:
+    artifact_id = payload.get("id")
+    title = payload.get("title")
+    content = payload.get("content")
+    source = payload.get("source")
+    if artifact_id is not None and not isinstance(artifact_id, str):
+        raise HTTPException(status_code=400, detail="id must be a string")
+    if title is not None and not isinstance(title, str):
+        raise HTTPException(status_code=400, detail="title must be a string")
+    if not isinstance(content, str):
+        raise HTTPException(status_code=400, detail="content must be a string")
+    if not isinstance(source, str):
+        raise HTTPException(status_code=400, detail="source must be a string")
+    try:
+        return runtime_artifacts.save_library_artifact(artifact_id, title, content, source)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404) from exc
+    except (PermissionError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+def _require_artifact(artifact_id: str) -> None:
+    runtime_artifacts.read_library_artifact(artifact_id)
+
+
+@app.get("/api/artifacts/{artifact_id}/comments")
+def api_artifact_comments(artifact_id: str) -> dict[str, object]:
+    try:
+        _require_artifact(artifact_id)
+        return {"comments": artifact_comments.list_comments(artifact_id)}
+    except FileNotFoundError as exc: raise HTTPException(status_code=404) from exc
+    except (PermissionError, ValueError) as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/artifacts/{artifact_id}/comments")
+def api_artifact_comment_create(artifact_id: str, payload: dict[str, object]) -> dict[str, object]:
+    quoted_text, author, body = payload.get("quoted_text"), payload.get("author"), payload.get("body")
+    if not all(isinstance(value, str) for value in (quoted_text, author, body)):
+        raise HTTPException(status_code=400, detail="quoted_text, author and body must be strings")
+    try:
+        _require_artifact(artifact_id)
+        return artifact_comments.create(artifact_id, quoted_text, author, body)
+    except FileNotFoundError as exc: raise HTTPException(status_code=404) from exc
+    except (PermissionError, ValueError) as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.patch("/api/artifacts/{artifact_id}/comments/{comment_id}")
+def api_artifact_comment_resolve(artifact_id: str, comment_id: str, payload: dict[str, object]) -> dict[str, object]:
+    resolved = payload.get("resolved")
+    if not isinstance(resolved, bool): raise HTTPException(status_code=400, detail="resolved must be a boolean")
+    try:
+        _require_artifact(artifact_id)
+        return artifact_comments.resolve(artifact_id, comment_id, resolved)
+    except FileNotFoundError as exc: raise HTTPException(status_code=404) from exc
+    except (PermissionError, ValueError) as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.delete("/api/artifacts/{artifact_id}/comments/{comment_id}")
+def api_artifact_comment_delete(artifact_id: str, comment_id: str) -> dict[str, bool]:
+    try:
+        _require_artifact(artifact_id)
+        artifact_comments.delete(artifact_id, comment_id)
+    except FileNotFoundError as exc: raise HTTPException(status_code=404) from exc
+    except (PermissionError, ValueError) as exc: raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"ok": True}
+
+
+@app.api_route("/api/vgov/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def api_vgov_proxy(path: str, request: Request) -> Response:
+    """Keep Version Governance behind the Hub control-plane boundary.
+
+    vgov-api mounts every functional router under /api/vgov, so the prefix must be preserved.
+    Forwarding to /{path} only ever resolved /health and 404'd everything else.
+    """
+    target = f"{config.VGOV_BASE_URL.rstrip('/')}/api/vgov/{path}"
+    headers = {name: value for name, value in request.headers.items()
+               if name.lower() in {"x-actor", "content-type"}}
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            upstream = await client.request(
+                request.method, target, params=request.query_params,
+                content=await request.body(), headers=headers,
+            )
+    except (httpx.ConnectError, httpx.TimeoutException):
+        return JSONResponse(
+            status_code=502,
+            content={"error": {"code": "RUNTIME_UNAVAILABLE", "message": "Version Governance API is unavailable"}},
+        )
+    content_type = upstream.headers.get("content-type")
+    return Response(content=upstream.content, status_code=upstream.status_code, media_type=content_type)
 
 
 @app.get("/api/board")

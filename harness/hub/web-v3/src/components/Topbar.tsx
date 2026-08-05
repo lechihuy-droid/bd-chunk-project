@@ -1,15 +1,26 @@
-import { useLocation } from 'react-router-dom'
-import { ProviderDot } from '../lib/ui'
+import { useEffect, useState, type KeyboardEvent } from 'react'
+import { Menu, Search, UserRound } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ApiError, api } from '../lib/api'
+import { t } from '../lib/i18n'
+import { Input, Popover, Status } from '../lib/ui'
 
-const titles: Record<string, string> = { chat: 'Chat đa cửa sổ', sessions: 'Phiên đã lưu', workflows: 'Workflows', artifacts: 'Artifacts', runs: 'Runs', agents: 'Agents', skills: 'Skills', approvals: 'Chờ duyệt', usage: 'Usage & quota', settings: 'Cài đặt' }
+const titles = { overview: t('nav.overview'), chat: t('nav.chat'), sessions: t('nav.sessions'), workflows: t('nav.workflows'), artifacts: t('nav.artifacts'), runs: t('nav.runs'), agents: t('nav.agents'), skills: t('nav.skills'), hooks: t('nav.hooks'), files: t('nav.files'), approvals: t('nav.approvals'), usage: t('nav.usage'), settings: t('nav.settings') }
+type SearchResult = { type: 'workflow' | 'agent' | 'skill' | 'artifact'; id: string; title: string; context: string; href: string }
+const typeLabels: Record<SearchResult['type'], string> = { workflow: 'Workflow', agent: 'Agent', skill: 'Skill', artifact: 'Artifact' }
 
-export default function Topbar() {
-  const page = useLocation().pathname.split('/')[1] || 'runs'
-  const title = titles[page] ?? 'Runs'
-  return <header className="flex items-center gap-[14px] border-b border-border-subtle bg-sidebar px-[18px] py-[10px]"><span className="text-[13px] text-secondary">{title} / <b className="font-semibold text-primary">Harness Hub</b></span><div className="ml-auto flex gap-2">
-    {/* TODO(U4): wire /api/usage quota. */}
-    <span className="flex items-center gap-[7px] rounded-full border border-border-subtle bg-elevated px-[10px] py-[3px] font-mono text-[11px] text-secondary"><ProviderDot provider="claude" />claude —</span><span className="flex items-center gap-[7px] rounded-full border border-border-subtle bg-elevated px-[10px] py-[3px] font-mono text-[11px] text-secondary"><ProviderDot provider="codex" />codex —</span><span className="flex items-center gap-[7px] rounded-full border border-border-subtle bg-elevated px-[10px] py-[3px] font-mono text-[11px] text-secondary"><ProviderDot provider="nvidia" />nvidia free</span>
-  </div></header>
+export default function Topbar({ onOpenNavigation }: { onOpenNavigation: () => void }) {
+  const [providers, setProviders] = useState<{ id: string; available: boolean; detail?: string }[] | null>(null); const [providersError, setProvidersError] = useState('')
+  const [query, setQuery] = useState(''); const [results, setResults] = useState<SearchResult[]>([]); const [searchError, setSearchError] = useState(''); const [active, setActive] = useState(0)
+  const navigate = useNavigate()
+  useEffect(() => { void api<{ id: string; available: boolean; detail?: string }[]>('/api/providers').then(setProviders).catch(error => setProvidersError(error instanceof ApiError ? error.message : t('topbar.loadProvidersFailed'))) }, [])
+  useEffect(() => { const value = query.trim(); setActive(0); if (value.length < 2) { setResults([]); setSearchError(''); return } let current = true; void api<SearchResult[]>(`/api/search?q=${encodeURIComponent(value)}`).then(data => { if (current) { setResults(data); setSearchError('') } }).catch(error => { if (current) { setResults([]); setSearchError(error instanceof ApiError ? error.message : t('topbar.searchFailed')) } }); return () => { current = false } }, [query])
+  const page = useLocation().pathname.split('/')[1] || 'runs'; const title = titles[page as keyof typeof titles] ?? t('nav.runs')
+  const choose = (result: SearchResult, close: () => void) => { navigate(result.href); close() }
+  const searchKeyDown = (event: KeyboardEvent<HTMLInputElement>, close: () => void) => { if (event.key === 'ArrowDown' && results.length) { event.preventDefault(); setActive(current => Math.min(current + 1, results.length - 1)) } else if (event.key === 'ArrowUp' && results.length) { event.preventDefault(); setActive(current => Math.max(current - 1, 0)) } else if (event.key === 'Enter' && results[active]) { event.preventDefault(); choose(results[active], close) } }
+  const count = providers?.filter(provider => provider.available).length
+  return <header className="flex h-[var(--hub-header-h)] shrink-0 items-center gap-space-4 overflow-hidden border-b border-border-subtle bg-sidebar px-[18px]">
+    <button type="button" className="topbar-nav-toggle" aria-label={t('nav.expand')} title={t('nav.expand')} onClick={onOpenNavigation}><Menu size={16} strokeWidth={1.75} aria-hidden="true" /></button><span className="shrink-0 text-label font-semibold text-primary">{title}</span><div className="min-w-0 flex-1" />
+    <div className="flex shrink-0 items-center gap-space-1"><Popover aria-label={t('topbar.globalSearch')} label={<Search size={16} strokeWidth={1.75} aria-hidden="true" />} className="w-[280px]">{close => <div><Input aria-label={t('topbar.globalSearch')} placeholder={t('topbar.searchPlaceholder')} value={query} onChange={event => setQuery(event.target.value)} onKeyDown={event => searchKeyDown(event, close)} aria-activedescendant={results[active] ? `global-search-${active}` : undefined} />{searchError ? <p className="mt-space-2 text-caption text-error">{searchError}</p> : query.trim().length < 2 ? <p className="mt-space-2 text-caption text-muted">{t('topbar.minSearchLength')}</p> : results.length ? <div className="mt-space-2 max-h-72 overflow-auto" role="listbox" aria-label={t('topbar.searchResults')}>{results.map((result, index) => <button key={`${result.type}-${result.id}`} id={`global-search-${index}`} type="button" role="option" aria-selected={index === active} onMouseEnter={() => setActive(index)} onClick={() => choose(result, close)} className={`block w-full rounded-md px-space-2 py-space-2 text-left hover:bg-hover ${index === active ? 'bg-hover' : ''}`}><div className="flex items-center gap-space-2 text-caption"><span className="text-muted">{typeLabels[result.type]}</span><span className="truncate text-primary">{result.title}</span></div><div className="truncate text-caption text-secondary">{result.context}</div></button>)}</div> : <p className="mt-space-2 text-caption text-muted">{t('topbar.noSearchResults')}</p>}</div>}</Popover><Popover aria-label={t('topbar.providerStatus')} align="end" label={<Status kind="ready" label="" />}><div className="space-y-space-2">{providersError ? <p className="text-caption text-error">{providersError}</p> : <><Status kind="ready" label={count === undefined ? t('common.notAvailable') : t('common.onlineProviders', { count, provider: count === 1 ? 'provider' : 'providers' })} />{providers?.map(provider => <div key={provider.id} className="text-caption text-secondary">{provider.id} · {provider.available ? t('provider.available') : provider.detail || t('provider.unavailable')}</div>)}</>}</div></Popover><span aria-label={t('topbar.user')} className="grid h-10 w-10 place-items-center rounded-full bg-elevated text-caption font-semibold text-primary"><UserRound size={16} strokeWidth={1.75} aria-hidden="true" /></span></div>
+  </header>
 }
-
-

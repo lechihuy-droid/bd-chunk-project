@@ -1,122 +1,67 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from pathlib import Path
 from typing import Any
 
-import config
-from services import runtime_state
-from services.skill_library import split_frontmatter
+from services import runtime_state, skill_library
 
 
 _SLUG_RE = re.compile(r"[^a-z0-9._-]+")
-# A frontmatter `name:` is only trusted when it looks like a skill name; a
-# malformed block can otherwise leak YAML punctuation into the id.
 _NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ._:-]*$")
 
 
-def _skill_roots() -> list[Path]:
-    """Roots the Skills page lists: the configured skill sources, nothing else.
-
-    Deliberately excludes vendored plugin caches (~/.codex/plugins/cache) — those
-    are bundled copies the user does not author or deploy, and they ship the same
-    skill under several version directories.
-    """
-    return [Path(path) for path in config.SKILL_SOURCES.values()]
+def _id(name: str) -> str:
+    return _SLUG_RE.sub("-", name.lower()).strip("-")
 
 
-def _fallback_id(path: Path) -> str:
-    digest = hashlib.sha1(str(path.resolve()).encode("utf-8")).hexdigest()[:12]
-    return f"skill-{digest}"
-
-
-def _dir_name(path: Path) -> str:
-    return path.parent.name if path.name.lower() == "skill.md" else path.stem
-
-
-def _summary(body: str) -> tuple[str, str]:
-    """Fall back to the markdown body for skills without frontmatter."""
-    title = ""
-    description = ""
+def _summary(content: str) -> tuple[str, str, str]:
+    """Preserve the legacy runtime title/description fallbacks."""
+    meta, body = skill_library.split_frontmatter(content)
+    title = description = ""
     for line in body.splitlines():
         stripped = line.strip()
-        # A leftover `---` means the frontmatter block never closed; skip it
-        # rather than surfacing the delimiter as the description.
         if not stripped or stripped == "---":
             continue
         if stripped.startswith("#"):
             title = stripped.lstrip("#").strip() or title
-            continue
-        description = stripped
-        break
-    return title, description
+        else:
+            description = stripped
+            break
+    return meta.get("name", ""), title, description
 
 
-def _is_hidden(path: Path, root: Path) -> bool:
-    """True for skills tucked under a dot-directory (e.g. `.codex/skills/.system`)."""
-    return any(part.startswith(".") for part in path.relative_to(root).parts[:-1])
-
-
-def _iter_skill_files() -> list[Path]:
-    files: list[Path] = []
-    for root in _skill_roots():
-        if not root.exists():
-            continue
-        try:
-            files.extend(
-                path
-                for path in root.rglob("SKILL.md")
-                if path.is_file() and not _is_hidden(path, root)
-            )
-        except OSError:
-            continue
-    return sorted(files, key=lambda path: str(path).lower())
-
-
-def _skill_record(path: Path, include_body: bool = False) -> dict[str, Any]:
-    text = path.read_text(encoding="utf-8", errors="replace")
-    meta, body = split_frontmatter(text)
-    declared = meta.get("name", "").strip()
-    if not _NAME_RE.match(declared):
-        declared = ""
-    name = declared or _dir_name(path)
-    heading, first_line = _summary(body)
-    record: dict[str, Any] = {
-        "id": _SLUG_RE.sub("-", name.lower()).strip("-") or _fallback_id(path),
-        "title": declared or heading or name or "Untitled skill",
-        "description": meta.get("description", "").strip() or first_line,
-        "path": str(path),
-        "read_only": True,
-    }
-    if include_body:
-        record["body"] = text
-    return record
-
-
-def list_skills() -> list[dict[str, Any]]:
-    """One row per skill; the first path wins when an id repeats.
-
-    Repeats happen when the same skill is present in two sources, or when a root
-    keeps several version directories of it (`26.715.31925/` and `latest/`).
-    """
+def _records(include_body: bool = False) -> list[dict[str, Any]]:
+    """Read the authoritative library and adapt it to the legacy API shape."""
     rows: dict[str, dict[str, Any]] = {}
-    for path in _iter_skill_files():
-        try:
-            record = _skill_record(path)
-        except OSError:
+    for entry in skill_library.list_skills():
+        fallback_name = str(entry["id"]).partition("/")[2]
+        detail = skill_library.get_skill(str(entry["id"]))
+        content = str(detail["content"])
+        declared, heading, first_line = _summary(content)
+        name = declared if _NAME_RE.match(declared) else fallback_name
+        skill_id = _id(name)
+        if not skill_id or skill_id in rows:
             continue
-        rows.setdefault(record["id"], record)
+        path = Path(str(entry["path"]))
+        rows[skill_id] = {
+            "id": skill_id,
+            "title": name if declared and _NAME_RE.match(declared) else heading or name or "Untitled skill",
+            "description": str(entry["description"]).strip() or first_line,
+            "path": str(path / "SKILL.md") if path.is_dir() else str(path),
+            "read_only": True,
+            **({"body": content} if include_body else {}),
+        }
     return sorted(rows.values(), key=lambda row: str(row["id"]))
 
 
+def list_skills() -> list[dict[str, Any]]:
+    return _records()
+
+
 def get_skill(skill_id: str) -> dict[str, Any]:
-    for path in _iter_skill_files():
-        try:
-            record = _skill_record(path, include_body=True)
-        except OSError:
-            continue
+    for record in _records(include_body=True):
         if record["id"] == skill_id:
             return record
     raise FileNotFoundError(f"Skill not found: {skill_id}")

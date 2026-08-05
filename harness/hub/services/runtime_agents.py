@@ -14,6 +14,8 @@ from services.providers import registry
 LOGGER = logging.getLogger(__name__)
 AGENTS_DIR = config.HUB_DIR / "agents"
 REQUIRED_FIELDS = ("id", "provider", "system_prompt", "skills", "permission", "budget", "risk_tier")
+OPTIONAL_FIELDS = ("model", "allowed_tools", "allowed_paths")
+PROFILE_FIELDS = frozenset((*REQUIRED_FIELDS, *OPTIONAL_FIELDS))
 PERMISSIONS = {"read_only", "workspace_write"}
 
 
@@ -26,6 +28,9 @@ def _validate_agent_id(agent_id: object) -> str:
 def validate_agent_profile(data: dict[str, Any], known_skills: set[str] | None = None) -> None:
     if not isinstance(data, dict):
         raise ValueError("Agent profile must be a mapping")
+    unknown = sorted(set(data) - PROFILE_FIELDS)
+    if unknown:
+        raise ValueError(f"Unknown agent profile field(s): {', '.join(unknown)}")
 
     for field in REQUIRED_FIELDS:
         if field not in data:
@@ -50,6 +55,11 @@ def validate_agent_profile(data: dict[str, Any], known_skills: set[str] | None =
     permission = data["permission"]
     if permission not in PERMISSIONS:
         raise ValueError(f"Invalid permission: {permission}")
+
+    for field in ("allowed_tools", "allowed_paths"):
+        value = data.get(field)
+        if value is not None and (not isinstance(value, list) or any(not isinstance(item, str) or not item for item in value)):
+            raise ValueError(f"{field} must be a list of non-empty strings")
 
     # Spawn gating matches the tier by exact string (workflow_exec), so a tier
     # outside risk.TIERS can never appear in a blocklist and would silently

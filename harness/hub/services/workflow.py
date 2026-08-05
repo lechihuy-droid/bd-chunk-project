@@ -17,6 +17,23 @@ from services import boundary, runtime_agents
 WORKFLOWS_DIR = config.HUB_DIR / "workflows"
 _REQUIRED_TOP_LEVEL_FIELDS = ("id", "nodes", "edges", "stop")
 _TEMPLATE_REF = re.compile(r"{{(.*?)}}")
+_EDGE_KINDS = {"default", "success", "warning", "error"}
+_EDGE_LABEL_MAX_LENGTH = 120
+_WORKFLOW_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
+_RENDER_NODE_FORBIDDEN_FIELDS = {"command", "cwd", "args", "env"}
+
+
+class WorkflowConflictError(ValueError):
+    """Raised when creation would overwrite an existing workflow."""
+
+
+def _edge_endpoints(edge: Any) -> tuple[Any, Any] | None:
+    """Extract execution endpoints, intentionally ignoring display-only metadata."""
+    if isinstance(edge, (list, tuple)) and len(edge) == 2:
+        return edge[0], edge[1]
+    if isinstance(edge, dict) and "from" in edge and "to" in edge:
+        return edge["from"], edge["to"]
+    return None
 
 
 def workflow_path(workflow_id: str) -> Path:
@@ -96,10 +113,11 @@ def _walk_chain(nodes: list[dict[str, Any]], edges: list[Any]) -> tuple[list[str
     usable_edges = True
 
     for edge in edges:
-        if not isinstance(edge, (list, tuple)) or len(edge) != 2:
+        endpoints = _edge_endpoints(edge)
+        if endpoints is None:
             usable_edges = False
             continue
-        source, target = edge
+        source, target = endpoints
         if source not in node_id_set or target not in node_id_set:
             usable_edges = False
             continue
@@ -151,14 +169,18 @@ def validate_workflow(data: dict[str, Any], available_agents: set[str] | None = 
             continue
         normalized_nodes.append(node)
         node_type = node.get("type", "agent")
-        if node_type not in {"agent", "validate"}:
+        if node_type not in {"agent", "validate", "render"}:
             errors.append(f"Node {node.get('id', index)} has unknown type: {node_type}")
         elif node_type == "agent":
             for field in ("id", "agent", "prompt", "gate"):
                 if field not in node:
                     errors.append(f"Node {index} missing required field: {field}")
-        else:
+        elif node_type == "validate":
             for field in ("id", "target", "checks", "on_fail"):
+                if field not in node:
+                    errors.append(f"Node {index} missing required field: {field}")
+        else:
+            for field in ("id", "target", "props_from"):
                 if field not in node:
                     errors.append(f"Node {index} missing required field: {field}")
         node_id = node.get("id")
@@ -198,6 +220,29 @@ def validate_workflow(data: dict[str, Any], available_agents: set[str] | None = 
                             errors.append(f"Node {node.get('id', index)} check {check_index} values must be a non-empty list of strings")
             if node.get("on_fail") not in {"interrupt", "fail"}:
                 errors.append(f"Node {node.get('id', index)} has invalid on_fail: {node.get('on_fail')}")
+        elif node_type == "render":
+            target = node.get("target")
+            if not isinstance(target, str) or not target:
+                errors.append(f"Node {node.get('id', index)} target must be a non-empty string")
+            elif target not in config.RENDER_TARGETS:
+                errors.append(f"Node {node.get('id', index)} references unknown render target: {target}")
+            else:
+                target_config = config.RENDER_TARGETS[target]
+                command = target_config.get("command") if isinstance(target_config, dict) else None
+                if not isinstance(command, list) or command.count("{props}") != 1 or any(
+                    not isinstance(value, str) or ("{" in value or "}" in value) and value != "{props}"
+                    for value in (command or [])
+                ):
+                    errors.append(f"Render target {target} has invalid command configuration")
+            props_from = node.get("props_from")
+            if not isinstance(props_from, str) or not props_from:
+                errors.append(f"Node {node.get('id', index)} props_from must be a non-empty string")
+            gate = node.get("gate", "approval")
+            if gate not in {"none", "approval"}:
+                errors.append(f"Node {node.get('id', index)} has invalid gate: {gate}")
+            forbidden = sorted(_RENDER_NODE_FORBIDDEN_FIELDS & set(node))
+            if forbidden:
+                errors.append(f"Node {node.get('id', index)} may not supply render fields: {', '.join(forbidden)}")
 
     if available_agents is None:
         available_agents = {agent["id"] for agent in runtime_agents.list_agents()}
@@ -225,10 +270,25 @@ def validate_workflow(data: dict[str, Any], available_agents: set[str] | None = 
     if not isinstance(edges_value, list):
         errors.append("edges must be a list")
     for index, edge in enumerate(edges):
-        if not isinstance(edge, (list, tuple)) or len(edge) != 2:
-            errors.append(f"Edge {index} must contain exactly two node ids")
+        endpoints = _edge_endpoints(edge)
+        if endpoints is None:
+            errors.append(f"Edge {index} must be [from, to] or a mapping with from and to")
             continue
-        for node_id in edge:
+        if isinstance(edge, dict):
+            unexpected = set(edge) - {"from", "to", "kind", "label"}
+            if unexpected:
+                errors.append(f"Edge {index} has unknown fields: {', '.join(sorted(unexpected))}")
+            kind = edge.get("kind")
+            if "kind" in edge and (not isinstance(kind, str) or kind not in _EDGE_KINDS):
+                errors.append(
+                    f"Edge {index} kind must be one of: {', '.join(sorted(_EDGE_KINDS))}"
+                )
+            label = edge.get("label")
+            if "label" in edge and not isinstance(label, str):
+                errors.append(f"Edge {index} label must be a string")
+            elif isinstance(label, str) and len(label) > _EDGE_LABEL_MAX_LENGTH:
+                errors.append(f"Edge {index} label must be at most {_EDGE_LABEL_MAX_LENGTH} characters")
+        for node_id in endpoints:
             if node_id not in node_ids:
                 errors.append(f"Edge {index} references unknown node id: {node_id}")
 
@@ -254,7 +314,17 @@ def validate_workflow(data: dict[str, Any], available_agents: set[str] | None = 
         walk_position = {node_id: position for position, node_id in enumerate(walk)}
         for node in normalized_nodes:
             node_id = node.get("id")
-            if node.get("type", "agent") == "validate":
+            if node.get("type", "agent") in {"validate", "render"}:
+                reference_field = "target" if node.get("type") == "validate" else "props_from"
+                reference = node.get(reference_field)
+                if node.get("type") == "render":
+                    if reference not in node_ids:
+                        errors.append(f"Node {node_id} references unknown props_from: {reference}")
+                    elif reference == node_id:
+                        errors.append(f"Node {node_id} cannot use itself as props_from")
+                    elif isinstance(node_id, str) and walk_position.get(reference, -1) >= walk_position.get(node_id, 0):
+                        errors.append(f"Node {node_id} props_from must be an earlier node: {reference}")
+                    continue
                 target = node.get("target")
                 if target not in node_ids:
                     errors.append(f"Node {node_id} references unknown target: {target}")
@@ -278,7 +348,7 @@ def validate_workflow(data: dict[str, Any], available_agents: set[str] | None = 
                     templates.append((f"spawn {index} objective", spawn_objective))
             for _label, template in templates:
                 for token in _TEMPLATE_REF.findall(template):
-                    if token == "objective":
+                    if token in {"objective", "inputs"}:
                         continue
                     match = re.fullmatch(r"(.+)_(output|claims)", token)
                     if match and match.group(1) in walk_position and walk_position[match.group(1)] < walk_position[node_id]:
@@ -309,6 +379,21 @@ def build_ir(data: dict[str, Any]) -> list[dict[str, Any]]:
                 "target": node["target"],
                 "checks": [dict(check) for check in node["checks"]],
                 "on_fail": node["on_fail"],
+                "order": order,
+            })
+            continue
+        if node.get("type") == "render":
+            target_name = node["target"]
+            target = config.RENDER_TARGETS[target_name]
+            resolved_target = {**target, "cwd": str(target["cwd"])}
+            result.append({
+                "id": node_id,
+                "type": "render",
+                "target": target_name,
+                "render_target": resolved_target,
+                "props_from": node["props_from"],
+                "gate": node.get("gate", "approval"),
+                "risk_tier": target["risk_tier"],
                 "order": order,
             })
             continue
@@ -359,8 +444,62 @@ def save_workflow(workflow_id: str, yaml_text: str) -> dict[str, Any]:
     old_bytes = path.read_bytes()
     backup = path.with_name(f"{path.name}.bak-{int(time.time())}")
     backup.write_bytes(old_bytes)
-    path.write_text(yaml_text, encoding="utf-8")
+    path.write_bytes(yaml_text.encode("utf-8"))
     return data
+
+
+def create_workflow(
+    workflow_id: str, yaml_text: str | None = None, *, agent: str | None = None
+) -> dict[str, Any]:
+    """Validate and persist a new workflow without overwriting an existing definition."""
+    if not _WORKFLOW_ID.fullmatch(workflow_id):
+        raise ValueError("Workflow id must be a lowercase slug (letters, numbers, and hyphens)")
+
+    path = workflow_path(workflow_id)
+    if path.exists():
+        raise WorkflowConflictError(f"Workflow already exists: {workflow_id}")
+
+    agents = runtime_agents.list_agents()
+    available_agents = {item["id"] for item in agents}
+    if yaml_text is None:
+        selected_agent = agent or (agents[0]["id"] if agents else None)
+        if selected_agent is None:
+            raise ValueError("Cannot create a workflow without an available agent")
+        data: dict[str, Any] = {
+            "id": workflow_id,
+            "nodes": [{"id": "start", "agent": selected_agent, "prompt": "{{objective}}", "gate": "none"}],
+            "edges": [],
+            "stop": {"max_nodes": 10, "max_seconds": 1800},
+        }
+        yaml_text = yaml.safe_dump(data, sort_keys=False, allow_unicode=True)
+    else:
+        data = parse_workflow(yaml_text)
+        if data["id"] != workflow_id:
+            raise ValueError("Workflow id must match the path id")
+
+    errors = validate_workflow(data, available_agents)
+    if errors:
+        raise ValueError("; ".join(errors))
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml_text, encoding="utf-8")
+    save_layout(workflow_id, {
+        "nodes": {
+            node["id"]: {"x": 70 + index * 260, "y": 90}
+            for index, node in enumerate(data["nodes"])
+        }
+    })
+    return data
+
+
+def delete_workflow(workflow_id: str) -> None:
+    """Back up and remove a workflow definition and its optional layout sidecar."""
+    path = workflow_path(workflow_id)
+    old_bytes = path.read_bytes()
+    backup = path.with_name(f"{path.name}.bak-{int(time.time())}")
+    backup.write_bytes(old_bytes)
+    path.unlink()
+    workflow_layout_path(workflow_id).unlink(missing_ok=True)
 
 
 def model_yaml_text(workflow_id: str, model: dict[str, Any]) -> str:

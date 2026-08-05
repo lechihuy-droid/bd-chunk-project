@@ -1,0 +1,6 @@
+// UI copy for the approvals area. Owned by one migration batch to keep parallel work conflict-free.
+export const approvals = {
+  'approvals.approve': 'Approve', 'approvals.accept': 'Accept', 'approvals.acceptConfirm': 'Accept this diff and apply its changes?', 'approvals.loadFailed': 'Unable to load approval queue', 'approvals.diffLoadFailed': 'Unable to load diff', 'approvals.actionFailed': 'Action failed', 'approvals.reject': 'Reject', 'approvals.rollback': 'Rollback', 'approvals.rollbackConfirm': 'Roll back this job? This will discard its diff.',
+  'approvals.section': 'MONITORING', 'approvals.title': 'Awaiting approval', 'approvals.description': 'One place for every decision that needs attention.', 'approvals.gitJobs': 'Git jobs', 'approvals.id': 'ID', 'approvals.agent': 'Agent', 'approvals.status': 'Status', 'approvals.createdAt': 'Created at', 'approvals.brief': 'Brief', 'approvals.unifiedDiff': 'Unified diff', 'approvals.noDiff': 'No diff available.',
+  'approvals.hitlGate': 'HITL gate', 'approvals.objective': 'Objective', 'approvals.runId': 'Run ID', 'approvals.open': 'Open', 'approvals.interruptedRun': 'Interrupted run', 'approvals.none': 'No pending approvals',
+} as const
