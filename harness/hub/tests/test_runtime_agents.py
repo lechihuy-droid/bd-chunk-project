@@ -62,6 +62,11 @@ def test_validate_agent_profile_accepts_model_class(agents_tmp: Path) -> None:
     runtime_agents.validate_agent_profile(valid_profile() | {"provider": "cheap"})
 
 
+def test_validate_agent_profile_rejects_unknown_field(agents_tmp: Path) -> None:
+    with pytest.raises(ValueError, match="Unknown agent profile field\\(s\\): allowd_tools"):
+        runtime_agents.validate_agent_profile(valid_profile() | {"allowd_tools": ["Read"]})
+
+
 def test_list_agents_preserves_authored_model_class(agents_tmp: Path) -> None:
     profile = valid_profile() | {"provider": "cheap"}
     runtime_agents.create_or_update_agent(profile)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from services import governance, risk, runtime_state
+from services import audit, governance, risk, runtime_state, security
 
 
 def _path():
@@ -17,7 +17,7 @@ def record_decision(decision: dict[str, Any]) -> dict[str, Any]:
         "decision": str(decision.get("decision") or "allow"),
         "tier": str(decision.get("tier") or risk.UNKNOWN),
         "reasons": [str(item) for item in decision.get("reasons", [])] if isinstance(decision.get("reasons"), list) else [],
-        "metadata": decision.get("metadata") if isinstance(decision.get("metadata"), dict) else {},
+        "metadata": security.redact(decision.get("metadata")) if isinstance(decision.get("metadata"), dict) else {},
     }
     path = _path()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -25,6 +25,7 @@ def record_decision(decision: dict[str, Any]) -> dict[str, Any]:
         handle.write(json.dumps(row, ensure_ascii=False) + "\n")
     if row["decision"] == "deny":
         governance.record_denial(row["subject_id"], row["reasons"] or ["guardrail denial"])
+        audit.append("policy.denial", subject_id=row["subject_id"], policy_evaluation_id=str(decision.get("policy_evaluation_id") or ""), context=row)
     return row
 
 

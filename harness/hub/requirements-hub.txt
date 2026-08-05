@@ -1,6 +1,6 @@
-fastapi
-uvicorn
 pytest
 openai  # NVIDIA integrate.api.nvidia.com OpenAI-compatible chat streaming
 pyyaml
 python-dotenv  # loads NVIDIA_API_KEY etc. from the repo-root .env at startup
+python-multipart  # FastAPI UploadFile for the per-run files API
+httpx

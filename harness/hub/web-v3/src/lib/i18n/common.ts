@@ -1,0 +1,8 @@
+// Shared keys: navigation, topbar, status, generic actions.
+export const common = {
+  'common.cancel': 'Cancel', 'common.delete': 'Delete', 'common.save': 'Save', 'common.search': 'Search', 'common.close': 'Close', 'common.loading': 'Loading…', 'common.notAvailable': '—', 'common.onlineProviders': '{count} {provider} online',
+  'nav.overview': 'Overview', 'nav.chat': 'Multi-window chat', 'nav.sessions': 'Saved sessions', 'nav.workflows': 'Workflows', 'nav.artifacts': 'Artifacts', 'nav.runs': 'Runs', 'nav.agents': 'Agents', 'nav.skills': 'Skills', 'nav.hooks': 'Hooks', 'nav.files': 'Files', 'nav.approvals': 'Approvals', 'nav.usage': 'Usage & quota', 'nav.settings': 'Settings',
+  'nav.zone.overview': 'OVERVIEW', 'nav.zone.chat': 'CHAT', 'nav.zone.orchestration': 'ORCHESTRATION', 'nav.zone.monitoring': 'MONITORING', 'nav.zone.system': 'SYSTEM', 'nav.recent': 'RECENT', 'nav.expand': 'Expand navigation', 'nav.collapse': 'Collapse navigation', 'nav.untitledArtifact': 'Document',
+  'topbar.globalSearch': 'Global search', 'topbar.searchPlaceholder': 'Search…', 'topbar.minSearchLength': 'Enter at least 2 characters.', 'topbar.noSearchResults': 'No matching results.', 'topbar.searchResults': 'Search results', 'topbar.providerStatus': 'Provider status', 'topbar.user': 'User', 'topbar.loadProvidersFailed': 'Unable to load providers', 'topbar.searchFailed': 'Unable to search',
+  'status.ready': 'Ready', 'status.running': 'Running', 'status.paused': 'Paused', 'status.setupRequired': 'Setup required', 'status.notInstalled': 'Not installed', 'status.rateLimited': 'Rate limited', 'status.error': 'Error', 'status.offline': 'Offline', 'provider.available': 'available', 'provider.unavailable': 'unavailable', 'ui.remove': 'Remove',
+} as const

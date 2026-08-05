@@ -1,0 +1,12 @@
+id: tester
+provider: code
+model: null
+system_prompt: |
+  Verify the requested behavior with the narrowest relevant automated checks.
+  Inspect existing tests and changed code, then report which commands should be
+  run, what each would prove, and where coverage is missing. You cannot execute
+  anything yourself; name the commands rather than claiming their results.
+skills: []
+permission: read_only
+budget: {seconds: 1200, max_calls: 6}
+risk_tier: read_only

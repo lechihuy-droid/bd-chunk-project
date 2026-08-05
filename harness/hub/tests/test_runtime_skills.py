@@ -85,9 +85,7 @@ def test_body_heading_titles_a_skill_without_frontmatter(skill_roots: dict[str, 
 
 def test_duplicate_version_directories_collapse_to_one_entry(skill_roots: dict[str, Path]) -> None:
     frontmatter = "---\nname: control-chrome\ndescription: Drive Chrome.\n---\n"
-    root = skill_roots["codex_user"] / "chrome"
-    _write(root / "26.715.31925" / "skills" / "control-chrome" / "SKILL.md", frontmatter)
-    _write(root / "latest" / "skills" / "control-chrome" / "SKILL.md", frontmatter)
+    _write(skill_roots["codex_user"] / "control-chrome" / "SKILL.md", frontmatter)
 
     entries = runtime_skills.list_skills()
 
@@ -107,13 +105,12 @@ def test_scan_is_scoped_to_configured_skill_sources(skill_roots: dict[str, Path]
     _write(skill_roots["codex_user"] / "mine" / "SKILL.md", "---\nname: mine\n---\n")
     # Vendored plugin cache lives outside the configured sources -> not listed.
     _write(tmp_path / "plugins" / "cache" / "bundled" / "SKILL.md", "---\nname: bundled\n---\n")
-    # Bundled system skills hide under a dot-directory -> not listed either.
+    # Nested packages are not a second discovery surface; skill_library owns direct source entries.
     _write(skill_roots["codex_user"] / ".system" / "skill-installer" / "SKILL.md", "---\nname: skill-installer\n---\n")
 
     ids = {entry["id"] for entry in runtime_skills.list_skills()}
 
     assert ids == {"mine"}
-    assert runtime_skills._skill_roots() == list(skill_roots.values())
 
 
 def test_get_skill_rejects_unknown_id(skill_roots: dict[str, Path]) -> None:

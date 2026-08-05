@@ -360,8 +360,6 @@ def _provider_for_model(model: str) -> str | None:
         return "claude"
     if model == "cli:codex":
         return "codex"
-    if model == "cli:gemini":
-        return "gemini"
     if model.startswith("nvidia/") or model in config.CHAT_MODELS:
         return "nvidia"
     return None

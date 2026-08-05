@@ -46,6 +46,57 @@ def test_valid_workflow_builds_ordered_ir(review_ui: dict[str, object]) -> None:
     assert ir[0]["agent"]["id"] == "reviewer"
 
 
+def test_tuple_edges_remain_valid_and_round_trip_unchanged(
+    monkeypatch: pytest.MonkeyPatch, tmp_path, review_ui: dict[str, object]
+) -> None:
+    _use_workflows_dir(monkeypatch, tmp_path)
+    text = yaml.safe_dump(review_ui, sort_keys=False)
+    path = tmp_path / "review-ui.workflow.yaml"
+    path.write_bytes(text.encode("utf-8"))
+
+    assert workflow.validate_workflow(review_ui) == []
+    workflow.save_workflow("review-ui", text)
+
+    assert path.read_bytes() == text.encode("utf-8")
+    assert yaml.safe_load(workflow.model_yaml_text("review-ui", review_ui))["edges"] == [["plan", "act"]]
+
+
+def test_mapping_edge_metadata_is_valid_and_ignored_by_ir_ordering(
+    monkeypatch: pytest.MonkeyPatch, tmp_path, review_ui: dict[str, object]
+) -> None:
+    data = deepcopy(review_ui)
+    data["edges"] = [{"from": "plan", "to": "act", "kind": "success", "label": "Approved plan"}]
+
+    assert workflow.validate_workflow(data) == []
+    assert [node["id"] for node in workflow.build_ir(data)] == ["plan", "act"]
+    _use_workflows_dir(monkeypatch, tmp_path)
+    path = tmp_path / "review-ui.workflow.yaml"
+    path.write_text(yaml.safe_dump(review_ui), encoding="utf-8")
+    workflow.save_workflow("review-ui", workflow.model_yaml_text("review-ui", data))
+    assert yaml.safe_load(path.read_text(encoding="utf-8"))["edges"] == data["edges"]
+
+
+def test_mapping_edge_rejects_unknown_kind_and_overlong_label(review_ui: dict[str, object]) -> None:
+    unknown_kind = deepcopy(review_ui)
+    unknown_kind["edges"] = [{"from": "plan", "to": "act", "kind": "branch"}]
+    assert "kind must be one of: default, error, success, warning" in "; ".join(workflow.validate_workflow(unknown_kind))
+
+    long_label = deepcopy(review_ui)
+    long_label["edges"] = [{"from": "plan", "to": "act", "label": "x" * 121}]
+    assert "label must be at most 120 characters" in "; ".join(workflow.validate_workflow(long_label))
+
+
+def test_real_workflow_files_still_validate() -> None:
+    for path in workflow.WORKFLOWS_DIR.glob("*.workflow.yaml"):
+        data = workflow.parse_workflow(path.read_text(encoding="utf-8"))
+        available_agents = {
+            node["agent"]
+            for node in data["nodes"]
+            if node.get("type", "agent") == "agent" and isinstance(node.get("agent"), str)
+        }
+        assert workflow.validate_workflow(data, available_agents) == [], path.name
+
+
 def test_cycle_is_rejected(review_ui: dict[str, object]) -> None:
     data = deepcopy(review_ui)
     data["edges"] = [["plan", "act"], ["act", "plan"]]
@@ -159,6 +210,65 @@ def test_save_workflow_requires_existing_file(monkeypatch: pytest.MonkeyPatch, t
 
     with pytest.raises(FileNotFoundError):
         workflow.save_workflow("review-ui", yaml.safe_dump(review_ui))
+
+
+def test_create_starter_validates_lists_and_saves_layout(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    _use_workflows_dir(monkeypatch, tmp_path)
+
+    created = workflow.create_workflow("starter")
+
+    assert workflow.validate_workflow(created, {"reviewer"}) == []
+    assert workflow.list_workflows() == [created]
+    assert workflow.read_layout("starter") == {"start": {"x": 70, "y": 90}}
+
+
+def test_create_explicit_yaml_round_trips(monkeypatch: pytest.MonkeyPatch, tmp_path, review_ui: dict[str, object]) -> None:
+    _use_workflows_dir(monkeypatch, tmp_path)
+    yaml_text = yaml.safe_dump(review_ui, sort_keys=False)
+
+    created = workflow.create_workflow("review-ui", yaml_text)
+
+    assert created == workflow.parse_workflow((tmp_path / "review-ui.workflow.yaml").read_text(encoding="utf-8"))
+
+
+def test_create_rejects_mismatch_invalid_ids_duplicates_and_missing_agent(
+    monkeypatch: pytest.MonkeyPatch, tmp_path, review_ui: dict[str, object]
+) -> None:
+    _use_workflows_dir(monkeypatch, tmp_path)
+    yaml_text = yaml.safe_dump(review_ui)
+    changed = deepcopy(review_ui)
+    changed["id"] = "other"
+    with pytest.raises(ValueError, match="must match"):
+        workflow.create_workflow("review-ui", yaml.safe_dump(changed))
+    for invalid_id in ("Upper", "has space", "", "-leading", "../escape", "path/name"):
+        with pytest.raises(ValueError, match="lowercase slug"):
+            workflow.create_workflow(invalid_id)
+
+    workflow.create_workflow("review-ui", yaml_text)
+    path = tmp_path / "review-ui.workflow.yaml"
+    original = path.read_bytes()
+    with pytest.raises(workflow.WorkflowConflictError):
+        workflow.create_workflow("review-ui", yaml.safe_dump({**review_ui, "nodes": []}))
+    assert path.read_bytes() == original
+
+    changed = deepcopy(review_ui)
+    changed["id"] = "missing-agent"
+    changed["nodes"][0]["agent"] = "missing-agent"
+    with pytest.raises(ValueError, match="missing-agent"):
+        workflow.create_workflow("missing-agent", yaml.safe_dump(changed))
+
+
+def test_delete_workflow_removes_definition_and_layout_with_backup(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    _use_workflows_dir(monkeypatch, tmp_path)
+    workflow.create_workflow("remove-me")
+
+    workflow.delete_workflow("remove-me")
+
+    assert not (tmp_path / "remove-me.workflow.yaml").exists()
+    assert not (tmp_path / "remove-me.layout.json").exists()
+    assert len(list(tmp_path.glob("remove-me.workflow.yaml.bak-*"))) == 1
+    with pytest.raises(FileNotFoundError):
+        workflow.delete_workflow("missing")
 
 
 def test_model_save_preserves_vietnamese_header_and_rejects_branch(

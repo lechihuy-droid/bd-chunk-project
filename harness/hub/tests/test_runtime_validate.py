@@ -26,7 +26,7 @@ class FakeProvider:
         self.text = text
         self.calls = 0
 
-    def stream_chat(self, messages: list[dict[str, str]], session_id: str | None = None, model: str | None = None) -> Iterator[dict[str, Any]]:
+    def stream_chat(self, messages: list[dict[str, str]], session_id: str | None = None, model: str | None = None, **_: Any) -> Iterator[dict[str, Any]]:
         self.calls += 1
         yield {"type": "delta", "text": self.text}
         yield {"type": "done", "usage": {}}

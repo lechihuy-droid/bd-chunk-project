@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,7 @@ from services import (
     runtime_reducers,
     runtime_skills,
     runtime_state,
+    skill_library,
 )
 
 
@@ -109,6 +111,64 @@ def test_runtime_state_checkpoint_events_interrupts_and_boundaries(runtime_tmp: 
         runtime_state.read_run("../outside")
 
 
+def test_runtime_command_rejects_stale_expected_version(runtime_tmp: Path) -> None:
+    run = runtime_state.create_run()
+    first = runtime_state.update_run_state(run["run_id"], {"metadata": {"one": True}}, expected_version=0, command_id="cmd-first")
+    assert first["state_version"] == 1
+    with pytest.raises(runtime_state.StaleRunVersionError):
+        runtime_state.update_run_state(run["run_id"], {"metadata": {"stale": True}}, expected_version=0, command_id="cmd-stale")
+    assert runtime_state.read_run(run["run_id"])["state_version"] == 1
+    assert "stale" not in runtime_state.read_run(run["run_id"])["metadata"]
+
+
+def test_runtime_commands_do_not_interleave_per_run(runtime_tmp: Path) -> None:
+    run = runtime_state.create_run()
+
+    def apply(index: int) -> dict[str, object]:
+        return runtime_state.update_run_state(run["run_id"], {"metadata": {f"worker_{index}": index}}, command_id=f"cmd-worker-{index}")
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        list(executor.map(apply, range(20)))
+    state = runtime_state.read_run(run["run_id"])
+    assert state["state_version"] == 20
+    assert {state["metadata"][f"worker_{index}"] for index in range(20)} == set(range(20))
+
+
+def test_runtime_command_idempotency_replays_once(runtime_tmp: Path) -> None:
+    run = runtime_state.create_run()
+    first = runtime_state.update_run_state(
+        run["run_id"], {"metadata": {"applied": True}}, command_id="cmd-replay", idempotency_key="key-replay"
+    )
+    replay = runtime_state.update_run_state(
+        run["run_id"], {"metadata": {"applied": True}}, command_id="cmd-replay", idempotency_key="key-replay"
+    )
+    assert first["state_version"] == replay["state_version"] == 1
+    with pytest.raises(runtime_state.IdempotencyConflictError):
+        runtime_state.update_run_state(run["run_id"], {"metadata": {"different": True}}, command_id="cmd-other", idempotency_key="key-replay")
+
+
+def test_runtime_recovery_quarantines_truncated_journal_tail(runtime_tmp: Path) -> None:
+    run = runtime_state.create_run()
+    runtime_state.update_run_state(run["run_id"], {"metadata": {"committed": True}}, command_id="cmd-commit")
+    journal = runtime_state.run_journal_path(run["run_id"])
+    journal.write_bytes(journal.read_bytes() + b'{"phase":"prepared"')
+    recovered = runtime_state.recover_run(run["run_id"])
+    assert recovered["state_version"] == 1
+    assert list((runtime_state.run_dir(run["run_id"]) / "quarantine").glob("transactions.tail-*.jsonl"))
+    assert len(runtime_state._read_journal(run["run_id"], repair_tail=False)) == 2
+
+
+def test_runtime_legacy_run_without_journal_remains_readable(runtime_tmp: Path) -> None:
+    run = runtime_state.create_run()
+    path = runtime_state.run_state_path(run["run_id"])
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    raw.pop("state_version")
+    path.write_text(json.dumps(raw), encoding="utf-8")
+    state = runtime_state.read_run(run["run_id"])
+    assert state["run_id"] == run["run_id"]
+    assert state["runtime_compatibility"] == "legacy_unjournaled"
+
+
 def test_runtime_pipeline_api_create_interrupt_resume_and_404(runtime_tmp: Path) -> None:
     client = TestClient(server.app, headers={"x-hub-client": "harness-hub"})
     response = client.post("/api/agent/runs", json={"objective": "api runtime smoke"})
@@ -188,25 +248,43 @@ def test_runtime_child_run_constraints_and_artifact_merge(runtime_tmp: Path) -> 
     assert runtime_state.read_run(failed_child["run_id"])["metadata"]["timed_out"] is True
 
 
+def test_direct_child_spawn_obeys_governance_tier_gate(runtime_tmp: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from services import governance
+
+    parent = runtime_state.create_run(metadata={"agent_id": "lead"})
+    monkeypatch.setattr(runtime_children.runtime_agents, "get_agent", lambda _agent_id: {"risk_tier": "network"})
+    monkeypatch.setattr(governance, "effective_blocked_tiers", lambda level=None: ["network"])
+
+    with pytest.raises(PermissionError, match="child spawn denied: risk_tier 'network' blocked for agent 'researcher'"):
+        runtime_children.create_child_run(parent["run_id"], {"objective": "blocked", "agent_id": "researcher"})
+
+    assert "risk_tier 'network' blocked for agent 'researcher'" in governance.status()["recent_denials"][0]["reasons"]
+
+
 def test_runtime_skills_memory_and_guardrail_apis(runtime_tmp: Path, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     skill_dir = tmp_path / "skills" / "demo"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text("# Demo Skill\n\nUse for runtime tests.\n", encoding="utf-8")
-    monkeypatch.setattr(runtime_skills, "_skill_roots", lambda: [tmp_path / "skills"])
+    monkeypatch.setattr(config, "SKILL_SOURCES", {"local": tmp_path / "skills"}, raising=False)
+    skill_library._clear_cache()
 
     candidate = runtime_memory.create_candidate("Remember explicit approvals only")
     client = TestClient(server.app, headers={"x-hub-client": "harness-hub"})
 
     skills = client.get("/api/skills")
     assert skills.status_code == 200
-    skill_id = skills.json()[0]["id"]
-    assert client.get(f"/api/skills/{skill_id}").json()["title"] == "Demo Skill"
-    assert client.get(f"/api/skills/{skill_id}/usage").json()["count"] == 0
+    listed = skills.json()[0]; skill_id = listed["id"]
+    assert set(listed) == {"id", "title", "description", "path", "read_only"}
+    detail = client.get(f"/api/skills/{skill_id}").json()
+    assert set(detail) == {"id", "title", "description", "path", "read_only", "body"}
+    assert detail["title"] == "Demo Skill"
+    usage = client.get(f"/api/skills/{skill_id}/usage").json()
+    assert set(usage) == {"skill_id", "count", "events"} and usage["count"] == 0
 
     candidates = client.get("/api/memory/candidates")
     assert candidates.status_code == 200
     assert candidates.json()[0]["id"] == candidate["id"]
-    accepted = client.post(f"/api/memory/candidates/{candidate['id']}/accept")
+    accepted = client.post(f"/api/memory/candidates/{candidate['id']}/accept", json={"accepted_by": "reviewer", "reason": "useful", "expires_at": "2030-01-01T00:00:00Z"})
     assert accepted.status_code == 200
     assert accepted.json()["status"] == "accepted"
     assert client.get("/api/memory").json()[0]["candidate_id"] == candidate["id"]

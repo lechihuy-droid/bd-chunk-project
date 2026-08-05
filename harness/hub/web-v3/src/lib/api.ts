@@ -11,7 +11,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 export async function apiRequest(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers)
   if (init.method && init.method !== 'GET') headers.set('X-Hub-Client', 'harness-hub')
-  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  if (init.body && !(init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   const response = await fetch(path, { ...init, headers })
   if (!response.ok) {
     let message = `Request failed (${response.status})`

@@ -9,7 +9,10 @@
  * See DESIGN.md for the full component contract, when-to-use rules, and
  * the migration checklist that points existing pages at these primitives.
  */
+import { X } from 'lucide-react'
 import { forwardRef, useEffect, useRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
+import { t } from './i18n'
+import type { ProviderId } from './uiHelpers'
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(' ')
 
@@ -52,7 +55,7 @@ const buttonVariants: Record<ButtonVariant, string> = {
 }
 
 const buttonSizes: Record<ButtonSize, string> = {
-  sm: 'h-8 px-space-3 text-caption leading-caption',
+  sm: 'h-10 px-space-3 text-caption leading-caption',
   md: 'h-10 px-space-4 text-label leading-label',
 }
 
@@ -94,9 +97,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       type={type}
       className={cx(
         variant === 'handle'
-          ? 'inline-flex h-4 w-4 min-h-4 min-w-4 items-center justify-center rounded-full border border-accent bg-app'
+          ? 'inline-flex h-10 w-10 min-h-10 min-w-10 items-center justify-center rounded-full border border-accent bg-app'
           : cx(
-            'inline-flex h-8 w-8 min-h-[32px] min-w-[32px] items-center justify-center',
+            'inline-flex h-10 w-10 min-h-10 min-w-10 items-center justify-center',
             'rounded-md text-secondary transition-colors',
             'hover:bg-hover hover:text-primary',
             'disabled:cursor-not-allowed disabled:opacity-40',
@@ -174,14 +177,14 @@ export type ChipProps = {
   children: ReactNode
   selected?: boolean
   muted?: boolean
-  /** Presence enables the removable variant and renders an × affordance. */
+  /** Presence enables the removable variant and renders a close-icon affordance. */
   onRemove?: () => void
-  /** Accessible label for the remove button. Defaults to "Xoá". */
+  /** Accessible label for the remove button. Defaults to the translated Remove label. */
   removeLabel?: string
   className?: string
 }
 
-export function Chip({ children, selected = false, muted = false, onRemove, removeLabel = 'Xoá', className }: ChipProps) {
+export function Chip({ children, selected = false, muted = false, onRemove, removeLabel = t('misc.ui.remove'), className }: ChipProps) {
   return (
     <span
       className={cx(
@@ -199,12 +202,12 @@ export function Chip({ children, selected = false, muted = false, onRemove, remo
           onClick={onRemove}
           aria-label={removeLabel}
           className={cx(
-            'ml-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full leading-none',
+            'ml-[2px] inline-flex h-10 w-10 items-center justify-center rounded-full leading-none',
             'text-muted hover:bg-hover hover:text-primary',
             focusRing,
           )}
         >
-          ×
+          <X size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
       ) : null}
     </span>
@@ -244,14 +247,14 @@ const statusDotClass: Record<StatusKind, string> = {
 }
 
 const statusLabels: Record<StatusKind, string> = {
-  ready: 'Sẵn sàng',
-  running: 'Đang chạy',
-  paused: 'Tạm dừng',
-  'setup-required': 'Cần cấu hình',
-  'not-installed': 'Chưa cài',
-  'rate-limited': 'Giới hạn tốc độ',
-  error: 'Lỗi',
-  offline: 'Ngoại tuyến',
+  ready: t('misc.status.ready'),
+  running: t('misc.status.running'),
+  paused: t('misc.status.paused'),
+  'setup-required': t('misc.status.setupRequired'),
+  'not-installed': t('misc.status.notInstalled'),
+  'rate-limited': t('misc.status.rateLimited'),
+  error: t('misc.status.error'),
+  offline: t('misc.status.offline'),
 }
 
 export function Status({ kind, label, className }: StatusProps) {
@@ -268,25 +271,34 @@ export function Status({ kind, label, className }: StatusProps) {
   )
 }
 
+export type RunStatusKind = 'running' | 'success' | 'error' | 'interrupted' | 'queued' | 'neutral'
+export type RunStatusBadgeProps = { kind: RunStatusKind; label: string; className?: string }
+
+const runStatusBadgeClass: Record<RunStatusKind, string> = {
+  running: 'border border-accent bg-accent-subtle text-primary', success: 'border border-success bg-surface text-primary', error: 'border border-error bg-error-subtle text-primary', interrupted: 'border border-warning bg-warning-subtle text-primary', queued: 'border border-border-strong bg-elevated text-secondary', neutral: 'border border-border-subtle bg-elevated text-secondary',
+}
+const runStatusBadgeMark: Record<RunStatusKind, string> = { running: '●', success: '✓', error: '!', interrupted: '◆', queued: '○', neutral: '?' }
+
+export function RunStatusBadge({ kind, label, className }: RunStatusBadgeProps) {
+  return <span className={cx('inline-flex items-center gap-[5px] rounded-full px-space-2 py-[2px] text-caption leading-caption', runStatusBadgeClass[kind], className)}><span aria-hidden="true" className="text-[10px] leading-none">{runStatusBadgeMark[kind]}</span>{label}</span>
+}
+
 // ---------------------------------------------------------------------------
 // ProviderDot
 // ---------------------------------------------------------------------------
-
-export type ProviderId = 'claude' | 'codex' | 'nvidia' | 'gemini'
 
 export type ProviderDotProps = {
   provider: ProviderId
   className?: string
 }
 
-// Reuses the existing --color-claude/codex/nvidia/gemini tokens from
+// Reuses the existing --color-claude/codex/nvidia tokens from
 // index.css's @theme block via their Tailwind bg-* utilities — provider
 // colour usage is restricted to this 6-8px identity dot everywhere else.
 const providerDotClass: Record<ProviderId, string> = {
   claude: 'bg-claude',
   codex: 'bg-codex',
   nvidia: 'bg-nvidia',
-  gemini: 'bg-gemini',
 }
 
 export function ProviderDot({ provider, className }: ProviderDotProps) {

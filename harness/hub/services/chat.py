@@ -143,7 +143,7 @@ def _reasoning_for_model(model: str) -> dict[str, Any]:
 
 
 def _messages_with_reasoning_system(
-    messages: list[dict[str, str]],
+    messages: list[dict[str, object]],
     system_prompt: object,
 ) -> list[dict[str, str]]:
     outgoing = list(messages)
@@ -176,6 +176,7 @@ def stream_chat(
     model: str,
     max_tokens: int,
     system_prompt: str | None = None,
+    tools: list[dict[str, object]] | None = None,
 ) -> Generator[dict[str, Any], None, None]:
     if model not in config.CHAT_MODELS:
         raise ValueError(f"Unsupported chat model: {model}")
@@ -200,11 +201,14 @@ def stream_chat(
             "stream_options": {"include_usage": True},
         }
         request.update(reasoning_params)
+        if tools:
+            request["tools"] = tools
         extra_body = reasoning_plan["extra_body"]
         if extra_body is not None:
             request["extra_body"] = extra_body
 
         completion = _create_completion_with_reasoning_fallback(client, request, set(reasoning_params))
+        tool_calls: dict[int, dict[str, str]] = {}
         for chunk in completion:
             chunk_usage = getattr(chunk, "usage", None)
             if chunk_usage is not None:
@@ -220,6 +224,17 @@ def stream_chat(
                 yield {"type": "reasoning", "text": reasoning}
             if content:
                 yield {"type": "delta", "text": content}
+            for call in getattr(delta, "tool_calls", None) or []:
+                index = int(getattr(call, "index", 0) or 0)
+                state = tool_calls.setdefault(index, {"id": "", "name": "", "arguments": ""})
+                if getattr(call, "id", None):
+                    state["id"] = call.id
+                function = getattr(call, "function", None)
+                if function is not None:
+                    if getattr(function, "name", None):
+                        state["name"] = function.name
+                    if getattr(function, "arguments", None):
+                        state["arguments"] += function.arguments
     except openai.AuthenticationError as exc:
         raise ChatAuthError(AUTH_INVALID_ERROR_MESSAGE) from exc
     except openai.APIStatusError as exc:
@@ -227,5 +242,11 @@ def stream_chat(
         detail = _api_status_detail(exc)
         raise ChatUpstreamError(_upstream_error_message(model, code, detail), code) from exc
 
+    for state in tool_calls.values():
+        try:
+            tool_input = json.loads(state["arguments"] or "{}")
+        except json.JSONDecodeError:
+            tool_input = {}
+        yield {"type": "tool_call", "tool_name": state["name"], "tool_input": tool_input, "tool_use_id": state["id"]}
     _append_usage_event(_usage_event(model, usage))
     yield {"type": "done", "usage": usage, "model": model}

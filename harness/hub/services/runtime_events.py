@@ -4,7 +4,7 @@ import json
 import uuid
 from typing import Any, Iterator
 
-from services import runtime_state
+from services import runtime_state, security
 
 
 def append_event(run_id: str, event_type: str, data: dict[str, Any] | None = None, **fields: Any) -> dict[str, Any]:
@@ -17,12 +17,18 @@ def append_event(run_id: str, event_type: str, data: dict[str, Any] | None = Non
         "ts": runtime_state.now_iso(),
     }
     if data:
-        event.update(data)
+        event.update(security.redact(data))
     if fields:
-        event.update(fields)
+        event.update(security.redact(fields))
     path = runtime_state.runtime_path("run", run_id, "events.jsonl")
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(event, ensure_ascii=False) + "\n")
+    # Hooks are isolated from execution: dispatch failures never affect a run.
+    try:
+        from services import hooks
+        hooks.fire(event)
+    except Exception:
+        pass
     return event
 
 

@@ -62,6 +62,8 @@ def temp_repo(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     monkeypatch.setattr(config, "HMAC_KEY_FILE", tmp_path / ".hmac_key")
     monkeypatch.setattr(config, "INTEGRITY_SIGS_FILE", tmp_path / ".cache" / "suite_sigs.json")
     monkeypatch.setattr(config, "GOVERNANCE_STATE_FILE", tmp_path / ".cache" / "governance.json")
+    monkeypatch.setattr(config, "RUNTIME_DIR", tmp_path / "runtime")
+    monkeypatch.setattr(config, "RUNTIME_STORE_DIR", tmp_path / "runtime" / "store")
     monkeypatch.setattr(boundary, "ROOT_RESOLVED", repo.resolve())
     gitjobs._STREAMS.clear()
     return repo
@@ -147,7 +149,7 @@ def test_job_lifecycle_uses_temp_repo_and_worktree_only(
     assert branch_exists(temp_repo, "other-branch")
 
 
-def test_job_run_cap_blocks_after_max_approvals(
+def test_approval_is_one_time_even_if_job_status_is_tampered(
     temp_repo: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -169,13 +171,11 @@ def test_job_run_cap_blocks_after_max_approvals(
     monkeypatch.setattr(gitjobs, "_spawn_agent", fake_spawn)
 
     job = gitjobs.create_job("run repeatedly", "codex")
-    for expected_count in range(1, config.JOB_MAX_RUNS + 1):
-        running = gitjobs.approve(job["id"])
-        assert running["run_count"] == expected_count
-        assert "event: exit" in "".join(gitjobs.stream_events(job["id"]))
-        force_awaiting_approval(job["id"])
-
-    with pytest.raises(ValueError, match="run cap exceeded"):
+    running = gitjobs.approve(job["id"])
+    assert running["run_count"] == 1
+    assert "event: exit" in "".join(gitjobs.stream_events(job["id"]))
+    force_awaiting_approval(job["id"])
+    with pytest.raises(ValueError, match="already used"):
         gitjobs.approve(job["id"])
 
 
@@ -194,6 +194,16 @@ def test_brief_signature_detects_tampering(temp_repo: Path) -> None:
     checked = gitjobs.get_job(job["id"])
     assert checked["brief_ok"] is False
     assert gitjobs.verify_brief(checked) is False
+
+
+def test_approval_binding_rejects_mutated_brief(temp_repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(gitjobs, "_spawn_agent", lambda *_args, **_kwargs: pytest.fail("agent should not launch"))
+    job = gitjobs.create_job("keep action exact", "codex")
+    record = gitjobs._read_job(job["id"])
+    record["brief"] = "different action"
+    gitjobs._write_job(record)
+    with pytest.raises(ValueError, match="approval binding changed"):
+        gitjobs.approve(job["id"])
 
 
 def test_approve_blocks_destructive_tier_without_override(
@@ -227,7 +237,7 @@ def test_approve_blocks_expired_job_token(
     monkeypatch.setattr(gitjobs, "_spawn_agent", fail_spawn)
     job = gitjobs.create_job("expired job", "codex")
     record = gitjobs._read_job(job["id"])
-    record["created_at"] = "2000-01-01T00:00:00Z"
+    record["approval_receipt"]["expires_at"] = "2000-01-01T00:00:00Z"
     gitjobs._write_job(record)
 
     with pytest.raises(ValueError, match="expired"):

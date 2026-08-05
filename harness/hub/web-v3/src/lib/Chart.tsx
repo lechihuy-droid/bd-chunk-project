@@ -1,38 +1,6 @@
 import type { ReactNode } from 'react'
-
-type ChartProps<T extends Record<string, unknown>> = {
-  rows: T[]
-  labelKey: keyof T
-  valueKey: keyof T
-  height: number
-}
-
+import { t } from './i18n'
+type ChartProps<T extends Record<string, unknown>> = { rows: T[]; labelKey: keyof T; valueKey: keyof T; height: number }
 const numberValue = (value: unknown) => typeof value === 'number' && Number.isFinite(value) ? value : 0
-
-export default function Chart<T extends Record<string, unknown>>({ rows, labelKey, valueKey, height }: ChartProps<T>) {
-  const width = Math.max(640, rows.length * 34)
-  const values = rows.map(row => numberValue(row[valueKey]))
-  const max = Math.max(...values, 1)
-  const chartHeight = Math.max(40, height - 28)
-  const barWidth = Math.max(8, Math.min(22, width / Math.max(rows.length, 1) - 10))
-
-  return <div className="overflow-x-auto">
-    <svg role="img" aria-label="Biểu đồ xu hướng theo ngày" width={width} height={height} className="min-w-full">
-      <line x1="0" y1={chartHeight} x2={width} y2={chartHeight} stroke="var(--color-line)" />
-      {rows.map((row, index) => {
-        const value = values[index]
-        const barHeight = value ? Math.max(2, value / max * (chartHeight - 12)) : 0
-        const x = index * (width / Math.max(rows.length, 1)) + (width / Math.max(rows.length, 1) - barWidth) / 2
-        const label = String(row[labelKey] ?? '—')
-        return <g key={`${label}-${index}`}>
-          <title>{`${label}: ${value}`}</title>
-          <rect x={x} y={chartHeight - barHeight} width={barWidth} height={barHeight} rx="2" fill="var(--color-codex)" aria-label={`${label}: ${value}`} />
-          <text x={x + barWidth / 2} y={height - 7} textAnchor="middle" fill="var(--color-faint)" fontSize="9">{label.slice(5)}</text>
-        </g>
-      })}
-    </svg>
-  </div>
-}
-
-export function ChartEmpty(): ReactNode { return <div className="flex h-28 items-center justify-center text-xs text-muted">Chưa có dữ liệu.</div> }
-
+export default function Chart<T extends Record<string, unknown>>({ rows, labelKey, valueKey, height }: ChartProps<T>) { const width = Math.max(640, rows.length * 34); const values = rows.map(row => numberValue(row[valueKey])); const max = Math.max(...values, 1); const chartHeight = Math.max(40, height - 28); const barWidth = Math.max(8, Math.min(22, width / Math.max(rows.length, 1) - 10)); return <div className="overflow-x-auto"><svg role="img" aria-label={t('misc.chart.ariaLabel')} width={width} height={height} className="min-w-full"><line x1="0" y1={chartHeight} x2={width} y2={chartHeight} stroke="var(--color-line)" />{rows.map((row, index) => { const value = values[index]; const barHeight = value ? Math.max(2, value / max * (chartHeight - 12)) : 0; const x = index * (width / Math.max(rows.length, 1)) + (width / Math.max(rows.length, 1) - barWidth) / 2; const label = String(row[labelKey] ?? '—'); return <g key={`${label}-${index}`}><title>{`${label}: ${value}`}</title><rect x={x} y={chartHeight - barHeight} width={barWidth} height={barHeight} rx="2" fill="var(--color-codex)" aria-label={`${label}: ${value}`} /><text x={x + barWidth / 2} y={height - 7} textAnchor="middle" fill="var(--color-faint)" fontSize="9">{label.slice(5)}</text></g> })}</svg></div> }
+export function ChartEmpty(): ReactNode { return <div className="flex h-28 items-center justify-center text-xs text-muted">{t('misc.chart.empty')}</div> }

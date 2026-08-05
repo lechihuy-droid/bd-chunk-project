@@ -134,6 +134,29 @@ def test_workflow_save_rejects_traversal(client: TestClient, sandboxed_workflows
     assert list(sandboxed_workflows.glob("outside.workflow.yaml.bak-*")) == []
 
 
+def test_workflow_create_and_delete_api(client: TestClient, sandboxed_workflows: Path) -> None:
+    created = client.post("/api/workflows", json={"id": "api-created"})
+    assert created.status_code == 201
+    assert created.json()["id"] == "api-created"
+
+    duplicate = client.post("/api/workflows", json={"id": "api-created"})
+    assert duplicate.status_code == 409
+    assert client.post("/api/workflows", json={"id": "Bad Id"}).status_code == 400
+    assert client.delete("/api/workflows/missing").status_code == 404
+    assert client.delete("/api/workflows/api-created").status_code == 200
+
+
+def test_workflow_create_and_delete_require_client_header(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    workflows_dir = tmp_path / "workflows"
+    workflows_dir.mkdir()
+    monkeypatch.setattr(workflow, "WORKFLOWS_DIR", workflows_dir)
+    monkeypatch.setattr(boundary, "ROOT_RESOLVED", tmp_path.resolve())
+    raw_client = TestClient(server.app)
+
+    assert raw_client.post("/api/workflows", json={"id": "blocked"}).status_code == 403
+    assert raw_client.delete("/api/workflows/blocked").status_code == 403
+
+
 def test_runs_endpoints(client: TestClient) -> None:
     response = client.get("/api/runs")
     assert response.status_code == 200

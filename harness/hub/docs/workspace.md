@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-07-29.** Route `#/workspace` không còn tồn tại — `web-v3/src/pages/index.tsx` không đăng ký nó. Giữ lại để truy vết.
+
 # Workspace Route
 
 `#/workspace` is a full-bleed AI Workspace surface inside Harness Hub. It mounts

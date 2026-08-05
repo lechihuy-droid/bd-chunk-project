@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from types import ModuleType
 
-from services.providers import base, claude_cli, codex_cli, gemini_cli, nvidia_api
+from services.providers import base, claude_cli, codex_cli, nvidia_api
 
 registry: dict[str, ModuleType] = {
     "nvidia": nvidia_api,
     "claude": claude_cli,
     "codex": codex_cli,
-    "gemini": gemini_cli,
 }
 
 
