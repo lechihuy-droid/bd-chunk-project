@@ -2,20 +2,20 @@
 
 ## 1. Purpose
 
-Requirement Assessment exists to create a controlled semantic bridge between evidence-backed requirements and downstream design governance.
+Requirement Assessment exists to make the pre-design interpretation of requirements explicit, governed and reusable.
 
-Stage 1 ReqKB preserves what the source says. Stage 3 Design Governance + Design Planning decides what the project must design. Stage 2 sits deliberately between them and answers a narrower question:
+Stage 1 ReqKB preserves what the source says. Stage 3 Design Governance and Design Planning decide what the project must design. Stage 2 sits between them and answers a deliberately narrower question:
 
-> What design-relevant characteristics can be established from the requirement evidence before any design solution is selected?
+> Which characteristics of the requirement must be understood before design governance can make an informed design decision?
 
-Assessment therefore converts requirement evidence into explicit, reviewable characteristics. It does not create APIs, screens, tables, components, architecture patterns, technologies or Basic Design content.
+The methodology is therefore purpose-first. It does not begin by asking how accurately an LLM can classify requirements. It begins by establishing why an assessment is needed, what must be assessed, and whether those assessment items are sufficient for downstream design reasoning.
 
 ```text
 Stage 1 — ReqKB
 Requirement Evidence Set
         ↓
 Stage 2 — Requirement Assessment
-Assessment Result / Characteristic Set
+Design-relevant Characteristic Set
         ↓
 Stage 3 — Design Governance + Design Planning
 Design Obligations + Artifact Plan
@@ -23,50 +23,72 @@ Design Obligations + Artifact Plan
 Stage 4 — Basic Design Generation
 ```
 
-## 2. Problem statement
+## 2. Why Assessment exists
 
-A ReqKB prepared from source documents is still an evidence layer. Even when SourceUnits have metadata, validation results and lightweight ontology annotations, the evidence does not yet expose all characteristics needed by a design process.
+A ReqKB is an evidence layer. Parsing, metadata, source traceability and lightweight ontology make requirement evidence retrievable and governable, but they do not by themselves establish the distinctions an architect uses before selecting a design response.
 
-For example, ReqKB may establish that a manager approves a purchase request under a stated condition. A designer may recognize that the behavior is approval-oriented, stateful and multi-actor. Those characteristics matter because downstream governance may apply different rules to different kinds of behavior.
+For example, source evidence may establish that a manager approves a purchase request under a stated condition. Before deciding any solution, an architect may need to understand whether the requirement represents approval behavior, whether business state changes, whether multiple actors participate, whether an authorization boundary exists, or whether an external system is involved.
 
-If the system skips Assessment and sends ReqKB directly to a generative model, one component is forced to perform several responsibilities at once:
+Those are not yet design decisions. They are design-relevant characteristics of the requirement.
+
+Without Stage 2, a downstream generative component is forced to combine several responsibilities:
 
 ```text
 Understand evidence
-+ characterize requirement
-+ recall design standards
-+ choose design decisions
++ decide what matters for design
++ characterize the requirement
++ recall design governance
++ choose design responses
 + plan artifacts
-+ write BD
++ generate BD
 ```
 
-That coupling makes results difficult to reproduce, review, govern and improve independently.
+That coupling makes the reasoning difficult to challenge, govern, reproduce and improve independently.
 
-Assessment separates the characterization responsibility from the design responsibility.
+Stage 2 separates the question **"What must we understand about this requirement?"** from **"What should we design because of it?"**
 
-## 3. Methodological position
+## 3. Methodology logic: WHY → WHAT → SUFFICIENCY → STANDARD → EXECUTION
 
-This project uses IPA guidance around System and Software Life Cycle Processes (SLCP) and Common Frame as methodological references for process separation and common terminology. IPA describes SLCP as a lifecycle framework covering system and software activities without prescribing one development methodology. Common Frame 2013 also incorporates requirement-definition concepts from ISO/IEC/IEEE 29148.
+The Assessment methodology follows this order deliberately:
 
-The project adopts the following principle from that lifecycle thinking:
+```text
+WHY
+Why does the distinction matter to design reasoning?
+        ↓
+WHAT
+What assessment items or dimensions must be examined?
+        ↓
+SUFFICIENCY
+Do those items cover the distinctions needed downstream?
+        ↓
+STANDARD
+What makes a classification valid for each item?
+        ↓
+EXECUTION
+How do Human / Rule / LLM apply the standard?
+        ↓
+QUALITY
+Was the result correct, repeatable and useful?
+```
 
-> Requirement analysis and design or architecture definition are related, but they should remain distinguishable responsibilities with explicit outputs and feedback between them.
+This order is an architectural constraint.
 
-The Stage 2 Assessment Framework defined by this project is not an IPA standard and must not be represented as one. IPA/SLCP provides a reference for separation of concerns; the assessment viewpoints, taxonomy, rules and automation methods are project-specific assets.
+The project must not optimize classification accuracy or LLM repeatability before establishing that the Assessment Framework is assessing the right things.
 
-Other requirement-engineering, systems-engineering or architecture references may inform the Assessment Framework later, but each adopted concept must be documented explicitly rather than silently treated as part of IPA.
+A system can classify an irrelevant taxonomy perfectly and still provide little value to design.
 
-## 4. Relationship to the human architect workflow
+## 4. Relationship to human architecture work
 
-A human Solution Architect rarely moves directly from raw requirement text to a final design. Before choosing a solution, the architect normally establishes an internal understanding of the requirement: what behavior is involved, who interacts, whether state changes, what information is affected, which boundaries are crossed, and which quality concerns are explicit.
+A human Solution Architect rarely moves directly from raw requirement text to final design. Before choosing a solution, the architect establishes an internal model of the requirement: behavior, interaction, state, information, boundaries, controls, constraints and other concerns relevant to the design problem.
 
-This reasoning is usually implicit and varies between people.
+That intermediate interpretation is often implicit and may vary significantly between architects.
 
-Stage 2 makes that intermediate understanding explicit and reviewable:
+Stage 2 externalizes the part of this reasoning that should be systematic:
 
 ```text
 Human workflow
 Read evidence
+→ determine what matters
 → recognize characteristics
 → apply design knowledge
 → plan solution
@@ -74,172 +96,274 @@ Read evidence
 
 Project workflow
 ReqKB
-→ Assessment
+→ Assessment Framework
+→ Characteristic Set
 → Design Governance + Planning
 → BD Generation
 ```
 
-The goal is not to replace architectural judgment with classification. The goal is to externalize the repeatable part of pre-design interpretation so that later design decisions have a stable input.
+Assessment does not attempt to replace architectural judgment. It creates a governed semantic input on which architectural judgment and design governance can operate.
 
-## 5. Assessment subject
+## 5. Assessment Framework: WHAT must be assessed
+
+The Assessment Framework defines the set of assessment items or dimensions through which requirement evidence must be examined.
+
+Examples may eventually include interaction, process/state, information, integration, control, functional behavior and quality constraints. The definitive set is intentionally not defined in this methodology document; it belongs in `01_ASSESSMENT_FRAMEWORK.md`.
+
+Every proposed assessment item must answer two questions before it is accepted into the Framework:
+
+1. **What distinction does this item allow us to observe in requirement evidence?**
+2. **Why does that distinction matter to downstream design reasoning?**
+
+An item must not be included merely because it is easy to classify, commonly found in requirement documents, or technically interesting.
+
+The Framework should contain the minimum set of distinctions necessary to support downstream design governance without collapsing materially different requirement situations into the same assessment result.
+
+## 6. Sufficiency before correctness
+
+Before asking whether individual classifications are correct, the project must establish whether the Framework itself is sufficiently complete for its intended purpose.
+
+Framework sufficiency asks:
+
+> Are there requirement situations that require materially different downstream design consideration but that the current Assessment Framework cannot distinguish?
+
+If yes, the Framework is under-specified.
+
+The opposite failure is also possible. A Framework may introduce many distinctions that do not affect downstream reasoning. Such a Framework is over-specified and creates classification cost without design value.
+
+The target is therefore not maximum taxonomy coverage. The target is **purposeful coverage**.
+
+Two practical tests govern Framework sufficiency:
+
+### 6.1 Missing-distinction test
+
+If two requirement situations need materially different design consideration but the Framework represents them identically, a relevant assessment dimension or classification may be missing.
+
+### 6.2 Irrelevant-distinction test
+
+If a distinction never changes which design concerns must be considered downstream, its inclusion in Stage 2 must be challenged.
+
+These tests evaluate the Framework, not the execution engine.
+
+## 7. Assessment Standard: what makes a classification valid
+
+Once the Framework defines what must be assessed, the Assessment Standard defines what valid classification means within each assessment item.
+
+For each governed classification, the Standard should eventually define concepts such as:
+
+- semantic definition;
+- positive criteria;
+- exclusion criteria;
+- minimum evidence expectations;
+- ambiguous or insufficient-evidence conditions;
+- conflicting-evidence handling;
+- relationship to neighboring classifications.
+
+For example, the Framework may decide that `Process / State Characteristic` is worth assessing. The Standard then defines how evidence is validly classified as `Stateful`, `Stateless`, `Unknown`, or another approved value.
+
+This separation is intentional:
+
+```text
+Assessment Framework
+WHAT matters?
+        ↓
+Assessment Standard
+What does a valid classification mean?
+        ↓
+Assessment Method
+How is the classification performed?
+```
+
+## 8. Correctness comes after sufficiency
+
+Correctness is evaluated only after the Framework and Standard are defined.
+
+A classification is not correct merely because it conforms to a schema or because multiple assessors agree with one another.
+
+Assessment correctness has at least three aspects:
+
+### 8.1 Evidence fidelity
+
+The characteristic must be supported by the governed Requirement Evidence Set. Plausibility is not evidence.
+
+### 8.2 Classification validity
+
+The evidence must satisfy the approved meaning and criteria of the selected classification.
+
+### 8.3 Boundary validity
+
+The result must remain a requirement characteristic rather than introducing a downstream design choice.
+
+For example:
+
+```text
+"The interaction is approval-oriented"
+→ valid Stage 2 characteristic
+
+"Use a workflow engine"
+→ Stage 3 design decision, not Assessment
+```
+
+## 9. Repeatability comes after correctness
+
+Repeatability asks whether independent qualified assessors applying the same Framework and Standard to the same governed evidence reach materially equivalent semantic conclusions.
+
+Repeatability is not identical to deterministic output.
+
+Two LLM executions or two human assessors may use different wording while reaching the same governed classification.
+
+Conversely, high agreement does not prove correctness. A poorly designed Framework can make humans and AI consistently produce the same wrong or incomplete result.
+
+Therefore:
+
+> Repeatability is necessary for scalable automation, but it is not a substitute for Framework sufficiency or classification correctness.
+
+## 10. Decision relevance
+
+A characteristic exists in Stage 2 because it represents a distinction that downstream design governance may need to consider.
+
+Decision relevance does not mean Stage 2 specifies the design response.
+
+For example:
+
+```text
+Assessment dimension:
+Process / State
+
+Why it matters:
+Stateful and stateless behavior create materially different design concerns.
+
+Not allowed in Stage 2:
+Stateful → use workflow engine.
+```
+
+The first statement justifies why the dimension belongs in Assessment. The second is a Design Governance rule and belongs in Stage 3.
+
+This boundary allows the project to test whether an assessment item is useful without embedding design decisions into the Assessment Framework.
+
+## 11. Assessment subject and evidence boundary
 
 Assessment operates on a `Requirement Evidence Set`, not automatically on one SourceUnit.
 
-A Requirement Evidence Set is the smallest governed collection of ReqKB evidence that provides sufficient context to characterize one requirement concern. It may contain:
+A Requirement Evidence Set is the smallest governed collection of ReqKB evidence that provides sufficient context to assess one requirement concern. It may contain a single SourceUnit or multiple structurally related SourceUnits such as a requirement statement, condition, exception, referenced business rule or terminology evidence.
 
-- one SourceUnit;
-- a requirement statement plus its condition or exception;
-- a requirement plus an explicitly referenced business rule;
-- several SourceUnits whose meaning is structurally dependent;
-- related evidence needed to resolve a pronoun, term or cross-reference.
+The evidence set remains traceable to ReqKB. Assessment is derived knowledge and never becomes the factual source of truth.
 
-The evidence set remains fully traceable to ReqKB. Assessment does not copy the evidence into a new source of truth.
-
-## 6. Assessment responsibility
+## 12. Assessment responsibility boundary
 
 Assessment may:
 
-- identify design-relevant characteristics supported by evidence;
-- classify those characteristics using the approved Assessment Framework;
-- combine findings from multiple evidence items;
+- examine evidence through approved Framework items;
+- recognize candidate characteristics;
+- classify them according to the Assessment Standard;
+- consolidate findings across evidence;
 - expose ambiguity, conflict or insufficient information;
-- record provenance, method and version information;
-- request human review when automation cannot produce a supported result.
+- preserve evidence and classification basis;
+- route uncertain cases for governed review.
 
 Assessment must not:
 
-- select a technology or architecture pattern;
-- decide that a Screen, API, Batch, Database table or other design artifact must exist;
-- apply project Design Governance rules;
-- turn a characteristic into a design obligation;
-- rewrite or correct ReqKB evidence;
-- infer missing facts merely because they would make a design convenient;
-- generate Basic Design prose.
+- select architecture or technology;
+- decide that a Screen, API, Batch, Database table or other artifact must exist;
+- apply Design Governance rules;
+- produce Design Obligations;
+- repair canonical ReqKB evidence;
+- infer missing facts because they make a design convenient;
+- generate Basic Design content.
 
-A simple boundary test is:
+## 13. Logical assessment process
+
+Only after WHY, WHAT, sufficiency and classification standards are governed does execution begin.
 
 ```text
-"This is a stateful approval interaction"
-→ Assessment characteristic
+1. Frame
+   Resolve the Assessment Subject and evidence boundary.
 
-"Use a workflow engine and store approval history"
-→ Design Governance / Design Planning
+2. Examine
+   Apply the relevant Assessment Framework items.
+
+3. Recognize
+   Identify candidate characteristics from evidence.
+
+4. Classify
+   Apply governed classification criteria.
+
+5. Consolidate
+   Merge equivalent findings and expose conflicts.
+
+6. Validate
+   Check evidence fidelity, classification validity and boundary validity.
+
+7. Review / Publish
+   Resolve governed review cases and publish accepted results.
 ```
 
-## 7. Method phases
+The process is implementation-neutral. Human assessment, deterministic rules, LLM-assisted interpretation or hybrid execution may implement it.
 
-Assessment is defined as a capability with several logical phases. The phases do not imply a specific tool, agent framework or implementation technology.
+## 14. Quality model
 
-### 7.1 Frame
+Stage 2 quality must not be represented by a single generic `accuracy` score.
 
-Resolve the Assessment Subject and construct the bounded Requirement Evidence Set.
+The methodology distinguishes four quality questions:
 
-The purpose is to ensure that subsequent interpretation receives sufficient but controlled context.
+### 14.1 Framework sufficiency
 
-### 7.2 Examine
+Are we assessing the distinctions that downstream design reasoning actually needs?
 
-Evaluate the evidence through the applicable Assessment Framework viewpoints.
+### 14.2 Correctness
 
-This establishes which concerns need characterization without yet deciding their values.
+Did we characterize the governed evidence correctly according to the Framework and Standard?
 
-### 7.3 Recognize
+### 14.3 Repeatability
 
-Identify candidate characteristics using approved methods such as deterministic rules, terminology knowledge, pattern recognition, LLM-assisted interpretation or human judgment.
+Can independent qualified assessors or approved execution methods reach materially equivalent semantic results?
 
-### 7.4 Classify
+### 14.4 Decision relevance
 
-Map recognized candidates into the controlled Assessment Standard and characteristic taxonomy.
+Does the assessed distinction matter to downstream design consideration without prescribing the design solution?
 
-Recognition and classification are intentionally distinct: language recognition methods may evolve while the downstream semantic contract remains stable.
+These dimensions must be evaluated separately because a system can be highly repeatable but systematically wrong, correct but inconsistent, or correct and repeatable while assessing distinctions that provide no downstream value.
 
-### 7.5 Consolidate
+## 15. Uncertainty and non-results
 
-Combine findings across the evidence set, preserve supporting evidence, merge equivalent findings and expose incompatible findings instead of silently choosing one.
+Assessment does not guarantee that every input produces a Characteristic Set.
 
-### 7.6 Validate
+Valid stage outcomes include:
 
-Check that every characteristic is allowed by the current standard, supported by evidence and internally consistent with the rest of the Assessment Result.
+- `ASSESSED` — supported governed characteristics are available;
+- `UNKNOWN` — valid evidence does not support the required characterization;
+- `CONFLICTING` — governed evidence supports incompatible findings;
+- `REVIEW_REQUIRED` — qualified judgment is required;
+- `INPUT_NOT_READY` — the ReqKB evidence set is not suitable for assessment.
 
-### 7.7 Review and publish
+No supported classification is preferable to an unsupported confident classification.
 
-Route unresolved cases according to review policy. Only accepted results are published for automatic consumption by Stage 3.
+## 16. Provenance, versioning and reproducibility
 
-## 8. Governing principles
+Every published Assessment Result must identify enough governed context to explain how it was produced, including the evidence baseline and applicable Framework, Standard, knowledge and execution versions.
 
-### 8.1 Evidence before inference
+The goal is operational reproducibility rather than bit-for-bit deterministic generation.
 
-Every accepted characteristic must be traceable to the Requirement Evidence Set. Model plausibility is not evidence.
+A result is derived knowledge and may require reassessment when its evidence, Framework, Standard, classification taxonomy or materially relevant execution policy changes.
 
-### 8.2 Characteristics, not design decisions
+Stage 2 must never silently mutate source evidence or erase conflicting evidence.
 
-Assessment describes properties relevant to design. It never selects the design response.
+## 17. Feedback to Stage 1
 
-### 8.3 ReqKB remains authoritative
+If Assessment cannot proceed because the evidence itself is structurally or semantically defective, Stage 2 routes the issue back to ReqKB governance.
 
-ReqKB is the evidence source of truth. Assessment is derived knowledge and can be invalidated or regenerated without changing ReqKB.
+Examples include unresolved references, incorrect SourceUnit boundaries, superseded evidence, conflicting source revisions or unresolved terminology required for interpretation.
 
-### 8.4 Stable semantics, replaceable execution
+Stage 2 records the problem; it does not repair canonical evidence itself.
 
-Assessment Framework, Standard and output meaning should change conservatively. Rules, prompts, models and orchestration may evolve independently.
+## 18. Relationship to Stage 3
 
-### 8.5 Explicit uncertainty
-
-Unknown, conflicting and insufficient-evidence outcomes are legitimate results. No supported characteristic is preferable to an unsupported confident answer.
-
-### 8.6 Reproducibility and provenance
-
-Every published Assessment Result must identify the evidence baseline and the versions of the standard, knowledge and execution configuration that produced it.
-
-The objective is not bit-for-bit deterministic LLM output. The objective is operational reproducibility: a reviewer must be able to explain which inputs and governed versions led to the result.
-
-### 8.7 Independent reviewability
-
-A reviewer must be able to assess the validity of a characteristic without reading generated BD or accepting downstream design decisions.
-
-### 8.8 Reusability
-
-Assessment output should describe requirement characteristics independently of one specific artifact type. The same accepted result may support Design Governance, impact analysis, test design or other approved consumers.
-
-### 8.9 No silent mutation
-
-Neither automated methods nor human review may silently rewrite source evidence or erase conflicting evidence. Corrections are represented as new derived results or Stage 1 feedback.
-
-## 9. Outcome semantics
-
-Assessment does not guarantee that every input becomes a Characteristic Set.
-
-At the stage level, valid outcomes include:
-
-- `ASSESSED` — a supported Assessment Result is available;
-- `UNKNOWN` — the evidence is valid but does not support a required characterization;
-- `CONFLICTING` — the evidence supports incompatible findings that cannot be consolidated safely;
-- `REVIEW_REQUIRED` — governed human judgment is required;
-- `INPUT_NOT_READY` — the ReqKB evidence set is structurally or semantically insufficient for assessment.
-
-Failure to characterize is not automatically a processing failure. It may be a legitimate statement about the evidence.
-
-## 10. Feedback to Stage 1
-
-Assessment must provide a controlled feedback route when the problem belongs to ReqKB rather than to interpretation.
-
-Examples include:
-
-- unresolved source reference;
-- missing context caused by an incorrect SourceUnit boundary;
-- invalid or superseded evidence;
-- conflicting source revisions;
-- missing terminology resolution required to interpret the evidence.
-
-Stage 2 records the issue and routes it to the appropriate Stage 1 review or remediation process. Stage 2 must not repair canonical evidence itself.
-
-## 11. Relationship to Stage 3
-
-Stage 3 consumes only governed Stage 2 outputs.
+Stage 3 consumes governed Assessment Results:
 
 ```text
-Assessment Result
+Requirement Evidence
         ↓
-Characteristic Set
+Assessment Characteristic Set
         ↓
 Design Rule Matching
         ↓
@@ -250,39 +374,84 @@ Design Planning
 Artifact Plan
 ```
 
-Stage 3 may use project architecture, standards, design rules, existing designs and human design decisions. Those inputs are intentionally excluded from Stage 2 because they can bias characterization toward a preferred solution.
+Stage 3 may use architecture principles, organization standards, Design Rules, patterns, existing designs and expert decisions. Those assets are excluded from Stage 2 because they represent design knowledge and can bias requirement characterization toward a preferred solution.
 
-A downstream BD generator must not use Assessment Results as a shortcut around Design Governance. When factual evidence is required for BD content, Stage 4 retrieves the authoritative SourceUnits from ReqKB through the assessment and planning trace.
+When Stage 4 requires factual support, it retrieves authoritative evidence from ReqKB through the trace chain rather than treating the Assessment Result as replacement evidence.
 
-## 12. Change and invalidation model
+## 19. Validation sequence for the methodology
 
-An Assessment Result is derived from a defined baseline and may become stale even when its text has not changed.
+The project should validate Stage 2 in the following order:
 
-Reassessment must be considered when any governing dependency changes, including:
+```text
+1. Purpose validation
+   Do we agree why Assessment exists?
 
-- Requirement Evidence Set or source revision;
-- Assessment Framework or Standard;
-- characteristic taxonomy;
-- Assessment Knowledge or rule set;
-- model, prompt or execution policy where the change can materially affect interpretation;
-- accepted human review decision.
+2. Framework sufficiency validation
+   Are we assessing the right and sufficient distinctions?
 
-Stage 2 therefore treats Assessment Results as versioned derived knowledge rather than permanent facts.
+3. Standard validation
+   Are the classifications and criteria semantically sound?
 
-## 13. Success criteria
+4. Human correctness validation
+   Can qualified reviewers apply them correctly to real requirements?
 
-The methodology is successful when:
+5. Human repeatability validation
+   Do independent reviewers reach materially equivalent conclusions?
 
-- architects agree that the Characteristic Set captures the repeatable information they establish before making design decisions;
-- different approved execution methods produce materially consistent classifications for clear cases;
-- every accepted characteristic can be traced to evidence and a governed assessment baseline;
-- ambiguous cases are surfaced rather than hidden by confident generation;
-- Stage 3 can apply Design Governance without repeatedly rereading raw RD prose for basic characterization;
-- design-rule changes do not require reassessment when the underlying requirement characteristics remain unchanged;
-- requirement or assessment changes invalidate downstream results in a controlled and traceable manner.
+6. Downstream relevance validation
+   Do the resulting distinctions support meaningful Design Governance reasoning?
 
-## 14. Methodology completion gate
+7. Automation validation
+   Can Rule / LLM / Hybrid execution reproduce the validated methodology at acceptable quality?
+```
 
-This methodology is ready to govern implementation only after the project has demonstrated it on a reviewed sample of real requirements.
+Automation is deliberately last.
 
-Before automation is considered authoritative, the project should be able to show that human reviewers can apply the same Assessment Framework to the sample and reach sufficiently consistent Characteristic Sets. Disagreement at this level indicates that the framework or standard requires refinement before adding more automation.
+The project must not use model performance to compensate for an unresolved Framework or Standard.
+
+## 20. Methodology completion gate
+
+Stage 2 methodology is ready to govern implementation only when a reviewed sample of real project requirements demonstrates all of the following:
+
+- the purpose and boundary of Assessment are understood by Requirement, Architecture and AI Engineering stakeholders;
+- the Framework covers the material pre-design distinctions needed for the target BD scope;
+- proposed dimensions can justify why they matter downstream;
+- classification criteria are sufficiently clear to evaluate correctness;
+- qualified human reviewers can apply the Framework and Standard with acceptable semantic agreement;
+- unresolved cases can be represented without forced classification;
+- Design Governance can consume the Characteristic Set without requiring Stage 2 to make design decisions;
+- automation can be evaluated against a validated human baseline rather than against an unvalidated taxonomy.
+
+The governing principle is:
+
+> First determine why and what to assess. Then prove that the Framework is sufficient. Then define what correct classification means. Only after that optimize repeatability and automation.
+
+## 21. Review model for subsequent Stage 2 documents
+
+Every subsequent Stage 2 document should be challenged from two deliberately different perspectives before it is treated as stable.
+
+### BPR / management-consulting perspective
+
+Challenge whether the document is purpose-driven, complete enough for the business/design decision, minimally sufficient, understandable to qualified practitioners and free of process or taxonomy that does not create downstream value.
+
+Typical questions include:
+
+- Why is this needed?
+- What decision or distinction does it enable?
+- What is missing?
+- What can be removed without losing value?
+- How would we know the process is working?
+
+### AI Engineering perspective
+
+Challenge whether the same methodology can be represented explicitly enough to execute, evaluate, version and scale through deterministic rules, LLMs or hybrid systems without hiding semantic ambiguity inside prompts.
+
+Typical questions include:
+
+- Is the input contract explicit?
+- Are classification criteria machine-interpretable enough to test?
+- Can uncertainty and conflict be represented?
+- Can results be traced and reproduced?
+- Can we separate methodology defects from model defects?
+
+Neither perspective is authoritative by itself. The BPR perspective protects purpose, sufficiency and usefulness; the AI Engineering perspective protects explicitness, testability, repeatability and operational scalability. Stage 2 should be accepted only where both views can be reconciled without violating the SA boundary between requirement characterization and design decision.
