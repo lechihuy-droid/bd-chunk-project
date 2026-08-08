@@ -1,43 +1,47 @@
-# Stage 2 — Requirement Assessment Framework
+# Stage 2 — Requirement Assessment
 
-This folder defines the independent assessment stage between ReqKB and Design Governance.
+This folder defines the documentation set for the Requirement Assessment phase.
+
+## Position in the overall flow
 
 ```text
-ReqKB
-→ Requirement Assessment
-→ Design Governance
-→ Design Planning
-→ Basic Design
+Stage 1 — ReqKB
+Evidence + source trace + lightweight requirement ontology
+
+        ↓
+
+Stage 2 — Requirement Assessment
+Design-relevant characteristics
+
+        ↓
+
+Stage 3 — Design Governance + Design Planning
+Design obligations + artifact plan
+
+        ↓
+
+Stage 4 — Basic Design Generation
+Artifact generation + evidence traceability
 ```
 
-The stage converts evidence-backed requirement facts into design-relevant characteristics. It does not make design decisions and does not generate BD artifacts.
+## Core principle
 
-## Reading order
+Assessment characterizes requirements for design consumption. It does not decide the design solution.
 
-1. [`00_METHODOLOGY.md`](00_METHODOLOGY.md) — purpose, boundaries and relationship to IPA/SLCP.
-2. [`01_FRAMEWORK.md`](01_FRAMEWORK.md) — assessment viewpoints and semantic structure.
-3. [`02_INPUTS.md`](02_INPUTS.md) — evidence, standards and knowledge required by assessment.
-4. [`03_METHOD.md`](03_METHOD.md) — rule, LLM and hybrid assessment methodology.
-5. [`04_OUTPUT_MODEL.md`](04_OUTPUT_MODEL.md) — assessment characteristics, provenance and review state.
-6. [`05_PIPELINE.md`](05_PIPELINE.md) — end-to-end processing flow and quality gates.
-7. [`06_HUMAN_REVIEW.md`](06_HUMAN_REVIEW.md) — reviewer responsibilities and feedback loop.
-8. [`07_IMPLEMENTATION_GUIDE.md`](07_IMPLEMENTATION_GUIDE.md) — phased implementation plan and acceptance criteria.
+ReqKB remains the evidence source of truth. Assessment results are derived knowledge.
 
-## Scope boundary
+## Document set
 
-Included:
+1. [`00_ASSESSMENT_METHODOLOGY.md`](00_ASSESSMENT_METHODOLOGY.md)
+2. [`01_ASSESSMENT_FRAMEWORK.md`](01_ASSESSMENT_FRAMEWORK.md)
+3. [`02_ASSESSMENT_INPUT.md`](02_ASSESSMENT_INPUT.md)
+4. [`03_ASSESSMENT_STANDARD.md`](03_ASSESSMENT_STANDARD.md)
+5. [`04_ASSESSMENT_METHOD.md`](04_ASSESSMENT_METHOD.md)
+6. [`05_ASSESSMENT_OUTPUT.md`](05_ASSESSMENT_OUTPUT.md)
+7. [`06_ASSESSMENT_PIPELINE.md`](06_ASSESSMENT_PIPELINE.md)
+8. [`07_QUALITY_AND_HUMAN_REVIEW.md`](07_QUALITY_AND_HUMAN_REVIEW.md)
+9. [`08_IMPLEMENTATION_APPROACH.md`](08_IMPLEMENTATION_APPROACH.md)
 
-- requirement characterization from ReqKB evidence;
-- assessment viewpoints and standards;
-- rule-based and LLM-assisted recognition;
-- classification and consolidation;
-- provenance, confidence and review;
-- reusable assessment output for downstream consumers.
+## Scope of this branch
 
-Excluded:
-
-- requirement quality approval;
-- architecture or technology selection;
-- Design Governance rules;
-- API, screen, database or batch design decisions;
-- BD generation.
+This branch establishes the documentation skeleton only. Each document will be developed and reviewed separately.
