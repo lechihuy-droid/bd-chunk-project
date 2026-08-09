@@ -4,31 +4,63 @@ This folder is the learning and architecture knowledge base for the BD Chunk / S
 
 ## Goal
 
-Build a framework-independent mental model for designing an enterprise-grade agent harness for Basic Design (BD) work.
+Build a framework-independent mental model for designing enterprise-grade AI agent systems while following the Microsoft Frontier / Titan certification path.
 
-The target architecture is not tied to a single framework such as LangGraph, Claude Code, OpenAI Agents SDK, or Microsoft Agent Framework. The goal is to define a canonical architecture first, then map each framework to that architecture.
+The architecture is not tied to a single framework such as LangGraph, Claude Code, OpenAI Agents SDK, or Microsoft Agent Framework. Canonical concepts come first; product/framework mappings come after.
 
-## Learning Tracks
+## Primary Learning Track
 
-### 1. AI Agent Engineering — 3-Week Bootcamp
+### Frontier / Titan — 21-Day Certification Sprint
 
-Main track for learning to build AI agents and a production-style multi-agent harness while mapping the work to Microsoft AI-103, AAAI-1/2, AI-500, and the later Frontier/Titan direction.
+```text
+AI-103 — 3-day concept rush
+        ↓
+GH-300 — 3-day concept rush
+        ↓
+4 integrated hands-on sessions
+        ↓
+AB-100 — 11-day intensive
+        ↓
+Titan / Project Ready / Frontier
+```
+
+Main roadmap:
 
 - [`AI_AGENT_3_WEEK_LEARNING_PATH.md`](./AI_AGENT_3_WEEK_LEARNING_PATH.md)
-- [`VOICE_LEARNING_PROGRESS.md`](./VOICE_LEARNING_PROGRESS.md) — live voice-first learning notes and checkpoints
 
-Current voice-learning progress: **Day 1–Day 4 completed conceptually; Day 5 is next.**
+Detailed certification units:
 
-### 2. Harness Architecture — 5-Day Path
+- [`certifications/AI-103_3_DAY_RUSH.md`](./certifications/AI-103_3_DAY_RUSH.md) — Certificate #1
 
-Focused architecture track for the canonical Super Agent Harness model.
+Voice-learning record:
+
+- [`VOICE_LEARNING_PROGRESS.md`](./VOICE_LEARNING_PROGRESS.md)
+
+## Certificate #1 — AI-103
+
+**Microsoft Certified: Azure AI Apps and Agents Developer Associate**
+
+Current strategy:
+
+```text
+Day 1 — Foundry + Model + Agent + Platform
+Day 2 — Generative AI + RAG + Tools + Agents
+Day 3 — Vision + Text + Extraction + Security + Operations + Exam Review
+```
+
+Implementation is intentionally deferred into the four integrated hands-on sessions after the GH-300 concept rush.
+
+## Harness Architecture Track
+
+Separate focused architecture material:
 
 - [`WEEK01_5_DAY_PLAN.md`](./WEEK01_5_DAY_PLAN.md)
+- [`DAY02_ARTIFACT_CENTRIC_ARCHITECTURE.md`](./DAY02_ARTIFACT_CENTRIC_ARCHITECTURE.md)
+- [`DAY03_HOOK_TRIGGER_INTEGRATION_RUNTIME_OBSERVABILITY.md`](./DAY03_HOOK_TRIGGER_INTEGRATION_RUNTIME_OBSERVABILITY.md)
 - [`SA_HANDBOOK.md`](./SA_HANDBOOK.md)
+- [`REFERENCES.md`](./REFERENCES.md)
 
-## Core Learning Outcome
-
-By the end of the architecture path, you should be able to explain and design the following components clearly:
+## Canonical Architecture
 
 ```text
 Goal
@@ -43,103 +75,51 @@ Orchestrator / Runtime
   ↓
 State + Artifact Store + Knowledge Base
   ↓
-Agent Pool
+Agent Pool + Tools / MCP
   ↓
-Review / Validation
+Review / Validation / Human Gate
+  ↓
+Evaluation / Observability / Governance
   ↓
 Deliverables
 ```
 
-The 3-week AI Agent track extends this into:
+## Learning Mode
+
+The current learning mode can be voice-first.
 
 ```text
-LLM / Model
-  ↓
-Tools + MCP
-  ↓
-Single Agent
-  ↓
-Workflow Runtime
-  ↓
-Multi-Agent Orchestration
-  ↓
-State / Memory / Knowledge
-  ↓
-Human Gate
-  ↓
-Evaluation / Observability / Security
-  ↓
-Runnable BD Chunk Agent Harness PoC
+Official objective
+      ↓
+Mental model
+      ↓
+Explain verbally
+      ↓
+Challenge scenario
+      ↓
+Exam-style checkpoint
+      ↓
+Hands-on validation later
 ```
 
-## Folder Structure
-
-```text
-harness-learning-path/
-├── README.md
-├── AI_AGENT_3_WEEK_LEARNING_PATH.md
-├── VOICE_LEARNING_PROGRESS.md
-├── WEEK01_5_DAY_PLAN.md
-├── DAY02_ARTIFACT_CENTRIC_ARCHITECTURE.md
-├── DAY03_HOOK_TRIGGER_INTEGRATION_RUNTIME_OBSERVABILITY.md
-├── SA_HANDBOOK.md
-└── REFERENCES.md
-```
-
-## Main Artifacts
-
-For agent engineering:
-
-```text
-AI_AGENT_3_WEEK_LEARNING_PATH.md
-VOICE_LEARNING_PROGRESS.md
-```
-
-For canonical harness architecture:
-
-```text
-SA_HANDBOOK.md
-```
-
-The handbook should become the project knowledge base for agent system architecture decisions.
-
-## How to Use These Paths
-
-For the 3-week AI Agent bootcamp, use approximately 4 hours/day and evolve the same BD Chunk / RD→BD capstone every day.
-
-The current learning mode can be voice-first: explain concepts verbally, answer checkpoints verbally, correct the mental model, then map it to implementation later. API access is not required for the early conceptual days.
-
-For the architecture path, each day requires approximately 3–4 hours.
-
-Recommended daily cycle:
-
-```text
-1. Learn from selected course/source
-2. Extract concept notes
-3. Map concept to BD Harness
-4. Build or update one artifact/lab
-5. Update SA_HANDBOOK.md when an architecture decision stabilizes
-6. Write one architecture decision or diagram
-```
+API access is not required for the early concept-rush days. Python/SDK knowledge is still required at code-reading level for AI-103 and will be exercised during hands-on sessions.
 
 ## Priority
 
-Do not learn more frameworks first. Focus on the canonical concepts:
+Do not learn more frameworks first. Focus on:
 
-- Planner
-- Orchestrator
-- Scheduler
-- State
-- Artifact Store
-- Workspace
-- Memory
-- Knowledge Base
-- Skills
+- Model vs Agent
+- Agent vs Tool
+- Workflow Runtime
+- State / Context / Memory / Knowledge
+- Agent Contracts
+- RAG / Search
 - Tools / MCP
-- Agent Pool
+- Multi-Agent Orchestration
 - Human Review
-- Traceability
+- Security
 - Evaluation
+- Observability
 - Governance
 
 Frameworks are implementation mappings after the canonical architecture is understood.
