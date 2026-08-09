@@ -15,6 +15,9 @@ The target architecture is not tied to a single framework such as LangGraph, Cla
 Main track for learning to build AI agents and a production-style multi-agent harness while mapping the work to Microsoft AI-103, AAAI-1/2, AI-500, and the later Frontier/Titan direction.
 
 - [`AI_AGENT_3_WEEK_LEARNING_PATH.md`](./AI_AGENT_3_WEEK_LEARNING_PATH.md)
+- [`VOICE_LEARNING_PROGRESS.md`](./VOICE_LEARNING_PROGRESS.md) — live voice-first learning notes and checkpoints
+
+Current voice-learning progress: **Day 1–Day 4 completed conceptually; Day 5 is next.**
 
 ### 2. Harness Architecture — 5-Day Path
 
@@ -75,6 +78,7 @@ Runnable BD Chunk Agent Harness PoC
 harness-learning-path/
 ├── README.md
 ├── AI_AGENT_3_WEEK_LEARNING_PATH.md
+├── VOICE_LEARNING_PROGRESS.md
 ├── WEEK01_5_DAY_PLAN.md
 ├── DAY02_ARTIFACT_CENTRIC_ARCHITECTURE.md
 ├── DAY03_HOOK_TRIGGER_INTEGRATION_RUNTIME_OBSERVABILITY.md
@@ -88,6 +92,7 @@ For agent engineering:
 
 ```text
 AI_AGENT_3_WEEK_LEARNING_PATH.md
+VOICE_LEARNING_PROGRESS.md
 ```
 
 For canonical harness architecture:
@@ -101,6 +106,8 @@ The handbook should become the project knowledge base for agent system architect
 ## How to Use These Paths
 
 For the 3-week AI Agent bootcamp, use approximately 4 hours/day and evolve the same BD Chunk / RD→BD capstone every day.
+
+The current learning mode can be voice-first: explain concepts verbally, answer checkpoints verbally, correct the mental model, then map it to implementation later. API access is not required for the early conceptual days.
 
 For the architecture path, each day requires approximately 3–4 hours.
 
