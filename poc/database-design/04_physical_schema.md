@@ -9,57 +9,29 @@
 
 ## 1. Mục tiêu
 
-Tài liệu này chuyển logical model sang schema đủ nhỏ để implement nhanh trong POC nhưng không phá đường scale lên PostgreSQL/main.
-
-Nguyên tắc:
+Chuyển logical model sang schema **implement nhanh cho POC nhưng không throw-away khi lên main**.
 
 ```text
 POC đơn giản ở implementation detail
 ≠
-POC làm yếu identity / lineage / baseline / publication semantics
+làm yếu identity / lineage / baseline / publication semantics
 ```
 
-Engine POC:
+POC dùng SQLite. Main có thể đổi PostgreSQL qua repository/domain contract ổn định.
 
-```text
-Catalog DB = SQLite
-```
+### Physical decisions
 
-Main có thể chuyển sang PostgreSQL qua repository/domain contract giữ ổn định.
+**PD-01 — ID:** application-generated UUID-compatible string, SQLite lưu `TEXT PRIMARY KEY`.  
+**Lý do:** ID phải correlation được giữa DB, Object Store, runtime và Neo4j; không phụ thuộc DB sequence.
 
----
+**PD-02 — time:** RFC3339 UTC `TEXT`.  
+**Lý do:** readable/sortable khi canonical; main map sang PostgreSQL `timestamptz`.
 
-## 2. Physical-design decisions
+**PD-03 — workspace_id denormalization:** giữ `workspace_id` trên các table cross-reference quan trọng.  
+**Lý do:** enforce cross-workspace relationship và chuẩn bị query/RLS main.  
+**Trade-off:** write service phải bảo đảm ownership consistency.
 
-### PD-01 — application-generated opaque IDs
-
-**Context:** ID được tham chiếu qua DB, Object Store, runtime và Neo4j.
-
-**Decision:** POC dùng application-generated UUID-compatible string, lưu `TEXT PRIMARY KEY` trong SQLite.
-
-**Rationale:** identity không phụ thuộc một DB instance/sequence và dễ correlation cross-store.
-
-**Trade-off:** PostgreSQL main có thể đổi physical type sang `UUID`; domain/API vẫn coi ID là opaque string.
-
-### PD-02 — UTC timestamp dạng TEXT trong SQLite
-
-**Decision:** lưu RFC3339 UTC, ví dụ `2026-08-10T15:00:00Z`.
-
-**Rationale:** readable, sortable khi format canonical, dễ migrate sang PostgreSQL `timestamptz`.
-
-### PD-03 — workspace_id denormalization có chủ đích
-
-**Context:** nhiều relationship nối các aggregate khác nhau; main cần tenant/RLS filtering hiệu quả.
-
-**Decision:** các table governance/cross-reference quan trọng giữ `workspace_id` trực tiếp dù có thể derive qua parent.
-
-**Rationale:** giúp query/filter và cho phép composite FK/validation cross-workspace.
-
-**Trade-off:** có duplicate ownership key; write path phải verify consistency. Main security/RLS strategy vẫn cần ADR riêng.
-
-### PD-04 — SQLite dùng WAL + foreign keys
-
-POC connection bootstrap bắt buộc:
+**PD-04 — SQLite bootstrap:**
 
 ```sql
 PRAGMA foreign_keys = ON;
@@ -67,13 +39,11 @@ PRAGMA journal_mode = WAL;
 PRAGMA busy_timeout = 5000;
 ```
 
-**Rationale:** FK mặc định cần bật explicit; WAL phù hợp read-heavy POC với một writer tại một thời điểm.
-
-**Trade-off:** SQLite vẫn không phải target cho high-concurrency multi-worker write.
+WAL phù hợp POC read-heavy/few writers; SQLite không phải target cho high-concurrency write.
 
 ---
 
-## 3. POC table set
+## 2. POC table set
 
 Implement NOW:
 
@@ -83,12 +53,12 @@ source_asset
 source_revision
 processing_run
 stage_execution
-stage_input
 output_slot
 output_slot_scope_member
 output_set
 stored_object
 baseline_selection
+stage_input
 baseline_head
 knowledge_space
 publication_scope
@@ -96,7 +66,7 @@ publication
 publication_head
 ```
 
-Conditional, chưa cần table ở POC đầu tiên:
+Conditional:
 
 ```text
 review_request
@@ -113,11 +83,13 @@ output_contract_registry
 full IAM/RLS tables
 ```
 
+Executable migration order phải theo dependency list trên; đặc biệt `baseline_selection` được tạo trước `stage_input` để composite FK baseline binding có thể khai báo ngay từ đầu.
+
 ---
 
-## 4. Table shape và constraints
+## 3. Core DDL
 
-### 4.1 Workspace / source
+### 3.1 Workspace / source
 
 ```sql
 CREATE TABLE workspace (
@@ -149,11 +121,9 @@ CREATE TABLE source_revision (
 );
 ```
 
-`UNIQUE(source_asset_id, content_hash)` tránh duplicate revision khi upload lại cùng bytes. Nếu product sau này cần intentional duplicate revision cùng content nhưng metadata khác, rule này phải được review lại trước main.
+POC coi cùng bytes của cùng SourceAsset là cùng content revision. Nếu main cần intentional revision mới dù bytes giống nhau, review lại unique rule này.
 
----
-
-### 4.2 ProcessingRun / StageExecution
+### 3.2 ProcessingRun / StageExecution
 
 ```sql
 CREATE TABLE processing_run (
@@ -194,28 +164,26 @@ CREATE TABLE stage_execution (
 
 Không tạo table theo `CONVERT/PARSE/ONTOLOGY`; `stage_type` là data.
 
----
-
-### 4.3 OutputSlot / source scope
+### 3.3 OutputSlot / source scope
 
 ```sql
 CREATE TABLE output_slot (
-  output_slot_id   TEXT PRIMARY KEY,
-  workspace_id     TEXT NOT NULL REFERENCES workspace(workspace_id),
-  artifact_role    TEXT NOT NULL,
+  output_slot_id    TEXT PRIMARY KEY,
+  workspace_id      TEXT NOT NULL REFERENCES workspace(workspace_id),
+  artifact_role     TEXT NOT NULL,
   scope_fingerprint TEXT NOT NULL,
-  logical_name     TEXT,
-  created_at       TEXT NOT NULL,
+  logical_name      TEXT,
+  created_at        TEXT NOT NULL,
   UNIQUE (workspace_id, artifact_role, scope_fingerprint),
   UNIQUE (output_slot_id, workspace_id)
 );
 
 CREATE TABLE output_slot_scope_member (
-  output_slot_id    TEXT NOT NULL,
-  workspace_id      TEXT NOT NULL,
+  output_slot_id     TEXT NOT NULL,
+  workspace_id       TEXT NOT NULL,
   source_revision_id TEXT NOT NULL,
-  scope_role        TEXT NOT NULL,
-  ordinal           INTEGER NOT NULL CHECK (ordinal >= 0),
+  scope_role         TEXT NOT NULL,
+  ordinal            INTEGER NOT NULL CHECK (ordinal >= 0),
   PRIMARY KEY (output_slot_id, scope_role, ordinal),
   FOREIGN KEY (output_slot_id, workspace_id)
     REFERENCES output_slot(output_slot_id, workspace_id),
@@ -225,17 +193,15 @@ CREATE TABLE output_slot_scope_member (
 );
 ```
 
-`scope_fingerprint` được application tính từ canonical ordered scope members:
+`scope_fingerprint = HASH(canonical ordered scope members)` với tuple:
 
 ```text
 (scope_role, source_revision_id, ordinal)
 ```
 
-Rerun cùng scope phải resolve cùng OutputSlot, không tạo slot mới.
+Rerun cùng logical scope phải resolve cùng OutputSlot.
 
----
-
-### 4.4 OutputSet / StoredObject
+### 3.4 OutputSet / StoredObject
 
 ```sql
 CREATE TABLE output_set (
@@ -263,6 +229,7 @@ CREATE TABLE stored_object (
   workspace_id     TEXT NOT NULL,
   output_set_id    TEXT NOT NULL,
   object_role      TEXT NOT NULL,
+  ordinal          INTEGER NOT NULL DEFAULT 0 CHECK (ordinal >= 0),
   object_uri       TEXT NOT NULL,
   content_hash     TEXT NOT NULL,
   schema_version   TEXT,
@@ -274,27 +241,59 @@ CREATE TABLE stored_object (
   created_at       TEXT NOT NULL,
   FOREIGN KEY (output_set_id, workspace_id)
     REFERENCES output_set(output_set_id, workspace_id),
-  UNIQUE (output_set_id, object_role),
+  UNIQUE (output_set_id, object_role, ordinal),
   UNIQUE (stored_object_id, workspace_id)
 );
 ```
 
-POC baseline eligibility không cần một column `baseline_eligible` riêng.
+Không giới hạn một file cho mỗi role; `ordinal` cho phép nhiều object cùng role nếu main cần.
 
-Derived rule:
+Baseline eligibility là derived invariant, không lưu duplicate boolean:
 
 ```text
 registration_completed_at IS NOT NULL
 AND output_set.integrity_status = VERIFIED
 AND schema_validation_status = PASSED
-AND không có required StoredObject nào ngoài VERIFIED/AVAILABLE
+AND không có required StoredObject ngoài VERIFIED/AVAILABLE
 ```
 
----
+### 3.5 Baseline history
 
-### 4.5 StageInput — controlled dual FK
+```sql
+CREATE TABLE baseline_selection (
+  baseline_selection_id TEXT PRIMARY KEY,
+  workspace_id          TEXT NOT NULL,
+  output_slot_id        TEXT NOT NULL,
+  output_set_id         TEXT NOT NULL,
+  previous_baseline_selection_id TEXT,
+  selection_mode        TEXT NOT NULL CHECK (selection_mode IN
+                        ('AUTO','AI_RECOMMEND','HUMAN')),
+  review_decision_id    TEXT,
+  selection_reason      TEXT,
+  selected_by           TEXT NOT NULL,
+  selected_at           TEXT NOT NULL,
 
-Physical choice được chốt trong `ADR-002-stage-input-physical-reference.md`.
+  FOREIGN KEY (output_slot_id, workspace_id)
+    REFERENCES output_slot(output_slot_id, workspace_id),
+  FOREIGN KEY (output_set_id, output_slot_id)
+    REFERENCES output_set(output_set_id, output_slot_id),
+  FOREIGN KEY (previous_baseline_selection_id, output_slot_id)
+    REFERENCES baseline_selection(baseline_selection_id, output_slot_id),
+
+  UNIQUE (baseline_selection_id, output_slot_id),
+  UNIQUE (baseline_selection_id, output_set_id),
+  UNIQUE (baseline_selection_id, output_set_id, output_slot_id),
+  UNIQUE (baseline_selection_id, workspace_id)
+);
+```
+
+`previous_baseline_selection_id` bị constrain cùng OutputSlot, tránh nối history chain sang artifact khác.
+
+`review_decision_id` chưa có FK trong POC nếu Review capability chưa bật; khi tạo conditional tables phải thêm migration/verification tương ứng.
+
+### 3.6 StageInput — controlled dual FK
+
+Physical choice: `ADR-002-stage-input-physical-reference.md`.
 
 ```sql
 CREATE TABLE stage_input (
@@ -315,6 +314,8 @@ CREATE TABLE stage_input (
     REFERENCES source_revision(source_revision_id, workspace_id),
   FOREIGN KEY (output_set_id, workspace_id)
     REFERENCES output_set(output_set_id, workspace_id),
+  FOREIGN KEY (source_baseline_selection_id, output_set_id)
+    REFERENCES baseline_selection(baseline_selection_id, output_set_id),
 
   CHECK ((source_revision_id IS NOT NULL) <> (output_set_id IS NOT NULL)),
   CHECK (
@@ -327,45 +328,17 @@ CREATE TABLE stage_input (
 );
 ```
 
-FK từ `source_baseline_selection_id` tới exact baseline/output được thêm sau khi `baseline_selection` được tạo; xem section 4.6.
+DB chứng minh baseline-bound input đã consume **đúng OutputSet được baseline đó chọn**.
 
----
-
-### 4.6 Baseline history + head
+### 3.7 BaselineHead
 
 ```sql
-CREATE TABLE baseline_selection (
-  baseline_selection_id TEXT PRIMARY KEY,
-  workspace_id          TEXT NOT NULL,
-  output_slot_id        TEXT NOT NULL,
-  output_set_id         TEXT NOT NULL,
-  previous_baseline_selection_id TEXT,
-  selection_mode        TEXT NOT NULL CHECK (selection_mode IN
-                        ('AUTO','AI_RECOMMEND','HUMAN')),
-  review_decision_id    TEXT,
-  selection_reason      TEXT,
-  selected_by           TEXT NOT NULL,
-  selected_at           TEXT NOT NULL,
-
-  FOREIGN KEY (output_slot_id, workspace_id)
-    REFERENCES output_slot(output_slot_id, workspace_id),
-  FOREIGN KEY (output_set_id, output_slot_id)
-    REFERENCES output_set(output_set_id, output_slot_id),
-  FOREIGN KEY (previous_baseline_selection_id)
-    REFERENCES baseline_selection(baseline_selection_id),
-
-  UNIQUE (baseline_selection_id, output_slot_id),
-  UNIQUE (baseline_selection_id, output_set_id, output_slot_id),
-  UNIQUE (baseline_selection_id, workspace_id)
-);
-
 CREATE TABLE baseline_head (
   output_slot_id TEXT PRIMARY KEY,
   workspace_id   TEXT NOT NULL,
   current_baseline_selection_id TEXT NOT NULL,
   lock_version   INTEGER NOT NULL CHECK (lock_version >= 1),
   updated_at     TEXT NOT NULL,
-
   FOREIGN KEY (output_slot_id, workspace_id)
     REFERENCES output_slot(output_slot_id, workspace_id),
   FOREIGN KEY (current_baseline_selection_id, output_slot_id)
@@ -373,18 +346,7 @@ CREATE TABLE baseline_head (
 );
 ```
 
-Sau `baseline_selection` tạo thêm composite FK cho StageInput bằng migration/schema order phù hợp:
-
-```text
-(stage_input.source_baseline_selection_id, stage_input.output_set_id)
-→ baseline_selection(baseline_selection_id, output_set_id)
-```
-
-SQLite không hỗ trợ `ALTER TABLE ... ADD CONSTRAINT` linh hoạt như PostgreSQL; vì vậy executable migration nên tạo `baseline_selection` trước `stage_input`, dù tài liệu trình bày StageInput trước vì dễ đọc.
-
----
-
-### 4.7 KnowledgeSpace / PublicationScope
+### 3.8 KnowledgeSpace / PublicationScope
 
 ```sql
 CREATE TABLE knowledge_space (
@@ -404,20 +366,16 @@ CREATE TABLE publication_scope (
   publication_role     TEXT NOT NULL,
   scope_key            TEXT,
   created_at           TEXT NOT NULL,
-
   FOREIGN KEY (knowledge_space_id, workspace_id)
     REFERENCES knowledge_space(knowledge_space_id, workspace_id),
   FOREIGN KEY (source_asset_id, workspace_id)
     REFERENCES source_asset(source_asset_id, workspace_id),
-
   UNIQUE (knowledge_space_id, source_asset_id, publication_role),
   UNIQUE (publication_scope_id, workspace_id)
 );
 ```
 
----
-
-### 4.8 Publication history + head
+### 3.9 Publication history + head
 
 ```sql
 CREATE TABLE publication (
@@ -438,8 +396,8 @@ CREATE TABLE publication (
     REFERENCES publication_scope(publication_scope_id, workspace_id),
   FOREIGN KEY (baseline_selection_id, output_set_id, output_slot_id)
     REFERENCES baseline_selection(baseline_selection_id, output_set_id, output_slot_id),
-  FOREIGN KEY (previous_publication_id)
-    REFERENCES publication(publication_id),
+  FOREIGN KEY (previous_publication_id, publication_scope_id)
+    REFERENCES publication(publication_id, publication_scope_id),
 
   UNIQUE (publication_id, publication_scope_id),
   UNIQUE (publication_id, workspace_id)
@@ -455,7 +413,6 @@ CREATE TABLE publication_head (
   current_publication_id TEXT NOT NULL,
   lock_version         INTEGER NOT NULL CHECK (lock_version >= 1),
   updated_at           TEXT NOT NULL,
-
   FOREIGN KEY (publication_scope_id, workspace_id)
     REFERENCES publication_scope(publication_scope_id, workspace_id),
   FOREIGN KEY (current_publication_id, publication_scope_id)
@@ -463,32 +420,34 @@ CREATE TABLE publication_head (
 );
 ```
 
-`publication_head` là concurrency/current pointer; partial unique index là safety net để không có hai row `ACTIVE` trong cùng PublicationScope.
+`previous_publication_id` bị constrain cùng PublicationScope. Partial unique index là safety net để không có hai `ACTIVE` publication trong cùng stable source stream.
+
+Một invariant chưa thể encode gọn bằng FK: OutputSlot/OutputSet được publish phải thuộc SourceAsset của PublicationScope. Publication service bắt buộc verify qua `output_slot_scope_member → source_revision → source_asset` trước materialization/activation.
 
 ---
 
-## 5. Critical write transactions
+## 4. Critical transactions
 
-### 5.1 Register OutputSet
+### 4.1 Register OutputSet
 
 ```text
-1. write payload vào Object Store
+1. write payload Object Store
 2. verify hash/schema
 3. BEGIN IMMEDIATE
-4. INSERT output_set REGISTERING
-5. INSERT stored_object rows
+4. INSERT OutputSet REGISTERING
+5. INSERT StoredObject rows
 6. verify required objects
-7. UPDATE output_set → VERIFIED + registration_completed_at
-8. COMMIT
+7. UPDATE OutputSet → VERIFIED + registration_completed_at
+8. nếu đây là final intended outputs của execution: mark StageExecution SUCCEEDED
+9. COMMIT
 ```
 
-Nếu DB fail sau object write → orphan object để reconciliation/GC xử lý.
+Nếu DB registration fail sau object write → orphan object để reconciliation/GC xử lý.
 
-### 5.2 Select baseline — optimistic concurrency
+### 4.2 Select baseline — optimistic concurrency
 
 ```text
 BEGIN IMMEDIATE
-
 read BaselineHead(lock_version)
 verify candidate eligibility
 verify expected lock_version
@@ -498,45 +457,42 @@ UPDATE BaselineHead
       lock_version = lock_version + 1
   WHERE output_slot_id = :slot
     AND lock_version = :expected
-
 require affected_rows = 1
 COMMIT
 ```
 
-Initial selection tạo BaselineSelection rồi INSERT BaselineHead `lock_version = 1` trong cùng transaction.
+Initial selection tạo BaselineSelection + BaselineHead(`lock_version=1`) trong cùng transaction.
 
-### 5.3 Activate publication
-
-Cross-store flow:
+### 4.3 Activate publication
 
 ```text
 DB: create Publication PENDING
 ↓
+verify PublicationScope ↔ SourceAsset ↔ OutputSlot provenance
+↓
 Neo4j: materialize candidate invisibly
 ↓
-verify
+verify materialization
 ↓
-DB transaction:
+BEGIN Catalog DB transaction
   verify PublicationHead lock_version
-  mark publication VERIFIED/ACTIVE
-  mark previous ACTIVE → SUPERSEDED
-  move PublicationHead
-↓
-commit
+  previous ACTIVE → SUPERSEDED
+  new Publication → ACTIVE
+  move PublicationHead + increment lock_version
+COMMIT
 ```
 
-Cách Neo4j giữ candidate invisible trước activation **chưa chốt trong 04**; bắt buộc ADR riêng trước implementation G3 cuối cùng.
+Cách Neo4j giữ candidate invisible trước activation **chưa chốt**; cần ADR riêng trước khi G3 production-safe.
 
 ---
 
-## 6. Required indexes for POC
+## 5. Required indexes
 
 SQLite không tự tạo index cho mọi FK/query path. Tối thiểu:
 
 ```sql
 CREATE INDEX ix_source_revision_asset
   ON source_revision(source_asset_id, created_at);
-
 CREATE INDEX ix_stage_execution_run
   ON stage_execution(processing_run_id, created_at);
 
@@ -546,15 +502,15 @@ CREATE INDEX ix_stage_input_output
   ON stage_input(output_set_id);
 CREATE INDEX ix_stage_input_source_revision
   ON stage_input(source_revision_id);
+CREATE INDEX ix_stage_input_baseline
+  ON stage_input(source_baseline_selection_id);
 
 CREATE INDEX ix_scope_member_revision
   ON output_slot_scope_member(source_revision_id);
-
 CREATE INDEX ix_output_set_slot
   ON output_set(output_slot_id, created_at);
 CREATE INDEX ix_output_set_execution
   ON output_set(producer_execution_id);
-
 CREATE INDEX ix_stored_object_output
   ON stored_object(output_set_id, is_required, integrity_status);
 
@@ -571,74 +527,55 @@ CREATE INDEX ix_publication_output
   ON publication(output_set_id);
 ```
 
-Không thêm index “cho chắc”. Mọi index mới phải gắn với query path/volume đo được.
+Không thêm index “cho chắc”; index mới phải gắn với query path/volume đo được.
 
 ---
 
-## 7. Representative queries
+## 6. Representative query paths
 
-### Current baseline
+```text
+Q1 current baseline
+BaselineHead → BaselineSelection
 
-```sql
-SELECT bs.*
-FROM baseline_head bh
-JOIN baseline_selection bs
-  ON bs.baseline_selection_id = bh.current_baseline_selection_id
-WHERE bh.output_slot_id = ?;
+Q2 candidate history
+OutputSlot → OutputSet ORDER BY created_at
+
+Q3 execution lineage
+StageExecution → StageInput → SourceRevision/OutputSet
+
+Q4 current published source
+PublicationScope → PublicationHead → Publication
+
+Q5 stale output
+StageInput.source_baseline_selection_id
+vs current upstream BaselineHead
 ```
 
-### Candidate history
-
-```sql
-SELECT *
-FROM output_set
-WHERE output_slot_id = ?
-ORDER BY created_at DESC;
-```
-
-### Current published revision của stable source
-
-```sql
-SELECT p.*
-FROM publication_scope ps
-JOIN publication_head ph
-  ON ph.publication_scope_id = ps.publication_scope_id
-JOIN publication p
-  ON p.publication_id = ph.current_publication_id
-WHERE ps.knowledge_space_id = ?
-  AND ps.source_asset_id = ?
-  AND ps.publication_role = ?;
-```
-
-### Stale derived output
-
-Không lưu canonical `is_stale`; derive từ StageInput baseline binding so với current upstream BaselineHead. Nếu main cần query thường xuyên, thêm rebuildable projection sau.
+`is_stale` không là canonical column; main có thể materialize rebuildable projection nếu query cost trở thành vấn đề.
 
 ---
 
-## 8. SQLite → PostgreSQL scale path
-
-Giữ nguyên domain/entity contract; thay physical implementation nơi cần.
+## 7. SQLite → PostgreSQL scale path
 
 | Concern | SQLite POC | PostgreSQL main |
 |---|---|---|
 | ID | UUID string `TEXT` | `UUID` |
 | Time | RFC3339 UTC `TEXT` | `timestamptz` |
 | Status | `TEXT + CHECK` | `TEXT + CHECK` hoặc enum/domain sau review |
-| Writer concurrency | single/few writers + WAL | MVCC / nhiều writers |
-| Baseline CAS | `BEGIN IMMEDIATE` + lock_version | row-level lock hoặc optimistic update |
-| Workspace security | application scoping | RLS + role policy nếu ADR chọn |
-| JSON metadata | TEXT nếu cần | `jsonb` khi có query semantics |
+| Writer concurrency | few writers + WAL | MVCC / nhiều writers |
+| CAS | `BEGIN IMMEDIATE` + lock_version | optimistic update hoặc row lock |
+| Workspace security | application scope | RLS nếu ADR chọn |
+| JSON extension | TEXT khi thực sự cần | `jsonb` theo query semantics |
 | Partial unique index | supported | supported |
-| Migration | rebuild table khi cần | richer ALTER, online migration strategy |
+| Migration | rebuild table khi cần | richer ALTER / online strategy |
 
-Không coi migration SQLite→PostgreSQL là chỉ đổi connection string. Cần migration test cho types, constraints, transaction/isolation và indexes.
+Không coi SQLite→PostgreSQL là đổi connection string. Phải test lại type mapping, constraints, transaction/isolation và indexes.
 
 ---
 
-## 9. Schema migration strategy
+## 8. Migration strategy
 
-POC source of truth:
+Schema source of truth:
 
 ```text
 schema/sqlite/
@@ -648,63 +585,67 @@ schema/sqlite/
 
 Rules:
 
-- migration append-only sau khi đã dùng chung;
-- không sửa migration đã apply ở shared environment;
-- mỗi change schema phải map tới logical invariant/decision;
-- destructive change phải có data migration/backfill plan;
-- khi physical schema ổn định, dùng Atlas inspect/diff/lint để machine-check drift/migration safety.
+- migration append-only sau khi shared environment đã apply;
+- mỗi change map tới logical invariant/decision;
+- destructive change cần backfill/migration plan;
+- không sửa migration history đã apply;
+- khi schema ổn định, dùng Atlas inspect/diff/lint để check drift/migration safety.
 
-Bytebase chỉ cần khi project cần approval/change-management layer lớn hơn; không đưa vào runtime POC.
+Bytebase chỉ cần khi cần approval/change-management layer lớn hơn; không đưa vào runtime POC.
 
 ---
 
-## 10. Gate D review checklist
+## 9. Gate D review checklist
 
-Trước implementation:
-
-- [ ] `PRAGMA foreign_keys = ON` được enforce ở connection bootstrap.
+- [ ] `foreign_keys=ON`, WAL, busy timeout nằm trong connection bootstrap.
 - [ ] OutputSlot uniqueness enforce bằng `(workspace, artifact_role, scope_fingerprint)`.
-- [ ] StageInput exactly-one-target được CHECK/FK bảo vệ.
-- [ ] BaselineSelection không thể chọn OutputSet của slot khác.
-- [ ] BaselineHead chỉ trỏ selection của cùng slot.
-- [ ] Baseline update dùng CAS/atomic transaction.
-- [ ] Required StoredObject integrity đủ để derive eligibility.
-- [ ] PublicationScope unique theo stable source/role.
+- [ ] StageInput exactly-one-target có FK + XOR CHECK.
+- [ ] BASELINE StageInput pin đúng BaselineSelection + OutputSet.
+- [ ] BaselineSelection không chọn OutputSet của slot khác.
+- [ ] Previous baseline nằm cùng OutputSlot.
+- [ ] BaselineHead chỉ trỏ selection của cùng slot và update bằng CAS.
+- [ ] Required StoredObject integrity derive được baseline eligibility.
+- [ ] PublicationScope unique theo stable SourceAsset/role.
 - [ ] Publication pin exact baseline/output set.
+- [ ] Previous publication nằm cùng PublicationScope.
+- [ ] Publication service verify OutputSlot thuộc SourceAsset của PublicationScope.
 - [ ] Tối đa một ACTIVE publication mỗi PublicationScope.
-- [ ] PublicationHead dùng CAS khi activation.
+- [ ] PublicationHead update bằng CAS.
 - [ ] FK/query-path indexes tối thiểu đã có.
 - [ ] Không hard-code table theo workflow step.
-- [ ] Schema migration source-of-truth rõ ràng.
+- [ ] Migration source-of-truth rõ ràng.
 
 ---
 
-## 11. Open decisions trước G3 production-grade
+## 10. Open decisions
 
-Chưa chốt:
+Không blocker cho Catalog DB POC:
 
 ```text
-Neo4j publication visibility strategy
-Workspace/RLS security strategy cho PostgreSQL main
+Workspace/RLS strategy cho PostgreSQL main
 Whole-KB KnowledgeRelease semantics
 ```
 
-Không blocker cho ingestion persistence POC; riêng Neo4j visibility phải được resolve bằng ADR trước khi G3 được coi production-safe.
+Blocker trước G3 production-safe:
+
+```text
+Neo4j publication visibility strategy
+```
 
 ---
 
-## 12. Handoff
+## 11. Handoff
 
-Sau `04`, implementation guide phải tập trung:
+Implementation guide tiếp theo tập trung:
 
 ```text
 Repository interfaces
 SQLite connection/bootstrap
 migration runner
-transaction services
+Baseline/Publication transaction services
 Object Store adapter
 reconciliation tests
 SQLite → PostgreSQL compatibility tests
 ```
 
-Không thêm abstraction mới nếu chưa có query/lifecycle requirement chứng minh cần thiết.
+Không thêm abstraction mới nếu chưa có lifecycle/query requirement chứng minh cần thiết.
