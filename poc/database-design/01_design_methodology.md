@@ -1,917 +1,1286 @@
 # ReqKB Ingestion Database Design Methodology
 
 **Status:** POC architecture baseline  
-**Scope:** ReqKB ingestion phase — từ source document đến knowledge được promote  
-**Audience:** System Architect, AI Engineer, Backend Engineer, Coding Agent  
-**Goal:** Định nghĩa phương pháp luận để quyết định dữ liệu nào phải được version, lưu ở đâu, liên kết thế nào và khi nào được promote vào ReqKB.
+**Scope:** Stage 1 — ReqKB ingestion only  
+**Audience:** System Architect, AI Engineer, Backend Engineer, Coding Agent, Product/UI Engineer  
+**Goal:** Định nghĩa phương pháp luận quản lý source, execution run, intermediate outputs, baseline selection và promotion từ input document vào ReqKB.
 
 ---
 
-## 1. Vì sao cần một phương pháp luận riêng?
+## 1. Scope của tài liệu
 
-ReqKB ingestion không phải một thao tác `read file -> insert database`.
-
-Một source document đi qua nhiều trạng thái:
+Tài liệu này chỉ thiết kế persistence và version governance cho **Stage 1 — Ingestion**.
 
 ```text
-Source
-  -> Convert
-    -> Parse
-      -> Validate / Repair
-        -> Ontology Build / Tag
-          -> Knowledge Candidate
-            -> Promote
-              -> Canonical Knowledge
+STAGE 1 — INGESTION
+
+Input Document
+      ↓
+G0 — Intake / Classification / Marking
+      ↓
+G1A — Convert / Normalize when needed
+      ↓
+G1B — Parse / Build Chunks (SourceUnits)
+      ↓
+G2 — Light Ontology Enrichment
+      ↓
+G3 — Promotion / Publish
+      ↓
+ReqKB
 ```
 
-Mỗi bước có thể:
+Các phase sau nằm ngoài scope:
 
-- dùng component version khác nhau;
-- sinh output trung gian;
-- fail và retry;
-- được re-run khi parser/validator/ontology thay đổi;
-- dùng LLM hoặc deterministic logic;
-- tạo dữ liệu chưa đủ tin cậy để đưa trực tiếp vào knowledge base.
+```text
+STAGE 2 — Assessment
+ReqKB → requirement quality/readiness assessment
 
-Nếu chỉ thiết kế database từ danh sách field hoặc từ output cuối cùng của parser, hệ thống sẽ sớm gặp các vấn đề:
+STAGE 3 — Retrieval & Generation
+ReqKB + Assessment → Retrieve Context → Generate BD
+```
 
-- không replay được ingestion;
-- không biết output nào được tạo bởi component version nào;
-- intermediate data bị ghi đè;
-- Neo4j chứa cả candidate và canonical knowledge;
-- khó rollback khi một run lỗi;
-- khó giải thích knowledge hiện tại đến từ source revision nào;
-- DB bị dùng đồng thời như file store, workflow state store và knowledge store.
-
-Do đó thiết kế phải bắt đầu từ **data lifecycle và ownership**, không bắt đầu từ PostgreSQL, SQLite hay Neo4j.
+MLflow, BD artifact governance, prompt evaluation và generation trace không thuộc core persistence model của tài liệu này.
 
 ---
 
-## 2. Nguyên tắc nền tảng
+## 2. Vấn đề cần giải quyết
 
-### 2.1 Design từ lifecycle trước, schema sau
-
-Thứ tự quyết định bắt buộc:
+Một input Excel/DOCX/PDF có thể được xử lý hàng chục hoặc hàng trăm lần:
 
 ```text
-Business lifecycle
-  -> Data states
-    -> Ownership
-      -> Identity / versioning
-        -> Persistence boundary
-          -> Logical data model
-            -> Physical database schema
+REV-003
+  ├── convert run 001 → MD-A
+  ├── convert run 002 → MD-B
+  ├── convert run 003 → MD-C
+  └── ...
 ```
 
-Không chọn database trước rồi ép lifecycle vào schema của database đó.
+Sau đó mỗi MD lại có thể được parse nhiều lần:
+
+```text
+MD-B
+  ├── parse run 101 → ChunkSet-A
+  ├── parse run 102 → ChunkSet-B
+  └── parse run 103 → ChunkSet-C
+```
+
+Vấn đề không chỉ là lưu tất cả output. Hệ thống phải luôn trả lời được:
+
+1. Source revision nào đang được xử lý?
+2. Có những execution run nào đã xảy ra?
+3. Mỗi run tạo output gì và output nằm ở đâu?
+4. Output nào hiện được coi là **chuẩn** để stage sau sử dụng?
+5. Ai hoặc policy nào đã chọn output đó?
+6. AI đã recommend candidate nào và dựa trên evidence nào?
+7. Output chuẩn hiện tại được tạo từ input/run/component version nào?
+8. Candidate nào cuối cùng được publish vào ReqKB?
+
+Do đó ingestion cần **version governance cho intermediate artifacts**, không chỉ version ở output cuối.
 
 ---
 
-### 2.2 Một loại state chỉ có một primary owner
+## 3. Core mental model
 
-POC sử dụng ba lớp persistence khác nhau:
+Phân biệt bốn khái niệm:
 
 ```text
-Object Store
-= payload và intermediate processing artifacts
-
-Metadata DB
-= identity, run state, stage state, lineage metadata, promotion metadata
-
-ReqKB / Neo4j
-= canonical semantic knowledge đã được promote
+Execution
+    ↓
+Candidate Output
+    ↓
+Selection / Baseline
+    ↓
+Next Stage
 ```
 
-Một dữ liệu có thể có reference ở nhiều hệ thống, nhưng chỉ có một primary owner.
+và ở boundary cuối:
+
+```text
+G2 Baseline
+    ↓
+G3 Promotion
+    ↓
+Canonical ReqKB
+```
+
+### 3.1 Run
+
+`Run` / `StageRun` là một lần execution.
+
+Nó trả lời:
+
+> Hệ thống đã chạy cái gì, khi nào, bằng component/config nào, trên input nào?
+
+### 3.2 Output
+
+`StageOutput` / `OutputSet` là kết quả immutable do run tạo ra.
+
+Nó trả lời:
+
+> Execution đó đã sản xuất artifact nào?
+
+### 3.3 Baseline
+
+`StageBaseline` là output đã được chấp nhận làm input chuẩn cho stage tiếp theo.
+
+Nó trả lời:
+
+> Trong nhiều candidate output, workflow hiện đang tin dùng output nào?
+
+### 3.4 Promotion
+
+`Promotion` chỉ dùng cho việc publish G2 baseline vào canonical ReqKB.
+
+Nó trả lời:
+
+> Candidate đã được chấp nhận và materialize vào ReqKB chưa?
+
+**Run thành công không đồng nghĩa output được baseline. Baseline không đồng nghĩa đã được promote vào ReqKB.**
+
+---
+
+## 4. Nguyên tắc thiết kế nền tảng
+
+### 4.1 Lifecycle-first, schema-second
+
+Thứ tự thiết kế:
+
+```text
+Workflow lifecycle
+  → Data states
+    → Ownership
+      → Identity
+        → Version semantics
+          → Governance transition
+            → Logical model
+              → Physical schema
+```
+
+Không bắt đầu bằng việc chọn PostgreSQL/SQLite rồi tạo bảng theo output hiện tại.
+
+### 4.2 Immutable targets, mutable/current pointers
+
+Các historical targets phải immutable:
+
+- Source Revision;
+- completed Stage Run facts;
+- Output Set;
+- content hash;
+- component/config version;
+- baseline decision history;
+- promotion history.
+
+Thứ được phép thay đổi là pointer/state hiện tại:
+
+- current baseline;
+- review status;
+- current active promotion;
+- runtime status.
+
+Không overwrite artifact cũ bằng `current.json` hoặc `final.json`.
+
+### 4.3 Latest không có nghĩa là baseline
 
 Ví dụ:
 
 ```text
-parsed blocks JSON
-Primary owner: Object Store
-Metadata DB: object_uri + hash + schema_version
-Neo4j: không lưu
+OUT-220 PASS
+OUT-221 PASS  ← current baseline
+OUT-222 PASS  ← newest
 ```
 
+Stage sau vẫn phải dùng `OUT-221` cho đến khi có một baseline decision mới.
+
+### 4.4 Baseline là governance decision
+
+Baseline không được suy ra từ file name, timestamp hoặc `MAX(run_id)`.
+
+Baseline phải có explicit record cho biết:
+
+- candidate nào được chọn;
+- decision được tạo bởi ai/policy nào;
+- AI recommendation là gì;
+- reason/evidence;
+- thời điểm có hiệu lực;
+- baseline trước đó là gì.
+
+### 4.5 Promotion tách khỏi G2
+
+Không dùng pattern:
+
 ```text
-Requirement node đã promote
-Primary owner: Neo4j
-Metadata DB: snapshot / promotion reference
-Object Store: candidate artifact trước promotion
+G2 ontology output → write active Neo4j immediately
 ```
+
+G2 phải tạo candidate/baseline trước. G3 là boundary publication riêng.
 
 ---
 
-### 2.3 Payload khác metadata
+## 5. Workflow chuẩn của Stage 1
 
-Payload là nội dung có thể lớn hoặc cần replay:
+```text
+Input
+  ↓
+Source Revision
+  ↓
+G0 Intake / Classification
+  ↓
+G0 selection policy
+  ↓
+G1A Convert / Normalize
+  ↓
+Convert OutputSet candidates
+  ↓
+Convert Baseline Gate
+  ↓
+G1B Parse / Chunk
+  ↓
+ChunkSet candidates
+  ↓
+Parse Baseline Gate
+  ↓
+G2 Light Ontology Enrichment
+  ↓
+Enriched ChunkSet candidates
+  ↓
+Ontology Baseline Gate
+  ↓
+G3 Promotion / Publish
+  ↓
+ReqKB
+```
 
-- DOCX/PDF/Excel gốc;
-- converted Markdown;
-- parsed document JSON;
-- validated JSON;
-- ontology candidate JSON;
-- debug bundle cần giữ lại.
-
-Các payload này ưu tiên Object Store.
-
-Metadata là dữ liệu điều khiển và truy vết:
-
-- source ID;
-- revision ID;
-- ingestion run ID;
-- stage status;
-- component version;
-- content hash;
-- object URI;
-- timestamps;
-- promotion status;
-- knowledge snapshot reference.
-
-Các metadata này thuộc Metadata DB.
-
-Quy tắc:
-
-> Không đưa payload lớn vào Metadata DB chỉ vì SQL query thuận tiện hơn.
-
-Có thể lưu một số field nhỏ, indexed hoặc denormalized để phục vụ query, nhưng không biến chúng thành canonical copy thứ hai của payload.
+Baseline gate không nhất thiết dừng human ở mọi stage. Gate luôn tồn tại ở logical level nhưng policy có thể auto-select.
 
 ---
 
-### 2.4 Intermediate output không phải canonical knowledge
+## 6. G0 — Intake / Classification / Marking
 
-Output từ parser, validator hoặc ontology builder vẫn là **processing artifact**.
+G0 không parse nội dung sâu. Mục tiêu là xác định cách tài liệu sẽ được xử lý.
 
-```text
-ParsedDocument
-ValidatedDocument
-OntologyCandidate
-```
-
-chưa tự động tương đương với:
+Ví dụ output:
 
 ```text
-ReqKB canonical graph
+source_revision = REV-003
+file_type = XLSX
+document_role = REQUIREMENT_DEFINITION
+language = JA
+parser_profile = excel_rd
+classification_confidence = 0.97
 ```
 
-Cần một boundary rõ ràng:
+G0 có thể sử dụng:
+
+- file extension / MIME type;
+- source location;
+- naming convention;
+- project metadata;
+- lightweight AI classification khi role không rõ.
+
+### G0 selection policy
+
+Thông thường:
 
 ```text
-Knowledge Candidate
-      ↓
-Promotion Gate
-      ↓
-Canonical Knowledge
+file type deterministic + role confidence high
+→ AUTO_SELECT
 ```
 
-Neo4j không được dùng như workflow scratchpad cho mọi output trung gian.
+Nếu document role không chắc chắn:
+
+```text
+AI recommendation
+→ human review
+→ approve classification baseline
+```
+
+Raw bytes vẫn nằm Object Store. Classification state là queryable governance data trong Ingestion Catalog DB.
 
 ---
 
-### 2.5 Immutable evidence, append-only history
+## 7. G1A — Convert / Normalize
 
-Các object sau sau khi được register phải được coi là immutable:
-
-- source revision bytes;
-- stage output đã hoàn thành;
-- content hash;
-- component version dùng trong stage run;
-- completed ingestion run facts;
-- promoted knowledge snapshot identity.
-
-Nếu xử lý lại, tạo run/output mới thay vì overwrite.
-
-Mental model:
+Không phải format nào cũng cần convert. Ví dụ Excel có thể được normalize thành Markdown/structured representation trước khi chunking.
 
 ```text
-old immutable state
-      ↓
-new run
-      ↓
-new immutable state
+REV-003 XLSX
+    ↓
+Convert Run C-001
+    ↓
+document.md
 ```
+
+Nhiều run có thể tạo nhiều candidate:
+
+```text
+C-001 → MD-A
+C-002 → MD-B
+C-003 → MD-C
+```
+
+Object Store giữ tất cả. `ConvertBaseline` xác định candidate nào G1B phải consume.
+
+Stage sau **không được lấy latest MD**.
+
+---
+
+## 8. G1B — Parse / Chunk
+
+Parser consume exact Convert Baseline hoặc raw source baseline nếu conversion không cần thiết.
+
+```text
+input_output_set = MD-B
+       ↓
+Parse Run P-103
+       ↓
+ChunkSet-103
+```
+
+Chunk/SourceUnit là đơn vị processing quan trọng của ReqKB.
+
+Ví dụ:
+
+```text
+SU-001
+unit_type = HEADING
+heading_path = ["3", "3.1"]
+text = "Customer Search"
+
+SU-002
+unit_type = REQUIREMENT_TEXT
+text = "User can search customer by name"
+```
+
+### SourceUnit persistence rule
+
+Giữ hai representation khác nhau:
+
+```text
+Object Store
+= full immutable parser artifact / parsed-document.json / chunks.json
+
+Ingestion Catalog DB
+= queryable SourceUnit projection cần cho diff, validation, review và lineage
+```
+
+Không bắt buộc relational DB trở thành canonical full-text document store; nhưng SourceUnit identity/hash/structure phải query được mà không phải deserialize toàn bộ historical artifact mỗi lần.
+
+---
+
+## 9. G2 — Light Ontology Enrichment
+
+G2 enrich SourceUnit để ReqKB có semantic structure đủ dùng cho Assessment/Retrieval sau này.
+
+Ví dụ:
+
+```text
+SU-002
+  semantic_type = FUNCTIONAL_REQUIREMENT
+  domain = CUSTOMER
+  capability = SEARCH
+  modality = CAN
+```
+
+Có thể thêm lightweight relations:
+
+```text
+SU-002 ──belongs_to──> Customer Search
+SU-003 ──constrains──> SU-002
+```
+
+G2 **không được mặc định coi là full ontology construction engine**.
+
+Output là `EnrichedChunkSet` candidate.
+
+Nếu G2 dùng LLM, vẫn áp dụng cùng governance model:
+
+```text
+StageRun
+→ Candidate OutputSet
+→ AI/Rule Evaluation
+→ Baseline Gate
+```
+
+Có thể pin thêm:
+
+```text
+model_ref
+prompt_ref
+ruleset_ref
+ontology_schema_version
+configuration_hash
+trace_ref (optional)
+```
+
+MLflow có thể tích hợp sau cho AI trace/evaluation nhưng không phải owner của ingestion lifecycle.
+
+---
+
+## 10. Baseline Gate
+
+Baseline Gate là version-governance boundary giữa các stage.
+
+### 10.1 Baseline Gate có ba mode
+
+```text
+AUTO_SELECT
+AI_RECOMMEND
+HUMAN_REQUIRED
+```
+
+Policy được xác định theo stage, risk, confidence và validation results.
+
+Ví dụ POC:
+
+| Handoff | Default policy |
+|---|---|
+| G0 classification → G1 | AUTO khi deterministic/confidence cao |
+| Convert → Parse | AUTO nếu structural validation pass |
+| Parse → G2 | AI_RECOMMEND; human khi quality thấp hoặc diff lớn |
+| G2 → G3 | AI_RECOMMEND / HUMAN_REQUIRED |
+| G3 → ReqKB | HUMAN_REQUIRED trong POC |
+
+### 10.2 AI chỉ recommend, policy quyết định authority
+
+AI Reviewer có thể tạo recommendation:
+
+```text
+recommended_output = OUT-221
+confidence = 0.91
+reasons:
+- heading coverage 100%
+- table coverage 98%
+- orphan chunks 0
+- validator errors 0
+```
+
+AI recommendation không đồng nghĩa human approval.
+
+Policy có thể cho phép auto-select nếu risk thấp và threshold đạt yêu cầu.
+
+### 10.3 Baseline history phải append-only
+
+Không overwrite một row baseline duy nhất.
+
+```text
+BASE-008
+stage = PARSE
+output = OUT-187
+effective_from = T1
+effective_to = T2
+
+BASE-009
+stage = PARSE
+output = OUT-221
+effective_from = T2
+effective_to = NULL
+```
+
+Current baseline là record có `effective_to IS NULL` hoặc tương đương.
+
+---
+
+## 11. G3 — Promotion / Publish
+
+G3 consume **G2 baseline chính xác**, không consume latest G2 output.
+
+```text
+G2 baseline OUT-310
+       ↓
+Promotion PROM-007
+       ↓
+materialize Neo4j
+       ↓
+verify
+       ↓
+ACTIVE promotion / ReqKB version
+```
+
+Promotion record phải pin:
+
+```text
+promotion_id
+source_revision_id
+ingestion_run_id
+selected_g2_output_set_id
+previous_promotion_id
+status
+promoted_at
+promoted_by
+```
+
+### Promotion states
+
+```text
+PENDING
+IN_PROGRESS
+ACTIVE
+FAILED
+SUPERSEDED
+```
+
+`SUCCEEDED ingestion run` chỉ nghĩa pipeline hoàn tất kỹ thuật. `ACTIVE promotion` mới nghĩa output đang được ReqKB sử dụng.
+
+---
+
+## 12. Storage ownership
+
+POC sử dụng ba persistence concerns.
+
+### 12.1 Object Store — immutable payload/evidence
+
+Giữ:
+
+- raw DOCX/PDF/XLSX;
+- converted Markdown/normalized payload;
+- full parsed document;
+- chunk bundle;
+- diagnostics;
+- enriched chunk bundle;
+- evaluation/review evidence bundle nếu lớn;
+- promotion manifest.
+
+### 12.2 Ingestion Catalog DB — control, governance và queryable projection
+
+Giữ:
+
+- source identity/revision;
+- ingestion/stage runs;
+- exact input/output references;
+- output set registry;
+- stage baseline history;
+- AI recommendation/review decision;
+- SourceUnit queryable projection;
+- component/config/schema versions;
+- promotion state;
+- lineage pointers.
+
+Tên `Ingestion Catalog DB` được dùng thay cho `Metadata DB` vì DB không chỉ chứa metadata thuần túy; nó còn chứa structured projection cần query cho ingestion operations.
+
+### 12.3 Neo4j — promoted ReqKB
+
+Giữ semantic nodes/relationships đã được G3 publish.
+
+Neo4j không phải staging database cho G0/G1/G2.
+
+---
+
+## 13. Object Store layout
+
+Recommended logical key structure:
+
+```text
+reqkb/
+└── projects/{project_id}/
+    └── sources/{source_document_id}/
+        ├── revisions/{source_revision_id}/
+        │   └── raw/
+        │       └── requirement.xlsx
+        │
+        └── runs/{ingestion_run_id}/
+            ├── g0/
+            │   └── classification.json
+            ├── g1-convert/
+            │   ├── document.md
+            │   └── diagnostics.json
+            ├── g1-parse/
+            │   ├── parsed-document.json
+            │   ├── chunks.json
+            │   └── diagnostics.json
+            ├── g2/
+            │   └── enriched-chunks.json
+            └── g3/
+                └── promotion-manifest.json
+```
+
+Folder/key không biểu diễn current/final state.
 
 Không dùng:
 
 ```text
-parsed/current.json
+/final/
+/current/
+/latest/
 ```
 
-rồi overwrite nhiều lần mà không còn provenance.
+để quyết định governance state.
 
 ---
 
-## 3. Data lifecycle chuẩn của ReqKB ingestion
+## 14. Core logical data model
 
-### 3.1 Source Document
-
-`SourceDocument` là business identity ổn định của tài liệu.
-
-Ví dụ:
+Physical schema sẽ được đặc tả ở tài liệu sau. Logical model tối thiểu:
 
 ```text
-Customer Management Requirement Definition
+SourceDocument
+  └── SourceRevision
+        └── IngestionRun
+              └── StageRun
+                    ├── StageOutputSet
+                    │     └── StageOutput
+                    └── AI Recommendation / Review
+
+SourceRevision + StageType
+  └── StageBaseline History
+        └── selected StageOutputSet
+
+G2 StageBaseline
+  └── Promotion
+        └── ReqKB active state
 ```
 
-Nó không đại diện cho bytes cụ thể của một lần upload.
-
----
-
-### 3.2 Source Revision
-
-Mỗi thay đổi nội dung tạo một `SourceRevision` mới.
-
-Ví dụ:
+Suggested entities:
 
 ```text
-DOC-001
-  ├── REV-001 hash=A
-  ├── REV-002 hash=B
-  └── REV-003 hash=C
-```
+source_document
+source_revision
 
-Source Revision trỏ tới raw object trong Object Store.
+ingestion_run
+stage_run
+stage_output_set
+stage_output
 
-Source Revision là đơn vị đầu vào của ingestion.
+stage_baseline
+review_request
+review_decision
 
----
+document_classification
+source_unit
+source_unit_enrichment
 
-### 3.3 Ingestion Run
-
-`IngestionRun` là một lần xử lý cụ thể của một Source Revision bằng một pipeline configuration cụ thể.
-
-```text
-ING-1001
-source_revision = REV-003
-pipeline_release = ingestion-1.4.0
-```
-
-Cùng `REV-003` có thể có nhiều ingestion run nếu parser, validator hoặc ontology thay đổi.
-
----
-
-### 3.4 Stage Run
-
-Mỗi công đoạn là một execution record độc lập:
-
-```text
-ING-1001
-  ├── STG-01 CONVERT
-  ├── STG-02 PARSE
-  ├── STG-03 VALIDATE
-  ├── STG-04 ONTOLOGY_BUILD
-  └── STG-05 PROMOTE
-```
-
-Stage Run lưu execution facts, không lưu toàn bộ output payload.
-
-Tối thiểu cần biết:
-
-- stage type;
-- status;
-- component name/version;
-- input references;
-- output references;
-- start/end time;
-- error information;
-- retry/attempt number nếu cần.
-
----
-
-### 3.5 Stage Output
-
-Stage có thể sinh một hoặc nhiều immutable output.
-
-Ví dụ:
-
-```text
-PARSE
-  -> parsed_document.json
-  -> parser_diagnostics.json
-```
-
-Metadata DB chỉ register:
-
-```text
-output_id
-stage_run_id
-output_type
-object_uri
-content_hash
-schema_version
-```
-
-Bytes thực tế thuộc Object Store.
-
----
-
-### 3.6 Knowledge Candidate
-
-Ontology builder/tagger tạo structured candidate cho graph.
-
-Ví dụ:
-
-```text
-knowledge-candidate.json
-
-Requirement REQ-001
-Function FUNC-010
-Constraint CST-003
-relationships...
-```
-
-Candidate vẫn có thể bị reject hoặc reprocess.
-
-Do đó Candidate thuộc processing lifecycle, không phải canonical ReqKB.
-
----
-
-### 3.7 Promotion
-
-Promotion là business/data-governance transition:
-
-```text
-Candidate
-   -> validate promotion conditions
-   -> materialize canonical knowledge
-   -> register snapshot/reference
-```
-
-Promotion phải tách khỏi ontology build để tránh pattern:
-
-```text
-LLM output -> write Neo4j immediately
-```
-
-Đây là anti-pattern vì generation và publication trở thành cùng một transaction logic.
-
----
-
-### 3.8 Knowledge Snapshot
-
-`KnowledgeSnapshot` là identity của trạng thái knowledge đã được công nhận để downstream workflow sử dụng.
-
-Ví dụ:
-
-```text
-KB-012
-```
-
-Generation workflow sau này pin:
-
-```text
-knowledge_snapshot = KB-012
-```
-
-thay vì sử dụng khái niệm mơ hồ:
-
-```text
-latest ReqKB
-```
-
-Chi tiết physical implementation của snapshot trong Neo4j sẽ được quyết định ở tài liệu Knowledge Promotion / Lineage; methodology chỉ yêu cầu snapshot phải có identity và provenance ổn định.
-
----
-
-## 4. Storage ownership methodology
-
-Đối với mỗi data object, trả lời tuần tự năm câu hỏi.
-
-### Question 1 — Đây là content hay control metadata?
-
-Nếu là bytes/content lớn hoặc structured payload cần replay:
-
-```text
--> Object Store
-```
-
-Nếu là trạng thái, ID, relation hoặc pointer:
-
-```text
--> Metadata DB
+promotion
 ```
 
 ---
 
-### Question 2 — Đây đã là canonical knowledge chưa?
+## 15. StageRun input must pin exact upstream baseline
 
-Nếu chưa pass promotion:
+Không lưu input chỉ bằng `source_revision_id` nếu stage consume output trung gian.
 
-```text
--> không vào Neo4j canonical graph
-```
-
-Nếu đã promoted:
+Ví dụ Parse Run:
 
 ```text
--> Neo4j
+stage_run_id = PARSE-221
+stage_type = PARSE
+input_output_set_id = CONVERT-OUT-087
+input_hash = abc123
+parser_version = v4
 ```
 
----
-
-### Question 3 — Có cần replay/debug chính xác không?
-
-Nếu có, output phải immutable và có:
+G2:
 
 ```text
-content_hash
-schema_version
-producer/component version
-input references
+stage_run_id = ONT-310
+input_output_set_id = CHUNKSET-221
 ```
 
----
-
-### Question 4 — Dữ liệu thay đổi bằng mutation hay new revision?
-
-Evidence và output lịch sử:
-
-```text
-new revision / new run
-```
-
-Mutable operational pointer có thể update:
-
-```text
-active source revision
-current run status
-active knowledge snapshot pointer
-review state
-```
-
-Pointer được phép mutable; target lịch sử phải immutable.
-
----
-
-### Question 5 — Ai cần query dữ liệu này?
-
-Nếu query chủ yếu phục vụ orchestration/governance:
-
-```text
-Metadata DB
-```
-
-Nếu query phục vụ semantic retrieval/traversal:
-
-```text
-Neo4j
-```
-
-Nếu query chỉ cần load/replay artifact:
-
-```text
-Object Store by URI/key
-```
-
----
-
-## 5. Decision matrix
-
-| Data | Primary store | Reason |
-|---|---|---|
-| Original DOCX/PDF/Excel | Object Store | Immutable source evidence |
-| Converted Markdown/text | Object Store | Intermediate replayable payload |
-| Parsed document / SourceUnit payload | Object Store | Parser output; can be regenerated/versioned |
-| Validation result bundle | Object Store | Detailed processing evidence |
-| Ontology candidate | Object Store | Candidate before promotion |
-| Source identity/revision metadata | Metadata DB | Governance and lookup |
-| Ingestion run | Metadata DB | Pipeline lifecycle |
-| Stage run | Metadata DB | Operational state and lineage |
-| Stage output URI/hash | Metadata DB | Pointer to immutable payload |
-| Component versions | Metadata DB | Reproducibility |
-| Promotion record | Metadata DB | Governance transition |
-| Knowledge snapshot metadata | Metadata DB | Stable downstream reference |
-| Canonical Requirement/Function/Rule nodes | Neo4j | Semantic graph query |
-| Canonical semantic relationships | Neo4j | Graph traversal |
-
----
-
-## 6. Identity methodology
-
-Mỗi layer cần identity riêng; không tái sử dụng một ID cho nhiều lifecycle.
-
-Recommended IDs:
-
-```text
-source_document_id
-source_revision_id
-ingestion_run_id
-stage_run_id
-stage_output_id
-knowledge_candidate_id
-promotion_id
-knowledge_snapshot_id
-```
-
-Ví dụ lineage:
-
-```text
-DOC-001
-  ↓
-REV-003
-  ↓
-ING-1001
-  ↓
-STG-04 ONTOLOGY_BUILD
-  ↓
-OUT-440 knowledge-candidate.json
-  ↓
-PROM-008
-  ↓
-KB-012
-```
-
-Không dùng file path hoặc Git SHA làm business identity chính.
-
-Hashes phục vụ integrity/deduplication; IDs phục vụ lifecycle identity.
-
----
-
-## 7. Versioning methodology
-
-Không phải mọi object đều dùng cùng một kiểu version.
-
-### Source Revision
-
-Version theo thay đổi source content.
-
-```text
-source content hash changed
--> new SourceRevision
-```
-
-### Pipeline / Component Version
-
-Pin exact version của converter/parser/builder/validator/ontology component đã chạy.
-
-### Schema Version
-
-Output contract phải có `schema_version` riêng với component version.
-
-Parser v4 có thể vẫn emit schema v2.
-
-### Knowledge Snapshot Version
-
-Sinh khi một candidate/set candidate được promote thành trạng thái canonical có thể downstream pin.
-
-Do đó không tạo một generic `version` column để đại diện tất cả lifecycle.
-
----
-
-## 8. Replay và idempotency
-
-Database design phải hỗ trợ hai capability khác nhau.
-
-### Idempotent retry
-
-Retry cùng operation không được tạo duplicate logical output ngoài ý muốn.
-
-Có thể sử dụng operation key dạng:
-
-```text
-source_revision_id
-+ pipeline_release
-+ stage_type
-+ component_version
-+ relevant configuration hash
-```
-
-### Intentional reprocess
-
-Reprocess có chủ đích phải tạo run mới dù source bytes không đổi.
-
-Ví dụ:
+Nhờ đó lineage deterministic:
 
 ```text
 REV-003
-  -> ING-1001 parser-v3
-  -> ING-1015 parser-v4
+  ↓
+Convert RUN-87
+  ↓
+MD OUTSET-087  ← baseline
+  ↓
+Parse RUN-221
+  ↓
+CHUNKSET-221   ← baseline
+  ↓
+G2 RUN-310
+  ↓
+ENRICHED-310   ← baseline
+  ↓
+PROM-007
+  ↓
+ReqKB
 ```
-
-Cả hai giữ nguyên để benchmark/debug/audit.
-
-Idempotency không được ngăn intentional reprocessing.
 
 ---
 
-## 9. Failure semantics
+## 16. OutputSet thay vì chỉ Output
 
-Một failed run không được phá trạng thái knowledge đang active.
+Một stage thường tạo nhiều artifact liên quan.
 
-Pattern:
+Ví dụ Parse:
 
 ```text
-Current canonical KB = KB-011
+OUTSET-221
+  ├── parsed-document.json
+  ├── chunks.json
+  └── diagnostics.json
+```
 
-ING-1001 starts
-  -> convert PASS
-  -> parse PASS
-  -> validate PASS
-  -> ontology FAIL
+Baseline nên trỏ tới `OutputSet`, không trỏ rời từng file.
+
+`StageOutputSet` đại diện cho một coherent result của một StageRun.
+
+`StageOutput` đại diện cho từng physical artifact trong set.
+
+---
+
+## 17. Review và AI recommendation model
+
+### review_request
+
+Logical fields:
+
+```text
+review_id
+source_revision_id
+stage_run_id
+review_type
+status
+recommended_output_set_id
+recommendation_score
+recommendation_summary
+recommendation_evidence_ref
+created_at
+resolved_at
+```
+
+### review_decision
+
+```text
+decision_id
+review_id
+decision                # APPROVE | REJECT | SELECT_OTHER
+selected_output_set_id
+decided_by
+decision_reason
+decided_at
+```
+
+### stage_baseline
+
+```text
+baseline_id
+source_revision_id
+stage_type
+output_set_id
+effective_from
+effective_to
+created_by_decision_id
+selection_mode           # AUTO | AI_POLICY | HUMAN
+```
+
+Baseline history là immutable governance evidence.
+
+---
+
+## 18. Workflow runtime integration
+
+LangGraph quản lý runtime execution state:
+
+```text
+current node
+checkpoint
+interrupt/resume
+retry
+workflow state
+```
+
+Ingestion Catalog DB quản lý business/governance state:
+
+```text
+stage output registered
+baseline selected
+review pending
+promotion active
+```
+
+Không dùng LangGraph checkpoint làm system of record cho baseline.
+
+Correlation:
+
+```text
+ingestion_run.runtime_ref
+stage_run.runtime_ref
+```
+
+### Human review flow
+
+```text
+Stage executes
+   ↓
+Candidate OutputSet
+   ↓
+Evaluate / Recommend
+   ↓
+Baseline Policy
+   ├── auto → create StageBaseline → continue
+   └── review → create ReviewRequest
+                    ↓
+                interrupt()
+                    ↓
+              human decision
+                    ↓
+            create StageBaseline
+                    ↓
+                 resume
+```
+
+---
+
+## 19. AI-native UI/UX mapping
+
+User không thao tác trực tiếp với database tables.
+
+Application nên có bốn surface chính:
+
+```text
+Workflow Canvas
+Artifact / Compare View
+Review Inbox
+AI Copilot / Chat
+```
+
+### 19.1 Workflow Canvas
+
+Hiển thị trạng thái:
+
+```text
+G1 Parse
+✓ execution completed
+4 candidates
+★ AI recommends OUTSET-221
+Baseline: waiting approval
+```
+
+Canvas trả lời: **workflow đang ở đâu và gate nào đang chặn?**
+
+### 19.2 Artifact / Compare View
+
+Mặc định compare:
+
+```text
+Current Baseline
+vs
+AI Recommended Candidate
+```
+
+Ví dụ:
+
+```text
+Current OUTSET-187
+Candidate OUTSET-221
+
++18 chunks
+-4 chunks
+3 heading paths corrected
+validator errors: 4 → 0
+```
+
+Không bắt user duyệt hàng trăm historical runs theo danh sách phẳng.
+
+### 19.3 Review Inbox
+
+Hiển thị các `review_request.status = OPEN`.
+
+User có thể:
+
+```text
+Approve recommended baseline
+Select another candidate
+Reject / request rerun
+```
+
+### 19.4 AI Copilot / Chat
+
+Chat hỗ trợ reasoning/explanation:
+
+```text
+“Vì sao recommend OUTSET-221?”
+“So với baseline hiện tại section 3.2 thay đổi gì?”
+“Chọn candidate này làm baseline.”
+```
+
+Button và chat command phải gọi cùng application command, ví dụ:
+
+```text
+ApproveStageBaseline(
+  source_revision_id,
+  stage_type,
+  output_set_id,
+  actor,
+  reason
+)
+```
+
+UI/chat không được ghi DB trực tiếp.
+
+---
+
+## 20. Application architecture
+
+```text
+                         FRONTEND
+
+ Workflow Canvas | Artifact Compare | Review Inbox | AI Chat
+                           │
+                           ▼
+                    APPLICATION API
+                           │
+       ┌───────────────────┼────────────────────┐
+       ▼                   ▼                    ▼
+  Workflow Service   Baseline Service     Review Service
+       │                   │                    │
+       └───────────────────┼────────────────────┘
+                           ▼
+                    Domain Commands
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+ Ingestion Catalog DB   Object Store    LangGraph Runtime
+          │
+          └──────────── G3 Promotion ────────────→ Neo4j
+```
+
+Representative commands:
+
+```text
+StartIngestion
+RunStage
+RegisterOutputSet
+RecommendBaseline
+ApproveBaseline
+RejectCandidate
+CompareOutputs
+PromoteToReqKB
+ResumeWorkflow
+```
+
+---
+
+## 21. Status semantics
+
+### StageRun
+
+```text
+PENDING
+RUNNING
+SUCCEEDED
+FAILED
+CANCELLED
+```
+
+### ReviewRequest
+
+```text
+OPEN
+IN_REVIEW
+RESOLVED_APPROVE
+RESOLVED_REJECT
+RESOLVED_SELECT_OTHER
+```
+
+### Baseline
+
+Không cần `FINAL`.
+
+Baseline history dùng effective interval hoặc active flag có constraint để đảm bảo một current baseline cho mỗi `(source_revision, stage_type, baseline_scope)`.
+
+### Promotion
+
+```text
+PENDING
+IN_PROGRESS
+ACTIVE
+FAILED
+SUPERSEDED
+```
+
+Terminology rule:
+
+> Không dùng `final` cho run/output. Dùng `selected baseline` cho intermediate artifacts và `active promotion` cho ReqKB publication.
+
+---
+
+## 22. Replay, retry và reprocess
+
+### Retry
+
+Retry cùng operation phải tránh duplicate logical side effects.
+
+### Reprocess
+
+Reprocess có chủ đích phải tạo new StageRun/OutputSet ngay cả khi source không đổi.
+
+```text
+REV-003
+  ├── PARSE-201 parser-v3
+  ├── PARSE-221 parser-v4
+  └── PARSE-240 parser-v4 + config-B
+```
+
+History được giữ để benchmark/debug/audit.
+
+### Baseline change
+
+Không rerun downstream tự động một cách mơ hồ.
+
+Khi upstream baseline đổi:
+
+```text
+Convert baseline OUT-087 → OUT-091
+```
+
+hệ thống phải xác định downstream baseline/run nào trở thành stale và tạo explicit reprocessing decision/event.
+
+Chi tiết stale propagation sẽ được đặc tả ở tài liệu implementation/schema tiếp theo.
+
+---
+
+## 23. Failure semantics
+
+Một failed candidate không được phá baseline hiện tại.
+
+Ví dụ:
+
+```text
+PARSE baseline = OUTSET-221
+
+PARSE-240 starts
+→ execution FAIL
 
 Result:
-- ING-1001 = FAILED
-- intermediate outputs retained
-- KB-011 remains active
-- no partial canonical promotion
+- PARSE-240 = FAILED
+- diagnostics retained
+- OUTSET-221 remains current baseline
+- G2 current baseline/history remains unchanged
 ```
 
-Promotion là boundary quan trọng nhất.
+Tương tự G3:
 
-Không để từng parser/ontology stage ghi trực tiếp vào active Neo4j graph theo kiểu incremental side-effect không có rollback boundary.
+```text
+Current active promotion = PROM-006
+PROM-007 fails
+→ PROM-006 remains active
+```
 
 ---
 
-## 10. Transaction methodology
+## 24. Transaction / consistency methodology
 
-Không cố tạo một distributed transaction xuyên Object Store + Metadata DB + Neo4j.
+Không tạo distributed transaction giả giữa Object Store + Catalog DB + Neo4j.
 
-POC ưu tiên **explicit state transition + idempotency**.
-
-Ví dụ register stage output:
+Register output:
 
 ```text
-1. write immutable payload to Object Store
+1. write immutable artifacts to Object Store
 2. calculate/verify hash
-3. insert StageOutput metadata
-4. mark StageRun completed
+3. register OutputSet + Output records
+4. mark StageRun SUCCEEDED
 ```
 
-Nếu step 3 fail, object chưa được register có thể được garbage-collect/reconciled sau.
+Nếu DB registration fail sau khi object được write, object trở thành orphan candidate và được reconciliation/GC xử lý sau.
+
+Baseline selection:
+
+```text
+1. validate candidate is eligible
+2. close previous baseline effective interval
+3. insert new StageBaseline
+4. resolve ReviewDecision if applicable
+5. emit/resume workflow transition
+```
+
+Các DB mutations của bước 1–4 nên nằm trong một relational transaction.
 
 Promotion:
 
 ```text
-1. create Promotion record = IN_PROGRESS
-2. materialize candidate into Neo4j idempotently
-3. verify materialization
-4. create/register KnowledgeSnapshot
-5. mark Promotion = COMPLETED
-6. optionally move active-snapshot pointer
+1. create Promotion = IN_PROGRESS
+2. read exact G2 baseline OutputSet
+3. materialize Neo4j idempotently
+4. verify materialization
+5. write promotion manifest
+6. set Promotion = ACTIVE
+7. supersede previous active promotion
 ```
-
-Chi tiết consistency/reconciliation sẽ được specification trong implementation documents.
 
 ---
 
-## 11. LLM-enabled stage methodology
+## 25. Technology selection
 
-Ontology Builder có thể sử dụng LLM sau này. Điều này không làm thay đổi storage model.
+Methodology không khóa PostgreSQL.
 
-Stage Run vẫn là:
-
-```text
-ONTOLOGY_BUILD
-```
-
-Nhưng có thể bổ sung component references:
+### POC
 
 ```text
-MODEL
-PROMPT
-TOOL
-CODE
-RULESET
-```
-
-Ví dụ:
-
-```text
-STG-04
-component = ontology-builder 0.4.0
-model_ref = model-profile-x
-prompt_ref = ontology-builder/v5
-ruleset_ref = ontology-rules/v3
-```
-
-Nếu tích hợp MLflow trong tương lai, Metadata DB chỉ lưu stable external reference như `trace_ref` hoặc `prompt_ref`; không duplicate MLflow internal data model.
-
-Nguyên tắc:
-
-> MLflow integration là observability/experiment concern của AI-enabled stage, không phải nền tảng của ingestion persistence model.
-
----
-
-## 12. Database technology selection
-
-Phương pháp luận không khóa PostgreSQL.
-
-Domain/application layer phụ thuộc vào repository contract, không phụ thuộc database engine.
-
-```text
-ReqKBMetadataRepository
-      │
-      ├── SQLite adapter      # POC
-      └── PostgreSQL adapter  # pilot / scale-up
-```
-
-### POC recommendation
-
-```text
-Metadata DB: SQLite
+Ingestion Catalog DB: SQLite
 Object Store: local filesystem adapter hoặc MinIO
-Knowledge Store: Neo4j
+ReqKB: Neo4j
+Runtime: LangGraph
 ```
 
-SQLite phù hợp khi:
+### Scale-up
 
-- một process hoặc ít writer;
-- local POC;
-- deployment đơn giản quan trọng hơn horizontal scale.
+Chuyển sang PostgreSQL khi có:
 
-### Scale-up trigger
+- concurrent workers/writers;
+- service tách process/machine;
+- audit/query workload lớn;
+- production backup/HA;
+- stronger concurrency control requirements.
 
-Chuyển PostgreSQL khi:
-
-- nhiều worker concurrent;
-- cần stronger operational isolation;
-- cần production backup/HA;
-- query/audit workload tăng;
-- service deployment tách process/machine.
-
-Việc chuyển DB không được yêu cầu thay đổi domain model hoặc LangGraph workflow contract.
-
----
-
-## 13. Quan hệ với LangGraph
-
-LangGraph quản lý **workflow execution state**.
-
-Metadata DB quản lý **business/ingestion lifecycle metadata**.
-
-Không copy toàn bộ LangGraph state vào Metadata DB.
-
-Ví dụ:
+Domain contract nên portable:
 
 ```text
-LangGraph
-- current node
-- checkpoint state
-- interrupt/resume state
-
-Metadata DB
-- ING-1001
-- PARSE completed
-- OUT-123 registered
-- promotion status
+IngestionRepository
+  ├── SQLite adapter
+  └── PostgreSQL adapter
 ```
 
-Nếu cần correlation:
+Tuy nhiên physical schema/index/locking/isolation strategy có thể khác giữa SQLite và PostgreSQL. Portability áp dụng cho domain/application contract, không có nghĩa chỉ đổi connection string.
+
+---
+
+## 26. Decision matrix
+
+| Data | Primary owner | Notes |
+|---|---|---|
+| Original DOCX/PDF/XLSX | Object Store | immutable evidence |
+| Converted MD/normalized payload | Object Store | immutable candidate artifact |
+| Parsed document/chunk bundle | Object Store | full replay artifact |
+| Enriched chunk bundle | Object Store | G2 candidate artifact |
+| Diagnostics/evaluation bundle | Object Store | if large/detailed |
+| Source identity/revision | Catalog DB | governance identity |
+| Classification | Catalog DB | queryable G0 state |
+| Ingestion/Stage runs | Catalog DB | execution facts |
+| OutputSet/Output URI/hash | Catalog DB | artifact registry |
+| SourceUnit projection | Catalog DB | diff/review/lineage queries |
+| Baseline history | Catalog DB | version governance |
+| AI recommendation/review decision | Catalog DB + evidence ref | governance/audit |
+| Promotion record | Catalog DB | publication lifecycle |
+| Canonical semantic nodes/edges | Neo4j | only after G3 |
+| Promotion manifest | Object Store | immutable publication evidence |
+
+---
+
+## 27. Anti-patterns
+
+### AP-01 — Latest output wins
 
 ```text
-ingestion_run.runtime_ref = langgraph thread/run reference
+SELECT latest run
+→ use as next stage input
 ```
 
-Runtime-specific schema không trở thành domain schema của ReqKB.
+**Reject.** Next stage consumes explicit current baseline.
+
+### AP-02 — `/final` folder as governance
+
+**Reject.** Object Store key không quyết định current state.
+
+### AP-03 — Overwrite intermediate artifacts
+
+**Reject.** New run → new immutable OutputSet.
+
+### AP-04 — Successful run = approved output
+
+**Reject.** Execution success và baseline selection là hai states khác nhau.
+
+### AP-05 — AI recommendation = approval
+
+**Reject.** AI recommends; policy defines whether selection can be automatic or requires human authority.
+
+### AP-06 — G2 writes directly to active Neo4j
+
+**Reject.** G3 Promotion là publication boundary.
+
+### AP-07 — LangGraph checkpoint as governance DB
+
+**Reject.** Runtime state và baseline/promotion state có owners khác nhau.
+
+### AP-08 — UI writes database directly
+
+**Reject.** Canvas, review UI và chat đều gọi domain/application commands.
 
 ---
 
-## 14. Quan hệ với tài liệu persistence hiện tại
+## 28. Design review checklist
 
-Tài liệu `poc/reqkb-ingestion-workflow/docs/05_PERSISTENCE_AND_INCREMENTAL_INGESTION.md` hiện mô tả PostgreSQL như system of record và lưu trực tiếp `source_units`, validation results và ontology annotations.
+Một implementation ingestion chỉ được chấp nhận khi trả lời rõ:
 
-Bộ `poc/database-design/` phát triển boundary này theo hướng:
+- [ ] SourceDocument và SourceRevision khác nhau thế nào?
+- [ ] Raw bytes có immutable hash/URI không?
+- [ ] G0 classification có identity/version/evidence không?
+- [ ] G1A/G1B pin exact input baseline không?
+- [ ] Mỗi StageRun có exact component/config/schema version không?
+- [ ] Mỗi OutputSet immutable không?
+- [ ] Một stage có thể giữ hàng trăm candidate mà không mất provenance không?
+- [ ] Current baseline có explicit DB record không?
+- [ ] Latest output có bị dùng ngầm thay baseline không?
+- [ ] Baseline history có append-only/effective history không?
+- [ ] AI recommendation và human decision có trace được không?
+- [ ] SourceUnit có queryable projection cho diff/review không?
+- [ ] Baseline change có thể xác định downstream stale state không?
+- [ ] G3 chỉ consume exact G2 baseline không?
+- [ ] Failed run/promotion có giữ current baseline/ReqKB active state không?
+- [ ] Object Store không dùng `/final` để quyết định state không?
+- [ ] LangGraph checkpoint có tách khỏi governance record không?
+- [ ] UI/chat có gọi cùng domain commands không?
+- [ ] SQLite/PostgreSQL có được che sau repository boundary không?
+
+---
+
+## 29. Baseline architecture sau tài liệu này
 
 ```text
-Old mental model
-PostgreSQL = source + processing + metadata system of record
+                             STAGE 1 — INGESTION
 
-New mental model
-Object Store = source/intermediate payload system of record
-Metadata DB = ingestion governance and lineage system of record
-Neo4j = promoted semantic knowledge system of record
+Input Document
+      │
+      ▼
+Source Revision ───────────────────────────────┐
+      │                                        │
+      ▼                                        │
+G0 Classification                             │
+      │                                        │
+      ▼                                        │
+G1A Convert ──→ Candidate OutputSets ──→ Baseline Gate
+      │                                        │
+      ▼                                        │
+G1B Parse ───→ ChunkSet Candidates ───→ Baseline Gate
+      │                                        │
+      ▼                                        │
+G2 Ontology ─→ Enriched Candidates ───→ Baseline Gate
+      │                                        │
+      ▼                                        │
+G3 Promotion                                  │
+      │                                        │
+      ▼                                        │
+     ReqKB                                     │
+                                               │
+Object Store  ← immutable payloads ────────────┤
+Catalog DB    ← runs/outputsets/baselines ─────┤
+LangGraph     ← execution/checkpoint ──────────┘
 ```
 
-Các nguyên tắc tốt của tài liệu hiện tại vẫn được giữ:
+Core rule:
 
-- append-only history;
-- atomic activation/promotion;
-- stale assertion handling;
-- explicit reprocessing policy;
-- idempotency;
-- component version tracking;
-- failed ingestion không thay active state.
-
-Việc mapping cụ thể các entity cũ như `source_units`, `validation_results`, `ontology_annotations` sang storage boundary mới sẽ được xử lý ở các tài liệu tiếp theo, không sửa âm thầm trong tài liệu methodology này.
+> **Execution tạo candidate. Evaluation/AI đánh giá candidate. Policy quyết định authority. Baseline ghi nhận output được chấp nhận. Stage tiếp theo chỉ consume exact baseline. G3 mới publish vào ReqKB.**
 
 ---
 
-## 15. Anti-patterns
+## 30. Output cho tài liệu tiếp theo
 
-### AP-01 — Neo4j as staging database
-
-Parser/ontology output được ghi thẳng vào canonical graph rồi sửa dần.
-
-**Reject.** Candidate phải tách khỏi canonical knowledge.
-
-### AP-02 — Database as file system
-
-Lưu toàn bộ DOCX, converted text và large parsed JSON trực tiếp vào relational DB không có lý do query rõ ràng.
-
-**Reject cho POC baseline.** Dùng Object Store + metadata reference.
-
-### AP-03 — Overwrite intermediate output
-
-Mỗi run ghi đè `parsed.json` của run trước.
-
-**Reject.** Intermediate output phải gắn run/stage identity.
-
-### AP-04 — Generic version column
-
-Một `version` đại diện document version, parser version, schema version và knowledge version.
-
-**Reject.** Lifecycle khác nhau cần version semantics khác nhau.
-
-### AP-05 — LangGraph state as ingestion database
-
-Dùng checkpoint làm persistent business record của ingestion.
-
-**Reject.** Runtime state và ingestion governance state là hai concern khác nhau.
-
-### AP-06 — Immediate LLM-to-KB write
-
-Ontology Builder dùng LLM và ghi trực tiếp result vào active Neo4j graph.
-
-**Reject.** LLM output phải tạo candidate và đi qua promotion gate.
-
----
-
-## 16. Design review checklist
-
-Một thiết kế DB ingestion chỉ được chấp nhận khi trả lời rõ:
-
-- [ ] Business identity của source document là gì?
-- [ ] Khi nào tạo Source Revision mới?
-- [ ] Ingestion Run khác Source Revision thế nào?
-- [ ] Mỗi stage có execution identity riêng không?
-- [ ] Intermediate output có immutable URI/hash không?
-- [ ] Payload lớn có bị duplicate trong Metadata DB không?
-- [ ] Candidate knowledge được tách khỏi canonical graph chưa?
-- [ ] Promotion có explicit state và failure boundary không?
-- [ ] Downstream có thể pin Knowledge Snapshot cụ thể không?
-- [ ] Có truy ngược KB snapshot về source revision và stage outputs được không?
-- [ ] Retry có idempotent không?
-- [ ] Intentional reprocess có tạo run riêng không?
-- [ ] Failed ingestion có giữ nguyên active knowledge không?
-- [ ] Component/schema versions có được pin độc lập không?
-- [ ] Storage engine có replaceable qua port/adapter không?
-- [ ] LangGraph runtime state có bị leak vào domain model không?
-
----
-
-## 17. Baseline architecture sau tài liệu này
-
-```text
-                           ReqKB Ingestion
-
-Source File
-    │
-    ▼
-Object Store: RAW
-    │
-    ▼
-Convert -> Parse -> Validate -> Ontology Build
-    │          │          │           │
-    └──────────┴──────────┴───────────┘
-               │
-               ▼
-      Object Store intermediates
-               │
-               │ URI / hash / version
-               ▼
-          Metadata DB
-      Source / Run / Stage / Lineage
-               │
-               ▼
-        Knowledge Candidate
-               │
-          Promotion Gate
-               │
-               ▼
-              Neo4j
-       Canonical ReqKB Knowledge
-               │
-               ▼
-       Knowledge Snapshot ID
-```
-
----
-
-## 18. Output cho tài liệu tiếp theo
-
-Tài liệu tiếp theo phải đặc tả **storage boundary** chi tiết hơn:
+Tài liệu tiếp theo:
 
 ```text
 02_storage_boundary.md
 ```
 
-Nó phải chốt:
+phải chốt cụ thể:
 
-1. ownership matrix cho từng data object hiện có trong ingestion workflow;
-2. dữ liệu nào nằm Object Store, Metadata DB và Neo4j;
-3. trường hợp nào được phép denormalize/duplicate;
-4. source-of-truth rules;
-5. read/write responsibility của từng pipeline stage;
-6. mapping từ các object hiện tại như `SourceUnit`, validation result và ontology annotation sang kiến trúc ba-store.
+1. entity nào thuộc Object Store / Catalog DB / Neo4j;
+2. mapping G0/G1A/G1B/G2/G3 theo read/write responsibility;
+3. SourceUnit và enrichment projection lưu tới mức nào trong relational DB;
+4. OutputSet/Object key conventions;
+5. baseline/review/promotion ownership;
+6. duplicate/denormalization rules;
+7. stale propagation khi upstream baseline thay đổi;
+8. boundary contract để Stage 2 Assessment consume ReqKB mà không phụ thuộc ingestion internals.
 
-Chỉ sau khi boundary này được khóa mới thiết kế physical relational schema.
+Chỉ sau khi storage boundary này được khóa mới thiết kế physical relational schema.
