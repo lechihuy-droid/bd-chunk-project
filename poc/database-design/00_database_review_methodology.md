@@ -1,16 +1,16 @@
 # Database Architecture Review Methodology
 
 **Status:** POC review baseline  
-**Scope:** Database architecture, version governance, physical schema, and migration safety  
-**Purpose:** Provide a repeatable review method that remains valid even when the ReqKB workflow changes.
+**Scope:** Database architecture, version governance, physical schema và migration safety  
+**Purpose:** Tạo một review method lặp lại được, vẫn dùng được khi ReqKB workflow thay đổi.
 
 ---
 
 ## 1. Review philosophy
 
-Database review must not start from SQL syntax or from the current workflow nodes.
+Database review không bắt đầu từ SQL syntax hoặc danh sách workflow node hiện tại.
 
-Review in this order:
+Review theo thứ tự:
 
 ```text
 Business identity
@@ -30,39 +30,39 @@ Indexes / performance / security
 Migration & drift safety
 ```
 
-A schema that is fast but models the wrong lifecycle is still a bad schema.
+Một schema nhanh nhưng model sai lifecycle vẫn là schema sai.
 
 ---
 
 ## 2. Research basis
 
-This methodology combines lessons from several independent sources. The sources are used for different review layers rather than treated as one universal checklist.
+Methodology này tổng hợp các góc review từ nhiều nguồn độc lập. Mỗi nguồn dùng cho một layer khác nhau, không coi bất kỳ repo/skill nào là universal checklist.
 
 ### 2.1 Supabase Agent Skills — PostgreSQL implementation review
 
-Source:
+Nguồn:
 
 - https://github.com/supabase/agent-skills
-- `supabase-postgres-best-practices`
+- skill `supabase-postgres-best-practices`
 
-The skill explicitly covers schema design, query performance, connection management, concurrency/locking, RLS/security, access patterns, and monitoring.
+Skill cover schema design, query performance, connection management, concurrency/locking, RLS/security, access patterns và monitoring.
 
-Use it primarily for **physical PostgreSQL review**, after the domain model is already sound.
+Dùng chủ yếu cho **physical PostgreSQL review**, sau khi domain model đã đúng.
 
-### 2.2 GitHub Awesome Copilot — independent PostgreSQL code review
+### 2.2 GitHub Awesome Copilot — independent PostgreSQL review
 
-Source:
+Nguồn:
 
 - https://github.com/github/awesome-copilot
-- `postgresql-code-review`
+- skill `postgresql-code-review`
 
-The skill focuses on PostgreSQL-specific schema quality, JSONB, custom types, constraints, indexes, functions, RLS, privileges, and PostgreSQL anti-patterns.
+Skill tập trung PostgreSQL-specific schema quality, JSONB, custom types, constraints, indexes, functions, RLS, privileges và anti-patterns.
 
-Use it as an **independent second reviewer** to challenge the physical design and catch engine-specific issues.
+Dùng như **independent second reviewer** để challenge physical design.
 
-### 2.3 wshobson/agents — logical database and architecture review
+### 2.3 wshobson/agents — logical database và architecture review
 
-Source:
+Nguồn:
 
 - https://github.com/wshobson/agents
 - `postgresql-table-design`
@@ -70,79 +70,79 @@ Source:
 - `event-store-design`
 - `projection-patterns`
 
-The repository separates focused architecture/database skills and emphasizes composability and clear responsibility boundaries.
+Repo tách các skill architecture/database theo single responsibility và composable boundaries.
 
-Use it mainly for **logical modeling, identity, projection, architecture boundaries, and system-of-record reasoning**.
+Dùng chủ yếu cho **logical modeling, identity, projection, architecture boundary và System-of-Record reasoning**.
 
-### 2.4 Atlas — schema-as-code and migration verification
+### 2.4 Atlas — schema-as-code và migration verification
 
-Source:
+Nguồn:
 
 - https://github.com/ariga/atlas
 
-Atlas supports declarative and versioned schema workflows, schema diff, migration planning/linting, testing, and drift detection across PostgreSQL and SQLite among other databases.
+Atlas hỗ trợ declarative/versioned schema workflow, inspect/diff, migration planning/linting, testing và drift detection trên PostgreSQL, SQLite và nhiều engine khác.
 
-Use it for **machine-verifiable schema change review** after the physical schema exists.
+Dùng cho **machine-verifiable schema change review** khi physical schema đã tồn tại.
 
 ### 2.5 Bytebase — database change governance reference
 
-Source:
+Nguồn:
 
 - https://github.com/bytebase/bytebase
 
-Bytebase provides database CI/CD, schema change review, GitOps integration, migration management, SQL Review, approval workflows, and audit-oriented database lifecycle management.
+Bytebase cung cấp database CI/CD, schema change review, GitOps integration, migration management, SQL Review, approval workflow và audit-oriented database lifecycle.
 
-Use it as a **reference architecture for database version/change governance**, not as the ReqKB persistence model itself.
+Dùng như **reference architecture cho database change/version governance**, không copy làm ReqKB persistence model.
 
 ---
 
 ## 3. Five review gates
 
-Every meaningful database design change should pass five gates.
+Mọi database design change quan trọng phải đi qua 5 gate.
 
 ### Gate A — Domain & identity
 
-Question: **Are we versioning the correct business objects?**
+Câu hỏi: **Ta có đang version đúng business object không?**
 
-Check:
+Review:
 
 - stable business identity vs revision identity;
 - execution identity vs artifact identity;
-- what event creates a new revision;
-- whether the design depends on current workflow node names;
-- whether one generic `version` field is hiding several version semantics;
-- whether a candidate revision belongs to a stable ArtifactSeries/OutputSlot.
+- event nào tạo revision mới;
+- schema có phụ thuộc workflow node name không;
+- một generic `version` có đang che nhiều version semantics không;
+- candidate revision có thuộc stable ArtifactSeries/OutputSlot không.
 
-Typical P0 findings:
+P0 điển hình:
 
 ```text
-Run ID used as artifact identity
-Latest row treated as current truth
-Stage-specific tables created for every workflow node
-No stable identity for the object being baselined
+Run ID dùng làm artifact identity
+Latest row bị coi là current truth
+Mỗi workflow node tạo một table riêng
+Không có stable identity cho object được baseline
 ```
 
-Primary review lens: logical modeling / architecture skills.
+Primary lens: logical modeling / architecture.
 
 ---
 
 ### Gate B — Ownership, lineage & version governance
 
-Question: **Can the system prove what is canonical and why?**
+Câu hỏi: **Hệ thống có chứng minh được cái gì là canonical và tại sao không?**
 
-Check:
+Review:
 
-- System of Record for every representation;
+- System of Record của từng representation;
 - immutable target vs mutable/current pointer;
 - baseline selection history;
-- publication/promotion separated from execution;
-- provenance from input revision to output revision;
+- publication tách khỏi execution;
+- provenance từ input revision đến output revision;
 - review/approval evidence;
 - exact upstream input pinning;
 - stale/downstream dependency handling;
 - concurrent baseline update semantics.
 
-Required rule:
+Rule bắt buộc:
 
 ```text
 latest != baseline
@@ -150,102 +150,100 @@ success != approval
 baseline != publication
 ```
 
-Typical P0 findings:
+P0 điển hình:
 
 ```text
-/final folder determines truth
-baseline row overwritten without history
-AI recommendation implicitly equals approval
-relational projection and object artifact both claim to be canonical
-last-write-wins on baseline change
+/final folder quyết định truth
+baseline bị overwrite không có history
+AI recommendation mặc định bằng approval
+Object artifact và DB projection đều claim canonical
+baseline dùng last-write-wins
 ```
 
-Primary review lens: version governance; Bytebase is a useful change-governance reference.
+Primary lens: version governance; Bytebase dùng làm change-governance reference.
 
 ---
 
 ### Gate C — Logical relational model
 
-Question: **Can the model enforce valid states without depending on application convention?**
+Câu hỏi: **Model có enforce valid state mà không chỉ dựa vào application convention không?**
 
 Review:
 
 - PK/FK boundaries;
 - cardinality;
-- optional vs mandatory relationships;
+- optional/mandatory relationship;
 - normalization vs intentional projection/denormalization;
-- uniqueness constraints;
+- UNIQUE/CHECK constraints;
 - state transition invariants;
-- many-input / DAG support where required;
+- multi-input/DAG support khi cần;
 - delete/retention semantics;
 - queryable projection rebuildability.
 
-Important principle:
+Principle:
 
-> Prefer database constraints for invariants that must never be violated; do not rely only on application code.
+> Invariant nào tuyệt đối không được vi phạm thì ưu tiên enforce bằng database constraint, không chỉ bằng application code.
 
-Examples:
+Ví dụ:
 
 ```text
-one OutputSet belongs to exactly one StageExecution
-one StoredObject belongs to exactly one OutputSet
-one baseline revision selects one OutputSet for one OutputSlot
-only one current baseline is allowed per baseline scope
+một OutputSet thuộc đúng một StageExecution
+một StoredObject thuộc đúng một OutputSet
+một Baseline revision chọn một OutputSet cho một OutputSlot
+mỗi baseline scope chỉ có tối đa một current baseline
 ```
-
-Primary review lens: table-design and architecture modeling.
 
 ---
 
 ### Gate D — Physical DB quality
 
-Question: **Is the chosen engine used safely and efficiently?**
+Câu hỏi: **Chosen engine có được dùng an toàn và hiệu quả không?**
 
-For PostgreSQL review:
+Với PostgreSQL review:
 
 - data types;
 - PK strategy;
 - FK indexes;
 - compound/partial indexes;
-- JSONB only where query semantics justify it;
+- JSONB chỉ dùng khi query semantics phù hợp;
 - timestamp/time-zone types;
 - CHECK/UNIQUE constraints;
 - transaction boundaries;
-- locking and concurrency;
-- role/privilege/RLS requirements;
-- connection pooling and scale assumptions.
+- locking/concurrency;
+- role/privilege/RLS;
+- pooling và scale assumptions.
 
-For SQLite POC review:
+Với SQLite POC:
 
-- writer concurrency assumptions;
+- writer concurrency assumption;
 - transaction behavior;
 - foreign keys enabled;
 - WAL/locking decision;
-- indexes based on real query paths;
-- features that will require redesign when moving to PostgreSQL.
+- indexes theo real query path;
+- feature nào sẽ cần redesign khi move sang PostgreSQL.
 
-Use Supabase `supabase-postgres-best-practices` as the primary implementation checklist and GitHub `postgresql-code-review` as an independent second pass for PostgreSQL.
+Dùng `supabase-postgres-best-practices` làm primary implementation checklist và GitHub `postgresql-code-review` làm second pass cho PostgreSQL.
 
 ---
 
 ### Gate E — Migration, drift & operability
 
-Question: **Can the schema evolve safely after data exists?**
+Câu hỏi: **Schema có evolve an toàn sau khi đã có data không?**
 
-Check:
+Review:
 
 - schema-as-code source;
 - migration history;
 - destructive changes;
-- NOT NULL/default changes on existing data;
-- large-table rewrite/lock risk;
-- backward compatibility during deployment;
+- NOT NULL/default changes trên existing data;
+- table rewrite/lock risk;
+- backward compatibility khi deploy;
 - rollback/roll-forward strategy;
-- drift between expected and actual schema;
+- expected vs actual schema drift;
 - data backfill strategy;
 - migration tests.
 
-Recommended machine verification when implementation begins:
+Recommended machine verification khi implementation bắt đầu:
 
 ```text
 schema definition
@@ -261,47 +259,45 @@ apply
 drift detection
 ```
 
-Bytebase can be studied when a larger approval/change-management layer is needed.
+Bytebase có thể nghiên cứu thêm khi cần approval/change-management layer lớn hơn.
 
 ---
 
 ## 4. Review severity
 
-Use three severities.
+### P0 — Architecture blocker
 
-### P0 — architecture blocker
+Phải sửa trước physical schema implementation.
 
-Must fix before physical schema implementation.
+Ví dụ:
 
-Examples:
+- sai business/version identity;
+- System of Record mơ hồ;
+- thiếu baseline/concurrency semantics;
+- workflow-specific schema dễ gãy khi flow đổi;
+- không reconstruct được provenance;
+- mutate immutable history.
 
-- incorrect business/version identity;
-- ambiguous System of Record;
-- no baseline/concurrency semantics;
-- workflow-specific schema that cannot support foreseeable changes;
-- provenance cannot be reconstructed;
-- destructive mutation of immutable history.
+### P1 — Design risk
 
-### P1 — design risk
+Phải sửa trước pilot/production hoặc trước capability liên quan.
 
-Fix before pilot/production or before the affected capability is implemented.
+Ví dụ:
 
-Examples:
+- thiếu constraint/index strategy;
+- stale propagation chưa rõ;
+- migration strategy yếu;
+- JSON/denormalization quá mức;
+- transaction boundary chưa tốt.
 
-- missing constraint/index strategy;
-- unclear stale propagation;
-- weak migration strategy;
-- excessive JSON/denormalization;
-- poor transaction boundary.
+### P2 — Optimization / maintainability
 
-### P2 — optimization / maintainability
+Có thể defer với backlog rõ ràng.
 
-Can be deferred with an explicit backlog item.
-
-Examples:
+Ví dụ:
 
 - naming consistency;
-- optional secondary indexes;
+- secondary indexes;
 - convenience views;
 - observability improvements.
 
@@ -309,7 +305,7 @@ Examples:
 
 ## 5. Multi-reviewer process
 
-A strong review should use independent passes rather than one agent attempting everything at once.
+Không nên để một reviewer/agent review tất cả trong một pass.
 
 ```text
 Pass 1 — Architecture Reviewer
@@ -322,21 +318,21 @@ Pass 3 — Database Model Reviewer
 ERD / PK-FK / constraints / cardinality / query model
 
 Pass 4 — Engine Reviewer
-PostgreSQL or SQLite physical design
+PostgreSQL hoặc SQLite physical design
 
 Pass 5 — Migration Reviewer
 schema diff / migration safety / drift
 ```
 
-The reviewers may disagree. Resolve disagreements against explicit requirements and invariants, not majority voting.
+Nếu reviewer disagree, resolve theo requirement/invariant rõ ràng, không majority voting.
 
 ---
 
-## 6. Required review inputs by maturity
+## 6. Required review inputs theo maturity
 
 ### Methodology stage
 
-Input:
+Cần:
 
 - data lifecycle;
 - business identities;
@@ -344,11 +340,11 @@ Input:
 - ownership boundaries;
 - expected query/use cases.
 
-Do not review indexes yet.
+Chưa review indexes.
 
 ### Logical model stage
 
-Input:
+Cần:
 
 - entity definitions;
 - ERD;
@@ -358,7 +354,7 @@ Input:
 
 ### Physical schema stage
 
-Input:
+Cần:
 
 - DDL;
 - representative queries;
@@ -368,7 +364,7 @@ Input:
 
 ### Migration stage
 
-Input:
+Cần:
 
 - current schema;
 - desired schema;
@@ -379,7 +375,7 @@ Input:
 
 ## 7. Standard review output
 
-Every review must produce the same structure:
+Mỗi review phải có cùng cấu trúc:
 
 ```text
 Overall assessment
@@ -396,49 +392,47 @@ P2 findings
 ...
 
 Decisions confirmed
-- what is already correct and should not be reopened
+- điểm đã đúng, không reopen nếu không có evidence mới
 
 Open architecture decisions
-- decisions that require explicit choice
+- điểm cần explicit choice
 
 Next gate
-- what artifact must exist before the next review
+- artifact nào phải có trước review tiếp theo
 ```
 
-Avoid reviews that only say "looks good" or produce a long generic best-practices list.
+Không chấp nhận review chỉ nói “looks good” hoặc list generic best practices không gắn với design hiện tại.
 
 ---
 
 ## 8. ReqKB-specific architecture invariants
 
-The current ReqKB database design should preserve these invariants even when workflow steps change:
+Các invariant này phải giữ dù workflow thay đổi:
 
-1. A SourceAsset may have many immutable SourceRevisions.
-2. Processing execution is separate from output/artifact identity.
-3. Every candidate OutputSet belongs to a stable OutputSlot/ArtifactSeries.
-4. A StageExecution may consume multiple exact versioned inputs.
-5. Object Store owns immutable payload; Catalog DB owns identity/governance/lineage.
-6. Relational content projections are explicitly rebuildable from their canonical artifact.
-7. Baseline is an explicit append-only governance decision; `latest` is never implicit baseline.
-8. Concurrent baseline changes cannot silently become last-write-wins.
-9. Publication to ReqKB is separate from intermediate baseline selection.
-10. Workflow node changes should not require core schema redesign.
+1. Một SourceAsset có nhiều immutable SourceRevision.
+2. Processing execution tách khỏi output/artifact identity.
+3. Mỗi candidate OutputSet thuộc một stable OutputSlot/ArtifactSeries.
+4. StageExecution có thể consume nhiều exact versioned inputs.
+5. Object Store sở hữu immutable payload; Catalog DB sở hữu identity/governance/lineage.
+6. Relational content projection phải explicit là rebuildable từ canonical artifact.
+7. Baseline là append-only governance decision; `latest` không bao giờ implicit baseline.
+8. Concurrent baseline change không được silent last-write-wins.
+9. Publication vào ReqKB tách khỏi intermediate baseline selection.
+10. Workflow node thay đổi không được buộc core schema redesign.
 
-These invariants are the primary review standard for `01_design_methodology.md`, `02_storage_boundary.md`, the logical ERD, and the physical schema.
+Các invariant này là review standard chính cho `01_design_methodology.md`, `02_storage_boundary.md`, logical ERD và physical schema.
 
 ---
 
-## 9. Recommended tool usage for this project
-
-Current recommendation:
+## 9. Recommended review stack cho project
 
 ```text
 Logical architecture review
-→ architecture/table-design skill or database architect reviewer
+→ database architect / architecture + table-design skill
 
 PostgreSQL physical review
 → supabase-postgres-best-practices
-→ github/awesome-copilot postgresql-code-review as second pass
+→ github/awesome-copilot postgresql-code-review (second pass)
 
 Schema/migration verification
 → Atlas
@@ -447,4 +441,4 @@ Database change governance research
 → Bytebase patterns
 ```
 
-Tools supplement architecture judgment; they do not decide domain identity or System-of-Record boundaries automatically.
+Tool hỗ trợ architecture judgment; không tự quyết định domain identity hoặc System-of-Record boundary.
