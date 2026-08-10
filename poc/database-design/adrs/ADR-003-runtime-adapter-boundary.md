@@ -100,6 +100,29 @@ retry
 runtime status
 ```
 
+### Runtime reference format
+
+`processing_run.runtime_ref` và `stage_execution.runtime_ref` là **provider-qualified opaque reference**.
+
+Ví dụ:
+
+```text
+langgraph:<opaque-runtime-id>
+prefect:<opaque-runtime-id>
+```
+
+hoặc URI-like format tương đương nếu adapter cần.
+
+Rule:
+
+> Không được suy luận provider từ current application config. Historical record phải tự mang đủ thông tin để biết runtime ref thuộc provider nào.
+
+Trong POC, một `ProcessingRun` dùng một runtime provider; `StageExecution.runtime_ref` phải cùng provider với parent run. Nếu sau này cần một run hybrid nhiều runtime provider, đó là model change và phải review bằng ADR mới.
+
+**Rationale:** giữ schema hiện tại nhỏ (`runtime_ref` vẫn là một field) nhưng historical run vẫn resolve được sau khi switch LangGraph → Prefect.
+
+**Trade-off:** adapter registry phải parse/validate prefix. Nếu main cần query/report theo provider ở volume lớn, có thể materialize thêm `runtime_provider` column bằng migration mà không đổi identity semantics.
+
 ---
 
 ## Rationale
@@ -151,12 +174,14 @@ MLflow outage mặc định không được làm mất governance state hoặc t
 - POC dùng LangGraph ngay không cần chờ platform abstraction lớn;
 - switch sang Prefect có boundary rõ;
 - runtime framework không trở thành System of Record;
+- historical runtime reference vẫn self-describing sau khi switch provider;
 - test application/database không cần real LangGraph;
 - MLflow được tích hợp độc lập.
 
 ### Cost
 
 - thêm adapter/interface layer;
+- adapter phải validate provider-qualified runtime reference;
 - framework-specific feature muốn expose ra Web App phải review xem có thực sự là application capability hay chỉ runtime detail;
 - switch runtime không bao giờ là “zero cost”: execution semantics, retries, deployment và operational behavior vẫn phải test lại.
 
@@ -186,9 +211,11 @@ Nếu switch ảnh hưởng execution semantics, retry/guarantee hoặc deployme
 
 1. implement `PrefectRuntimeAdapter` theo cùng port;
 2. pass runtime contract test suite;
-3. map `runtime_ref` sang Prefect flow/task run IDs;
+3. emit provider-qualified `prefect:<runtime-id>` refs;
 4. test resume/cancel/retry semantics;
 5. run side-by-side on non-critical workflows nếu cần;
 6. migrate workflow configuration, không migrate baseline/publication history sang runtime store.
 
-Historical Catalog DB records vẫn valid vì runtime IDs chỉ là correlation references.
+Historical Catalog DB records vẫn valid vì runtime IDs là provider-qualified correlation references.
+
+Nếu sau này cần query provider thường xuyên, backfill `runtime_provider` có thể derive deterministic từ existing `runtime_ref` prefix.
