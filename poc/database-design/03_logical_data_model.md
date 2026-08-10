@@ -15,7 +15,7 @@ Mục tiêu:
 
 - định nghĩa stable identity của từng entity;
 - chốt relationship và cardinality;
-- chỉ rõ immutable history vs mutable pointer;
+- phân biệt immutable history/facts với mutable lifecycle pointer/state;
 - bảo vệ exact lineage;
 - support linear workflow, DAG và fan-in mà không tạo table theo workflow node;
 - tạo đầu vào đủ rõ cho physical schema ở tài liệu tiếp theo.
@@ -44,13 +44,13 @@ Nếu decision chọn implementation strategy dài hạn hoặc có nhiều phư
 ```text
 Workspace
  ├── SourceAsset
- │     └── SourceRevision
+ │     └── SourceRevision [0..N]
  │
  ├── ProcessingRun
- │     └── StageExecution
+ │     └── StageExecution [0..N]
  │            ├── StageInput [0..N]
  │            └── OutputSet [0..N]
- │                   └── StoredObject [1..N]
+ │                   └── StoredObject [1..N when registered]
  │
  ├── OutputSlot / ArtifactSeries
  │     ├── OutputSlotScopeMember [1..N] → SourceRevision
@@ -60,7 +60,7 @@ Workspace
  │
  └── KnowledgeSpace
        ├── Publication [0..N]
-       └── PublicationHead [0..N by OutputSlot]
+       └── PublicationHead [0..1 per OutputSlot]
 ```
 
 Governance flow:
@@ -119,9 +119,11 @@ Customer Management Requirement Definition
 Relationship:
 
 ```text
-Workspace 1 ─── N SourceAsset
-SourceAsset 1 ─── N SourceRevision
+Workspace 1 ─── 0..N SourceAsset
+SourceAsset 1 ─── 0..N SourceRevision
 ```
+
+Cho phép SourceAsset tồn tại trước revision đầu tiên để registration/import không cần giả lập revision chưa có bytes.
 
 `SourceAsset` không đại diện cho bytes cụ thể.
 
@@ -147,7 +149,7 @@ created_at
 Invariant:
 
 - thuộc đúng một SourceAsset;
-- immutable sau khi register;
+- identity/content hash/raw reference không mutate sau khi registration hoàn tất;
 - raw artifact phải có integrity reference tới Object Store.
 
 ---
@@ -172,9 +174,11 @@ completed_at
 Relationship:
 
 ```text
-Workspace 1 ─── N ProcessingRun
-ProcessingRun 1 ─── N StageExecution
+Workspace 1 ─── 0..N ProcessingRun
+ProcessingRun 1 ─── 0..N StageExecution
 ```
+
+Cho phép run được tạo trước khi stage đầu tiên start.
 
 ---
 
@@ -214,6 +218,8 @@ StageExecution 1 ─── 0..N OutputSet
 ```
 
 Failed execution có thể không tạo OutputSet.
+
+Sau khi execution terminal, input bindings và resolved producer/config facts không được rewrite.
 
 ---
 
@@ -275,8 +281,8 @@ Một OutputSlot có nhiều candidate OutputSet revision.
 Relationship:
 
 ```text
-OutputSlot 1 ─── N OutputSet
-OutputSlot 1 ─── N BaselineSelection
+OutputSlot 1 ─── 0..N OutputSet
+OutputSlot 1 ─── 0..N BaselineSelection
 OutputSlot 1 ─── 0..1 BaselineHead
 ```
 
@@ -318,7 +324,7 @@ SourceRevision 1 ─── 0..N OutputSlotScopeMember
 
 ### 4.9 OutputSet
 
-Immutable coherent logical result do StageExecution tạo ra và là một candidate revision của đúng một OutputSlot.
+Coherent logical result do StageExecution tạo ra và là một candidate revision của đúng một OutputSlot.
 
 Logical attributes:
 
@@ -336,21 +342,22 @@ Relationships:
 ```text
 StageExecution 1 ─── 0..N OutputSet
 OutputSlot 1 ─── 0..N OutputSet
-OutputSet 1 ─── 1..N StoredObject
+OutputSet 1 ─── 1..N StoredObject khi registration complete
 ```
 
 Invariant:
 
 - thuộc đúng một StageExecution;
 - thuộc đúng một OutputSlot;
-- immutable sau registration;
+- producer/slot identity và registered membership không rewrite sau registration completion;
+- integrity lifecycle được phép transition tới terminal state;
 - chỉ baseline-eligible khi integrity requirements pass.
 
 ---
 
 ### 4.10 StoredObject
 
-Registry record cho physical immutable payload trong Object Store.
+Registry record cho physical payload trong Object Store.
 
 Logical attributes:
 
@@ -370,10 +377,12 @@ created_at
 Relationship:
 
 ```text
-OutputSet 1 ─── 1..N StoredObject
+OutputSet 1 ─── 1..N StoredObject khi registration complete
 ```
 
 Canonical bytes nằm Object Store; Catalog DB giữ registry/integrity facts.
+
+Object URI/hash/role không mutate sau verification; `integrity_status` chỉ transition theo lifecycle đã định nghĩa.
 
 ---
 
@@ -397,11 +406,15 @@ resolved_at
 
 Review không bắt buộc cho AUTO selection.
 
+Invariant:
+
+> `recommended_output_set_id`, nếu có, phải thuộc cùng OutputSlot của ReviewRequest.
+
 ---
 
 ### 4.12 ReviewDecision
 
-Immutable decision record của một review request.
+Immutable final decision record của một review request.
 
 Logical attributes:
 
@@ -421,7 +434,11 @@ Relationship:
 ReviewRequest 1 ─── 0..1 ReviewDecision
 ```
 
-Một resolved request chỉ có một final decision record; re-open/re-review phải tạo request/decision mới thay vì mutate audit history.
+Invariant:
+
+> `selected_output_set_id`, nếu decision chọn candidate, phải thuộc cùng OutputSlot của ReviewRequest.
+
+Một resolved request chỉ có một final decision record; re-open/re-review tạo request/decision mới thay vì mutate audit history.
 
 ---
 
@@ -453,6 +470,8 @@ OutputSet 1 ─── 0..N BaselineSelection
 Invariant quan trọng:
 
 > OutputSet được chọn phải thuộc chính OutputSlot của BaselineSelection và phải baseline-eligible.
+
+Nếu có ReviewDecision, decision đó phải resolve cùng OutputSlot/output selection.
 
 ---
 
@@ -512,7 +531,7 @@ Whole-KB `KnowledgeRelease` chưa được materialize trong POC.
 
 ### 4.16 Publication
 
-Immutable publication attempt/history record cho một exact baseline/output set vào một KnowledgeSpace.
+Publication attempt/history record cho một exact baseline/output set vào một KnowledgeSpace.
 
 Logical attributes:
 
@@ -548,6 +567,8 @@ FAILED
 SUPERSEDED
 ```
 
+Pinned references (`knowledge_space_id`, `output_slot_id`, `baseline_selection_id`, `output_set_id`) không được rewrite sau materialization start; lifecycle `status` được phép transition.
+
 Only `ACTIVE` publication được downstream coi là visible semantic state.
 
 ---
@@ -566,7 +587,7 @@ lock_version
 updated_at
 ```
 
-Publication history immutable; head chỉ biểu diễn active pointer.
+Publication history/facts được giữ; head chỉ biểu diễn active pointer.
 
 Whole-KB active state không được đồng nhất với một PublicationHead đơn lẻ.
 
@@ -577,10 +598,10 @@ Whole-KB active state không được đồng nhất với một PublicationHead
 ```mermaid
 erDiagram
     WORKSPACE ||--o{ SOURCE_ASSET : owns
-    SOURCE_ASSET ||--|{ SOURCE_REVISION : has
+    SOURCE_ASSET ||--o{ SOURCE_REVISION : has
 
     WORKSPACE ||--o{ PROCESSING_RUN : owns
-    PROCESSING_RUN ||--|{ STAGE_EXECUTION : contains
+    PROCESSING_RUN ||--o{ STAGE_EXECUTION : contains
     STAGE_EXECUTION ||--o{ STAGE_INPUT : consumes
     STAGE_EXECUTION ||--o{ OUTPUT_SET : produces
 
@@ -616,14 +637,14 @@ erDiagram
 
 | Parent | Child | Cardinality | Rule |
 |---|---|---:|---|
-| Workspace | SourceAsset | 1:N | source luôn thuộc một workspace |
-| SourceAsset | SourceRevision | 1:N | revision immutable |
-| ProcessingRun | StageExecution | 1:N | run là correlation container |
+| Workspace | SourceAsset | 1:0..N | source luôn thuộc một workspace |
+| SourceAsset | SourceRevision | 1:0..N | asset có thể tồn tại trước revision đầu tiên |
+| ProcessingRun | StageExecution | 1:0..N | run có thể tồn tại trước stage đầu tiên |
 | StageExecution | StageInput | 1:0..N | support fan-in |
 | StageExecution | OutputSet | 1:0..N | failed stage có thể không có output |
 | OutputSlot | ScopeMember | 1:1..N | Stage 1 slot phải có source scope |
 | OutputSlot | OutputSet | 1:0..N | nhiều candidate revision |
-| OutputSet | StoredObject | 1:1..N | coherent result có ít nhất một payload |
+| OutputSet | StoredObject | 1:1..N once registered | coherent result có ít nhất một payload |
 | OutputSlot | BaselineSelection | 1:0..N | append-only history |
 | OutputSlot | BaselineHead | 1:0..1 | chưa chọn baseline thì chưa có head |
 | ReviewRequest | ReviewDecision | 1:0..1 | một request có tối đa một final decision |
@@ -636,7 +657,7 @@ erDiagram
 
 **Context:** `02` yêu cầu StageExecution support nhiều input nhưng không chấp nhận free-form `ref_type + string id` làm mất referential integrity.
 
-**Decision:** POC chỉ cho phép StageInput target hai loại immutable versioned input:
+**Decision:** POC chỉ cho phép StageInput target hai loại immutable/version-pinned input:
 
 ```text
 SourceRevision
@@ -692,7 +713,7 @@ BaselineHead      = mutable current pointer + lock_version
 
 **Rationale:** history không bị overwrite, trong khi current baseline có một concurrency anchor rõ ràng.
 
-**Trade-off:** thêm một mutable projection/control entity phải luôn nhất quán với BaselineSelection history.
+**Trade-off:** thêm một mutable control projection phải luôn nhất quán với BaselineSelection history.
 
 Logical transaction:
 
@@ -710,7 +731,7 @@ Steps 2-5 phải atomic trong Catalog DB transaction ở physical design.
 
 ## 11. Decision LM-05 — staleness derive từ baseline lineage
 
-**Context:** OutputSet cũ vẫn là historical evidence hợp lệ khi upstream baseline đổi; mutate nó thành một historical state khác sẽ làm lẫn execution fact và current relevance.
+**Context:** OutputSet cũ vẫn là historical evidence hợp lệ khi upstream baseline đổi; mutate provenance để phản ánh current relevance sẽ làm lẫn execution fact và governance state.
 
 **Decision:** StageInput luôn pin exact target. Nếu input được lấy từ baseline, nó còn pin `source_baseline_selection_id`. Fresh/stale được derive bằng cách so với current BaselineHead của upstream OutputSlot.
 
@@ -743,7 +764,7 @@ AND required schema/contract validation passes
 AND OutputSet registration complete
 ```
 
-`integrity_status` biểu diễn verified fact; `baseline_eligible` có thể derive thay vì là mutable duplicate truth.
+`integrity_status` biểu diễn verified lifecycle fact; `baseline_eligible` ưu tiên derive thay vì trở thành mutable duplicate truth.
 
 **Rationale:** tránh race giữa object write, registration và review/selection.
 
@@ -755,18 +776,20 @@ Physical design phải chọn cách encode required-role contract mà không har
 
 ## 13. Decision LM-07 — Publication history + PublicationHead pointer
 
-**Context:** Publication phải immutable/auditable nhưng downstream cần biết publication nào active cho từng artifact scope trong KnowledgeSpace.
+**Context:** Publication phải auditable nhưng downstream cần biết publication nào active cho từng artifact scope trong KnowledgeSpace.
 
 **Decision:** tách:
 
 ```text
-Publication    = immutable attempt/history
+Publication     = publication attempt/history + lifecycle
 PublicationHead = active pointer cho (KnowledgeSpace, OutputSlot)
 ```
 
+Pinned publication references không rewrite; lifecycle status được phép transition tới terminal state.
+
 **Rationale:** cùng pattern history-vs-current như baseline; partial publication mới không thay active state trước activation.
 
-**Trade-off:** activation cần transaction/protocol giữa Catalog DB và Neo4j; physical strategy vẫn cần ADR theo `SB-07`.
+**Trade-off:** activation cần protocol giữa Catalog DB và Neo4j; physical strategy vẫn cần ADR theo `SB-07`.
 
 Whole-KB `KnowledgeRelease` vẫn là concept riêng, chưa materialize ở POC.
 
@@ -778,7 +801,7 @@ Whole-KB `KnowledgeRelease` vẫn là concept riêng, chưa materialize ở POC.
 
 **Decision:** SourceAsset, ProcessingRun, OutputSlot và KnowledgeSpace trực tiếp thuộc Workspace; các entity con phải resolve cùng workspace qua parent relationships.
 
-**Rationale:** data model có security anchor từ đầu mà không cần nhét `workspace_id` tùy tiện vào mọi child table ở logical level.
+**Rationale:** data model có security anchor từ đầu mà không cần nhét `workspace_id` tùy tiện vào mọi child entity ở logical level.
 
 **Trade-off:** physical schema phải quyết định nơi denormalize `workspace_id` cho RLS/query performance mà không tạo inconsistent ownership.
 
@@ -796,7 +819,7 @@ PENDING → RUNNING → SUCCEEDED
                   ↘ CANCELLED
 ```
 
-Completed execution facts không mutate producer/config/input lineage.
+Sau terminal state, execution inputs và producer/config facts không mutate.
 
 ### StoredObject integrity
 
@@ -804,6 +827,12 @@ Completed execution facts không mutate producer/config/input lineage.
 WRITING → WRITTEN → VERIFIED → AVAILABLE
                     ↘ INVALID
 ```
+
+Object identity/hash/URI trở thành immutable sau verification.
+
+### OutputSet integrity
+
+OutputSet membership/producer/slot được freeze khi registration complete; integrity state có thể transition cho tới terminal verification result.
 
 ### Baseline
 
@@ -828,6 +857,8 @@ failure anywhere before ACTIVE
 → FAILED / previous PublicationHead unchanged
 ```
 
+Pinned source references không mutate trong lifecycle.
+
 ---
 
 ## 16. Cross-entity invariants
@@ -839,10 +870,10 @@ INV-L01
 Mọi entity cùng lineage phải cùng Workspace.
 
 INV-L02
-SourceRevision thuộc đúng một SourceAsset và immutable.
+SourceRevision thuộc đúng một SourceAsset và content identity immutable sau registration.
 
 INV-L03
-StageExecution input target phải tồn tại và immutable/versioned.
+StageExecution input target phải tồn tại và version-pinned.
 
 INV-L04
 OutputSet thuộc đúng một StageExecution và một OutputSlot.
@@ -851,31 +882,37 @@ INV-L05
 StoredObject thuộc đúng một OutputSet.
 
 INV-L06
-BaselineSelection chỉ được chọn OutputSet thuộc cùng OutputSlot.
+ReviewRequest recommendation/ReviewDecision selection chỉ được tham chiếu OutputSet thuộc cùng OutputSlot.
 
 INV-L07
-BaselineHead chỉ được trỏ BaselineSelection thuộc cùng OutputSlot.
+BaselineSelection chỉ được chọn OutputSet thuộc cùng OutputSlot.
 
 INV-L08
-Một OutputSlot có tối đa một BaselineHead/current baseline.
+BaselineHead chỉ được trỏ BaselineSelection thuộc cùng OutputSlot.
 
 INV-L09
-Baseline candidate phải pass integrity eligibility.
+Một OutputSlot có tối đa một BaselineHead/current baseline.
 
 INV-L10
-Nếu StageInput binding_mode=BASELINE thì source_baseline_selection_id bắt buộc và phải resolve đúng target OutputSet.
+Baseline candidate phải pass integrity eligibility.
 
 INV-L11
-Publication phải pin exact BaselineSelection và exact OutputSet được baseline đó chọn.
+Nếu StageInput binding_mode=BASELINE thì source_baseline_selection_id bắt buộc và phải resolve đúng target OutputSet.
 
 INV-L12
-PublicationHead chỉ trỏ ACTIVE Publication trong cùng KnowledgeSpace + OutputSlot.
+Publication phải pin exact BaselineSelection và exact OutputSet được baseline đó chọn.
 
 INV-L13
-Publication chưa ACTIVE không visible cho downstream knowledge query.
+Publication, OutputSlot và KnowledgeSpace phải resolve cùng Workspace.
 
 INV-L14
-Historical StageInput/OutputSet/BaselineSelection/Publication không rewrite để phản ánh current state.
+PublicationHead chỉ trỏ ACTIVE Publication trong cùng KnowledgeSpace + OutputSlot.
+
+INV-L15
+Publication chưa ACTIVE không visible cho downstream knowledge query.
+
+INV-L16
+Historical StageInput/BaselineSelection/ReviewDecision không rewrite để phản ánh current state; lifecycle entities chỉ transition theo state machine hợp lệ.
 ```
 
 ---
@@ -890,12 +927,12 @@ Không hard-delete entity đang tham gia provenance chain.
 
 ```text
 SourceRevision identity
-StageExecution facts
+terminal StageExecution facts
 StageInput
 OutputSet registry
 BaselineSelection
 ReviewDecision
-Publication
+Publication history
 ```
 
 ### Object payload retention
@@ -955,7 +992,7 @@ Mỗi ADR phải ghi Context, Options, Decision, Rationale, rejected alternative
 - [ ] SourceAsset và SourceRevision tách identity.
 - [ ] ProcessingRun/StageExecution không bị dùng làm artifact identity.
 - [ ] OutputSlot là stable identity của artifact series.
-- [ ] OutputSet là immutable candidate revision.
+- [ ] OutputSet là candidate revision với identity/membership ổn định sau registration.
 - [ ] Publication không bị coi là whole-KB release.
 
 ### Gate B — Ownership / version governance
@@ -965,16 +1002,16 @@ Mỗi ADR phải ghi Context, Options, Decision, Rationale, rejected alternative
 - [ ] Baseline history append-only + current head rõ ràng.
 - [ ] Concurrent baseline update có lock_version semantics.
 - [ ] Stale state derive được từ baseline lineage.
-- [ ] Publication history tách active pointer.
+- [ ] Publication history/lifecycle tách active pointer.
 - [ ] Failed publication không đổi active knowledge.
 
 ### Gate C — Logical relational model
 
-- [ ] Cardinality không mâu thuẫn lifecycle.
+- [ ] Cardinality không ép child record tồn tại trước lifecycle thực tế.
 - [ ] StageInput target type controlled, không arbitrary string ref.
 - [ ] OutputSet → StageExecution và OutputSlot đều mandatory.
-- [ ] StoredObject → OutputSet mandatory.
-- [ ] BaselineSelection không thể chọn candidate khác OutputSlot.
+- [ ] StoredObject → OutputSet mandatory sau registration.
+- [ ] Review/Baseline selection không thể chọn candidate khác OutputSlot.
 - [ ] Publication pin exact baseline/output set.
 - [ ] Workspace cross-boundary reference bị cấm.
 - [ ] Delete/retention không phá provenance.
