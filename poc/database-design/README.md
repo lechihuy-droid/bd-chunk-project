@@ -5,6 +5,8 @@
 
 This folder is the database architecture + implementation contract for ReqKB ingestion.
 
+> **Important workflow scope:** the workflow shown in this package is a **generic lifecycle/overview**, not the canonical graph of the real Web App. Real node names, edges, loops, parallelism, gates and artifact contracts must be discovered from the actual workflow/app and mapped using `09_workflow_integration_guide.md`.
+
 ---
 
 ## 1. Read in this order
@@ -21,13 +23,15 @@ This folder is the database architecture + implementation contract for ReqKB ing
 04_physical_schema.md
   ↓ SQLite tables, PK/FK/CHECK/UNIQUE/index/transactions
 06_data_flow.md
-  ↓ how data moves end-to-end
+  ↓ generic data lifecycle / movement, NOT the canonical real workflow
 07_data_mutation_spec.md
   ↓ exact action → read/write fields → transaction → failure
 08_data_dictionary.md
   ↓ field meaning / source / mutability
 05_implementation_guide.md
   ↓ application/repository/runtime boundaries and coding order
+09_workflow_integration_guide.md
+  ↓ how to inspect a real workflow/app and map it into this DB model
 schema/sqlite/001_init.sql
   ↓ executable initial SQLite schema
 ```
@@ -37,6 +41,8 @@ For a fast overview first open:
 ```text
 database_design_summary.html
 ```
+
+For implementation against the **real workflow/app**, read `09` before wiring any workflow node to persistence.
 
 ---
 
@@ -50,9 +56,10 @@ database_design_summary.html
 | `03_logical_data_model.md` | What entities exist and how are they related? |
 | `04_physical_schema.md` | What tables/columns/constraints/indexes exist? |
 | `05_implementation_guide.md` | How should Web App/services/repositories/runtime adapters be separated? |
-| `06_data_flow.md` | Where does data move for each workflow flow? |
+| `06_data_flow.md` | Where does data move in the generic lifecycle? |
 | `07_data_mutation_spec.md` | When action X happens, exactly what is read/written and in what transaction? |
 | `08_data_dictionary.md` | What does each field mean, who supplies it and may it mutate? |
+| `09_workflow_integration_guide.md` | How do we discover the real workflow and map its nodes/actions/artifacts to the generic DB model? |
 | `001_init.sql` | What SQL actually creates the current SQLite schema? |
 | `database_design_summary.html` | What should a reviewer understand in 3–5 minutes? |
 
@@ -80,11 +87,16 @@ Field semantics / value source / mutability
 
 Executable SQLite DDL
 → schema/sqlite/001_init.sql
+
+Actual workflow topology / nodes / gates / retry behavior / artifact contracts
+→ the real workflow/app source + its workflow-specific integration mapping
 ```
 
 `001_init.sql` must implement `04`; it does not redefine architecture.
 
 If executable SQL and `04` differ, treat it as **schema drift/defect** and reconcile before coding continues.
+
+If the real workflow differs from examples/overview in this folder, the **real executable workflow wins for workflow behavior**, while the database invariants above remain binding unless explicitly changed through architecture review.
 
 ---
 
@@ -197,14 +209,24 @@ Create a new ADR when a change affects System of Record, publication/consistency
 
 ## 8. Coding-agent entry point
 
-Before writing repository/service code:
+### If implementing generic DB infrastructure
 
-1. Read `06` to understand the end-to-end flow.
+1. Read `06` to understand the generic end-to-end lifecycle.
 2. Read the relevant command section in `07`.
 3. Check field meaning in `08`.
 4. Verify constraints in `04` / `001_init.sql`.
 5. Implement through application command/repository boundary from `05`.
 6. Test invariants; do not weaken the schema because runtime code is inconvenient.
+
+### If integrating the real workflow/app
+
+1. Read `09_workflow_integration_guide.md` first.
+2. Locate the actual workflow graph/config/code and real app commands/APIs.
+3. Produce a real workflow inventory before touching schema.
+4. Map real steps/artifacts to `ProcessingRun`, `StageExecution`, `StageInput`, `OutputSlot`, `OutputSet`, baseline and publication concepts.
+5. Create a Gap / Extension Register for anything that does not map cleanly.
+6. Change schema only after a genuine model gap is reviewed.
+7. Keep workflow-specific stage names, graph topology and artifact registry beside the real workflow/app, not in the generic DB model.
 
 When unsure where state belongs:
 
