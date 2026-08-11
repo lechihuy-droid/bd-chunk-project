@@ -7,6 +7,8 @@ This folder is the database architecture + implementation contract for ReqKB ing
 
 > **Important workflow scope:** the workflow shown in this package is a **generic lifecycle/overview**, not the canonical graph of the real Web App. Real node names, edges, loops, parallelism, gates and artifact contracts must be discovered from the actual workflow/app and mapped using `09_workflow_integration_guide.md`.
 
+> **Important lineage scope:** `lineage` is not one thing. Full execution/artifact/governance lineage is canonical in Catalog DB; ReqKB/Neo4j owns active published semantic lineage and keeps only the provenance pointer/projection needed to trace back to Catalog DB. Read `10_lineage_ownership.md` before designing Neo4j provenance.
+
 ---
 
 ## 1. Read in this order
@@ -32,6 +34,8 @@ This folder is the database architecture + implementation contract for ReqKB ing
   ↓ application/repository/runtime boundaries and coding order
 09_workflow_integration_guide.md
   ↓ how to inspect a real workflow/app and map it into this DB model
+10_lineage_ownership.md
+  ↓ which lineage/provenance belongs to Catalog DB vs ReqKB/Neo4j/Object Store/observability
 schema/sqlite/001_init.sql
   ↓ executable initial SQLite schema
 ```
@@ -43,6 +47,8 @@ database_design_summary.html
 ```
 
 For implementation against the **real workflow/app**, read `09` before wiring any workflow node to persistence.
+
+For semantic provenance / Neo4j integration, read `10` before deciding which lineage fields or edges to publish.
 
 ---
 
@@ -60,6 +66,7 @@ For implementation against the **real workflow/app**, read `09` before wiring an
 | `07_data_mutation_spec.md` | When action X happens, exactly what is read/written and in what transaction? |
 | `08_data_dictionary.md` | What does each field mean, who supplies it and may it mutate? |
 | `09_workflow_integration_guide.md` | How do we discover the real workflow and map its nodes/actions/artifacts to the generic DB model? |
+| `10_lineage_ownership.md` | Which lineage belongs to Catalog DB, Object Store, ReqKB/Neo4j or observability, and how do we trace across them? |
 | `001_init.sql` | What SQL actually creates the current SQLite schema? |
 | `database_design_summary.html` | What should a reviewer understand in 3–5 minutes? |
 
@@ -72,6 +79,9 @@ Different files own different concerns. Do not choose whichever file is convenie
 ```text
 Architecture decision / rationale
 → ADR + 02/03
+
+Lineage/provenance ownership taxonomy
+→ 02_storage_boundary.md + 10_lineage_ownership.md
 
 Logical identity / cardinality / invariant
 → 03_logical_data_model.md
@@ -107,11 +117,14 @@ Object Store
 = canonical immutable payload bytes
 
 Catalog DB
-= business identity + execution correlation + exact lineage
+= business identity + execution correlation
+  + full technical/artifact/governance lineage
   + candidate registry + baseline + publication governance
 
 Neo4j / ReqKB
-= published semantic knowledge
+= active published semantic knowledge
+  + semantic lineage
+  + minimum publication/source provenance pointer or projection
 
 LangGraph / Prefect
 = execution runtime only
@@ -127,6 +140,21 @@ latest != baseline
 successful execution != accepted artifact
 accepted artifact != published knowledge
 runtime checkpoint != governance System of Record
+semantic lineage != execution lineage
+ReqKB provenance projection != canonical full provenance history
+```
+
+Deep trace is intentionally cross-store:
+
+```text
+ReqKB semantic node/edge
+→ Publication
+→ BaselineSelection
+→ OutputSet
+→ StageExecution
+→ StageInput
+→ SourceRevision / upstream OutputSet
+→ Object Store payload
 ```
 
 ---
@@ -203,6 +231,8 @@ ADR-003
 Minimal WorkflowRuntimePort; LangGraph current, Prefect replaceable
 ```
 
+`10_lineage_ownership.md` does not introduce a new System-of-Record decision; it clarifies the existing `SB-01` storage ownership rule. Create a new ADR if a future design moves canonical technical lineage into Neo4j or otherwise changes ownership/consistency semantics.
+
 Create a new ADR when a change affects System of Record, publication/consistency semantics, security isolation, runtime guarantees, or another hard-to-reverse cross-module contract.
 
 ---
@@ -224,17 +254,28 @@ Create a new ADR when a change affects System of Record, publication/consistency
 2. Locate the actual workflow graph/config/code and real app commands/APIs.
 3. Produce a real workflow inventory before touching schema.
 4. Map real steps/artifacts to `ProcessingRun`, `StageExecution`, `StageInput`, `OutputSlot`, `OutputSet`, baseline and publication concepts.
-5. Create a Gap / Extension Register for anything that does not map cleanly.
-6. Change schema only after a genuine model gap is reviewed.
-7. Keep workflow-specific stage names, graph topology and artifact registry beside the real workflow/app, not in the generic DB model.
+5. Classify each real relation/data item using `10_lineage_ownership.md` before deciding whether it belongs in Catalog DB or ReqKB.
+6. Create a Gap / Extension Register for anything that does not map cleanly.
+7. Change schema only after a genuine model gap is reviewed.
+8. Keep workflow-specific stage names, graph topology and artifact registry beside the real workflow/app, not in the generic DB model.
+
+### If implementing ReqKB / Neo4j publication
+
+1. Read `10_lineage_ownership.md`.
+2. Publish business semantic nodes/edges only from an activated Publication candidate.
+3. Ensure every published semantic record can resolve back to its exact `Publication`.
+4. Add source-level provenance only when the real workflow provides stable source identity/locators and the query/explainability use case requires them.
+5. Do not copy ProcessingRun/StageExecution/OutputSet/Baseline history into Neo4j by default.
+6. Keep Catalog DB canonical for the full technical provenance chain.
 
 When unsure where state belongs:
 
 ```text
-Payload bytes?          → Object Store
-Business identity?      → Catalog DB
-Lineage/governance?     → Catalog DB
-Runtime checkpoint?     → LangGraph / Prefect
-Published semantics?    → Neo4j
-Trace/evaluation?       → MLflow later
+Payload bytes?                         → Object Store
+Business identity?                     → Catalog DB
+Execution/artifact/governance lineage? → Catalog DB
+Published semantic lineage?            → ReqKB / Neo4j
+Publication/source provenance pointer? → ReqKB projection + Catalog canonical chain
+Runtime checkpoint?                    → LangGraph / Prefect
+Trace/evaluation?                      → MLflow later
 ```
