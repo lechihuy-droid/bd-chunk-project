@@ -1,0 +1,5602 @@
+[
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/"
+      },
+      "road": {
+        "raw": "無",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/"
+      },
+      "zoning": {
+        "raw": "２種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・300％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造2階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "1977年9月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2020年1月完了 水回り設備交換：キッチン・浴室・トイレ 内装リフォーム：壁・床・全室2020年1月外装リフォーム完了※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "8140円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 8140,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万2430円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 12430,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/"
+      },
+      "zoning": {
+        "raw": "商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/"
+      },
+      "structure": {
+        "raw": "RC14階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2012年1月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "116戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/"
+      },
+      "road": {
+        "raw": "道路幅：6ｍ、アスファルト舗装",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "建ぺい率：80％、容積率：200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2027年3月予定",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "2戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/nc_21791147/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "handover": {
+        "raw": "2028年8月下旬予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/"
+      },
+      "total_units": {
+        "raw": "36戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/"
+      },
+      "road": {
+        "raw": "無、南5ｍ幅",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/"
+      },
+      "zoning": {
+        "raw": "２種中高",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "60％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2022年1月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "6430円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 6430,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "4500円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 4500,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/"
+      },
+      "zoning": {
+        "raw": "近隣商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/"
+      },
+      "structure": {
+        "raw": "RC14階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2022年9月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "52戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/"
+      },
+      "road": {
+        "raw": "道路幅：3.4ｍ、アスファルト舗装、私道負担有 【1号地】セットバック部分約2.89m2(セットバック済)、【2号地】セットバック部分約3.25m2(セットバック済)",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "建ペい率：80%、容積率：200%",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造ガルバ二ウム鋼板立平葺3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年5月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "2戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20798676/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "handover": {
+        "raw": "即引渡可※諸手続き完了後",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/"
+      },
+      "total_units": {
+        "raw": "55戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/nc_67726620/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/"
+      },
+      "road": {
+        "raw": "無、西4ｍ幅（接道幅5.1ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/"
+      },
+      "zoning": {
+        "raw": "工業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "60％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "鉄骨3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "1999年6月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/nc_20037181/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "9800円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 9800,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "7760円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 7760,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/"
+      },
+      "zoning": {
+        "raw": "商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/"
+      },
+      "structure": {
+        "raw": "RC15階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2013年10月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "44戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/nc_21533314/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/"
+      },
+      "road": {
+        "raw": "7.38m2、南西4ｍ幅（接道幅4ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年11月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "1戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/nc_21686389/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "handover": {
+        "raw": "2028年2月下旬予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/"
+      },
+      "total_units": {
+        "raw": "52戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67735523/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/"
+      },
+      "road": {
+        "raw": "8.86m2、北4ｍ幅（接道幅4.4ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "軽量鉄骨3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2008年8月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "2027年4月予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/nc_20451840/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "8030円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 8030,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万9400円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 19400,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/"
+      },
+      "zoning": {
+        "raw": "商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/"
+      },
+      "structure": {
+        "raw": "SRC15階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2000年10月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2026年8月完了 水回り設備交換：キッチン・浴室・トイレ 内装リフォーム：床※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "49戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/nc_21431122/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/"
+      },
+      "road": {
+        "raw": "道路幅：8ｍ、アスファルト舗装",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "建ペい率：80％、容積率：200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2025年10月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "★★★（削減率20％達成）",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "insulation": {
+        "raw": "5段階/7段階中",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "1戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/nc_20374398/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "handover": {
+        "raw": "2028年4月下旬予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/"
+      },
+      "total_units": {
+        "raw": "42戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67736723/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/"
+      },
+      "road": {
+        "raw": "無、南6ｍ幅（接道幅3.4ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/"
+      },
+      "zoning": {
+        "raw": "２種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・300％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造2階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "1992年3月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/nc_20541085/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "1万1280円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 11280,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万1080円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 11080,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/"
+      },
+      "zoning": {
+        "raw": "準住居、１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/"
+      },
+      "structure": {
+        "raw": "RC14階地下1階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2006年7月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "144戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/nc_20358692/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/"
+      },
+      "road": {
+        "raw": "無",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/"
+      },
+      "zoning": {
+        "raw": "２種中高",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "60％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建一部木造",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年11月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "2026年11月予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "1戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/nc_79095899/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "1万5300円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 15300,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "4100円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 4100,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/"
+      },
+      "zoning": {
+        "raw": "準工業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/"
+      },
+      "structure": {
+        "raw": "RC13階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年7月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "48戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_21934017/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/"
+      },
+      "road": {
+        "raw": "5.82m2、西4ｍ幅（接道幅5.9ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/"
+      },
+      "zoning": {
+        "raw": "商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・240％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2022年12月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/nc_21830935/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "9800円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 9800,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万1120円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 11120,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/"
+      },
+      "zoning": {
+        "raw": "商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/"
+      },
+      "structure": {
+        "raw": "SRC15階地下1階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "1989年11月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "2027年3月予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "186戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_20676607/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/"
+      },
+      "road": {
+        "raw": "道路幅：8ｍ・9ｍ、アスファルト舗装、東側・南側（公道）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "建ペい率：80％、容積率：200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年6月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "1戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/nc_20139037/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "handover": {
+        "raw": "即引渡可(諸手続き完了後)",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/"
+      },
+      "total_units": {
+        "raw": "145戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67727490/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/"
+      },
+      "road": {
+        "raw": "無、北4ｍ幅",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/"
+      },
+      "zoning": {
+        "raw": "２種中高",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "60％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造2階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2011年7月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2026年8月完了 水回り設備交換：キッチン・トイレ 内装リフォーム：壁・床※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/nc_21943081/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "2万5700円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 25700,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "2万3600円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 23600,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/"
+      },
+      "zoning": {
+        "raw": "２種住居、商業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/"
+      },
+      "structure": {
+        "raw": "RC10階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "1997年12月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2026年2月完了 水回り設備交換：キッチン・浴室・トイレ 内装リフォーム：壁 その他：洗面台、給湯器他※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "16戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/nc_20916674/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/"
+      },
+      "road": {
+        "raw": "無、北6ｍ幅",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建（２×４工法）一部木造",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2027年1月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21651663/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "handover": {
+        "raw": "2027年6月下旬予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/"
+      },
+      "total_units": {
+        "raw": "100戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67727377/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/"
+      },
+      "road": {
+        "raw": "1.04m2、西4ｍ幅",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・300％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2022年1月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2025年8月完了 内装リフォーム：壁・全室※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21994449/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "1万3420円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 13420,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万7130円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 17130,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/"
+      },
+      "zoning": {
+        "raw": "工業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/"
+      },
+      "structure": {
+        "raw": "RC11階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2001年3月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2026年10月完了 水回り設備交換：キッチン・浴室・トイレ 内装リフォーム：壁・床・全室 その他：給湯器新調※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "75戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/nc_21178546/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/"
+      },
+      "road": {
+        "raw": "道路幅：2.6ｍ～4.5ｍ、私道部分11.67～31.73m2",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/"
+      },
+      "zoning": {
+        "raw": "２種中高",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "60％ 160％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造 地上3階",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2027年2月予定",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "2027年3月予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "3戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "7戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21182729/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "handover": {
+        "raw": "即引渡可※諸手続きが完了後の入居となります。",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/"
+      },
+      "total_units": {
+        "raw": "294戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/nc_67729345/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/"
+      },
+      "road": {
+        "raw": "無、北西6ｍ幅（接道幅4.8ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2017年10月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/nc_21472832/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "5860円／月（委託(通勤)）",
+        "label": "管理費",
+        "numeric_jpy": 5860,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万780円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 10780,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/"
+      },
+      "zoning": {
+        "raw": "準工業",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/"
+      },
+      "structure": {
+        "raw": "RC14階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2018年3月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "105戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/nc_21911512/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/"
+      },
+      "road": {
+        "raw": "私道部分8.62m2",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％ 240％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造 地上3階",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年8月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "2026年11月予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "1戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/nc_20935955/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "handover": {
+        "raw": "2026年12月中旬予定",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/"
+      },
+      "total_units": {
+        "raw": "56戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733094/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+    "category": "used_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/"
+      },
+      "road": {
+        "raw": "無、南東5.1ｍ幅（接道幅5.3ｍ）",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/"
+      },
+      "zoning": {
+        "raw": "１種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "80％・200％",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2022年2月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "-",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/nc_21769138/",
+        "status": "not_disclosed"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+    "category": "used_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "敷地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": "7610円／月（委託(管理員なし)）",
+        "label": "管理費",
+        "numeric_jpy": 7610,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "repair_fee": {
+        "raw": "1万3620円／月",
+        "label": "修繕積立金",
+        "numeric_jpy": 13620,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "repair_initial_fund": {
+        "raw": "-",
+        "label": "修繕積立基金",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "not_disclosed"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/"
+      },
+      "zoning": {
+        "raw": "１種住居、２種住居",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/"
+      },
+      "structure": {
+        "raw": "RC11階建",
+        "label": "構造・階建て",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2006年12月",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "2026年9月完了 水回り設備交換：キッチン・浴室・トイレ 内装リフォーム：壁・床・全室※年月は一番古いリフォーム箇所を表します",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "47戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/nc_21116532/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+    "category": "new_house",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": "所有権",
+        "label": "土地の権利形態",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/"
+      },
+      "road": {
+        "raw": "道路幅：4ｍ、アスファルト舗装、持出道路：約10.88m2(セットバック済)",
+        "label": "私道負担・道路",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/"
+      },
+      "zoning": {
+        "raw": "２種中高",
+        "label": "用途地域",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "coverage_far": {
+        "raw": "建ペい率：60％(70％)、容積率：200％(160％)",
+        "label": "建ぺい率・容積率",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "structure": {
+        "raw": "木造ガルバリウム鋼板立平葺3階建",
+        "label": "構造・工法",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "completion": {
+        "raw": "2026年8月下旬",
+        "label": "完成時期（築年月）",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "handover": {
+        "raw": "相談",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": "-",
+        "label": "エネルギー消費性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "not_disclosed"
+      },
+      "insulation": {
+        "raw": "-",
+        "label": "断熱性能",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "not_disclosed"
+      },
+      "utility_estimate": {
+        "raw": "-",
+        "label": "目安光熱費",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "not_disclosed"
+      },
+      "renovation": {
+        "raw": "-",
+        "label": "リフォーム",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "not_disclosed"
+      },
+      "sale_units": {
+        "raw": "1戸",
+        "label": "販売戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      },
+      "total_units": {
+        "raw": "1戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/nc_20469467/",
+        "status": "advertised"
+      }
+    }
+  },
+  {
+    "url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/",
+    "category": "new_condo",
+    "status": "ok",
+    "fields": {
+      "rights": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "management_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "repair_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "repair_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "management_initial_fund": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "lease_fee": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "road": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "setback": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "zoning": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "coverage_far": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "structure": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "completion": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "handover": {
+        "raw": "即引渡可",
+        "label": "引渡可能時期",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/",
+        "status": "advertised"
+      },
+      "energy": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "insulation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "utility_estimate": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "renovation": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "sale_units": {
+        "raw": null,
+        "label": null,
+        "numeric_jpy": null,
+        "status": "not_disclosed",
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/"
+      },
+      "total_units": {
+        "raw": "71戸",
+        "label": "総戸数",
+        "numeric_jpy": null,
+        "source_url": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/nc_67729847/",
+        "status": "advertised"
+      }
+    }
+  }
+]

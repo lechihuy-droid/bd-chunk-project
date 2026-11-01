@@ -1,0 +1,737 @@
+{
+  "stats": {
+    "total": 2179,
+    "preferred": 295,
+    "projects": 293,
+    "covered": 90,
+    "category": {
+      "used_house": {
+        "observed": 764,
+        "preferred": 67,
+        "projects": 0,
+        "missing": {
+          "price_jpy": 2,
+          "address": 0,
+          "ward": 0,
+          "layout": 0,
+          "station_raw": 0,
+          "built_year": 0
+        }
+      },
+      "used_condo": {
+        "observed": 800,
+        "preferred": 106,
+        "projects": 0,
+        "missing": {
+          "price_jpy": 0,
+          "address": 0,
+          "ward": 0,
+          "layout": 0,
+          "station_raw": 0,
+          "built_year": 0
+        }
+      },
+      "new_house": {
+        "observed": 407,
+        "preferred": 122,
+        "projects": 95,
+        "missing": {
+          "price_jpy": 72,
+          "address": 0,
+          "ward": 0,
+          "layout": 0,
+          "station_raw": 0,
+          "built_year": 407
+        }
+      },
+      "new_condo": {
+        "observed": 208,
+        "preferred": 0,
+        "projects": 198,
+        "missing": {
+          "price_jpy": 70,
+          "address": 0,
+          "ward": 0,
+          "layout": 0,
+          "station_raw": 0,
+          "built_year": 208
+        }
+      }
+    },
+    "wards": [
+      {
+        "ward": "中央区",
+        "preferred": 4,
+        "observed": 97
+      },
+      {
+        "ward": "住之江区",
+        "preferred": 6,
+        "observed": 61
+      },
+      {
+        "ward": "住吉区",
+        "preferred": 13,
+        "observed": 61
+      },
+      {
+        "ward": "北区",
+        "preferred": 9,
+        "observed": 135
+      },
+      {
+        "ward": "城東区",
+        "preferred": 12,
+        "observed": 105
+      },
+      {
+        "ward": "大正区",
+        "preferred": 10,
+        "observed": 58
+      },
+      {
+        "ward": "天王寺区",
+        "preferred": 8,
+        "observed": 73
+      },
+      {
+        "ward": "平野区",
+        "preferred": 14,
+        "observed": 115
+      },
+      {
+        "ward": "旭区",
+        "preferred": 18,
+        "observed": 104
+      },
+      {
+        "ward": "東住吉区",
+        "preferred": 8,
+        "observed": 100
+      },
+      {
+        "ward": "東成区",
+        "preferred": 15,
+        "observed": 105
+      },
+      {
+        "ward": "東淀川区",
+        "preferred": 16,
+        "observed": 112
+      },
+      {
+        "ward": "此花区",
+        "preferred": 16,
+        "observed": 106
+      },
+      {
+        "ward": "浪速区",
+        "preferred": 3,
+        "observed": 70
+      },
+      {
+        "ward": "淀川区",
+        "preferred": 10,
+        "observed": 59
+      },
+      {
+        "ward": "港区",
+        "preferred": 32,
+        "observed": 116
+      },
+      {
+        "ward": "生野区",
+        "preferred": 18,
+        "observed": 110
+      },
+      {
+        "ward": "福島区",
+        "preferred": 20,
+        "observed": 116
+      },
+      {
+        "ward": "西区",
+        "preferred": 13,
+        "observed": 76
+      },
+      {
+        "ward": "西成区",
+        "preferred": 3,
+        "observed": 73
+      },
+      {
+        "ward": "西淀川区",
+        "preferred": 11,
+        "observed": 59
+      },
+      {
+        "ward": "都島区",
+        "preferred": 12,
+        "observed": 110
+      },
+      {
+        "ward": "阿倍野区",
+        "preferred": 18,
+        "observed": 106
+      },
+      {
+        "ward": "鶴見区",
+        "preferred": 6,
+        "observed": 52
+      }
+    ]
+  },
+  "comparison": {
+    "shared_scopes": [
+      [
+        "used_condo",
+        "大正区"
+      ],
+      [
+        "used_condo",
+        "東成区"
+      ],
+      [
+        "used_condo",
+        "淀川区"
+      ],
+      [
+        "used_condo",
+        "西区"
+      ],
+      [
+        "used_condo",
+        "阿倍野区"
+      ],
+      [
+        "used_house",
+        "大正区"
+      ],
+      [
+        "used_house",
+        "東成区"
+      ],
+      [
+        "used_house",
+        "淀川区"
+      ],
+      [
+        "used_house",
+        "西区"
+      ],
+      [
+        "used_house",
+        "阿倍野区"
+      ]
+    ],
+    "old_shared": 368,
+    "new_shared": 301,
+    "overlap": 228,
+    "newly_seen_shared_scope": 73,
+    "not_seen_in_sample": 140,
+    "price_changes": [
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiabeno/nc_21442779/",
+        "old_jpy": 8990000,
+        "new_jpy": 8200000,
+        "delta_jpy": -790000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiabeno/nc_21541699/",
+        "old_jpy": 49800000,
+        "new_jpy": 46800000,
+        "delta_jpy": -3000000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiabeno/nc_79109322/",
+        "old_jpy": 10800000,
+        "new_jpy": 9800000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/nc_21265451/",
+        "old_jpy": 22000000,
+        "new_jpy": 21800000,
+        "delta_jpy": -200000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashinishi/nc_21602298/",
+        "old_jpy": 54800000,
+        "new_jpy": 53800000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitaisho/nc_21095690/",
+        "old_jpy": 29800000,
+        "new_jpy": 28990000,
+        "delta_jpy": -810000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitaisho/nc_21448808/",
+        "old_jpy": 29800000,
+        "new_jpy": 28800000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitaisho/nc_21898411/",
+        "old_jpy": 37800000,
+        "new_jpy": 34990000,
+        "delta_jpy": -2810000
+      },
+      {
+        "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiyodogawa/nc_20871952/",
+        "old_jpy": 20800000,
+        "new_jpy": 13000000,
+        "delta_jpy": -7800000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/nc_20730250/",
+        "old_jpy": 35990000,
+        "new_jpy": 34990000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/nc_21244981/",
+        "old_jpy": 228000000,
+        "new_jpy": 218000000,
+        "delta_jpy": -10000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/nc_21327662/",
+        "old_jpy": 47900000,
+        "new_jpy": 45900000,
+        "delta_jpy": -2000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/nc_21357916/",
+        "old_jpy": 86800000,
+        "new_jpy": 79800000,
+        "delta_jpy": -7000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/nc_21848108/",
+        "old_jpy": 55990000,
+        "new_jpy": 54990000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/nc_20667630/",
+        "old_jpy": 22990000,
+        "new_jpy": 29990000,
+        "delta_jpy": 7000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/nc_20753386/",
+        "old_jpy": 28900000,
+        "new_jpy": 27900000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/nc_21162631/",
+        "old_jpy": 49990000,
+        "new_jpy": 49490000,
+        "delta_jpy": -500000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/nc_21320477/",
+        "old_jpy": 25800000,
+        "new_jpy": 24800000,
+        "delta_jpy": -1000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/nc_20920998/",
+        "old_jpy": 45800000,
+        "new_jpy": 43800000,
+        "delta_jpy": -2000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/nc_21617862/",
+        "old_jpy": 69800000,
+        "new_jpy": 65800000,
+        "delta_jpy": -4000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/nc_21808897/",
+        "old_jpy": 49900000,
+        "new_jpy": 47900000,
+        "delta_jpy": -2000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/nc_21835899/",
+        "old_jpy": 49900000,
+        "new_jpy": 47900000,
+        "delta_jpy": -2000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/nc_21160158/",
+        "old_jpy": 52800000,
+        "new_jpy": 49800000,
+        "delta_jpy": -3000000
+      },
+      {
+        "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashiyodogawa/nc_20556352/",
+        "old_jpy": 35990000,
+        "new_jpy": 34990000,
+        "delta_jpy": -1000000
+      }
+    ]
+  },
+  "manifest": {
+    "run_id": "round2-20261023-luna",
+    "mode": "live",
+    "status": "verification_incomplete",
+    "parser_version": "round2.2",
+    "network_requests": 180,
+    "access_stop": false,
+    "unique_listing_urls": 2179,
+    "grain": "listing URL, not unique dwelling",
+    "preferred_exact_unit_candidates": 295,
+    "project_overlap_candidates": 53,
+    "by_category": {
+      "used_house": {
+        "observed": 764,
+        "preferred_exact": 67,
+        "projects": 0,
+        "routes_discovered": 24
+      },
+      "used_condo": {
+        "observed": 800,
+        "preferred_exact": 106,
+        "projects": 0,
+        "routes_discovered": 24
+      },
+      "new_house": {
+        "observed": 407,
+        "preferred_exact": 122,
+        "projects": 95,
+        "routes_discovered": 24
+      },
+      "new_condo": {
+        "observed": 208,
+        "preferred_exact": 0,
+        "projects": 198,
+        "routes_discovered": 18
+      }
+    },
+    "detail_pages_ok": 40,
+    "page_status_counts": {
+      "ok": 4,
+      "parsed": 135,
+      "budget_exhausted": 22
+    },
+    "missing_counts": {
+      "used_house": {
+        "price_jpy": 2,
+        "address": 0,
+        "ward": 0,
+        "layout": 0,
+        "station_raw": 0,
+        "built_year": 0
+      },
+      "used_condo": {
+        "price_jpy": 0,
+        "address": 0,
+        "ward": 0,
+        "layout": 0,
+        "station_raw": 0,
+        "built_year": 0
+      },
+      "new_house": {
+        "price_jpy": 72,
+        "address": 0,
+        "ward": 0,
+        "layout": 0,
+        "station_raw": 0,
+        "built_year": 407
+      },
+      "new_condo": {
+        "price_jpy": 70,
+        "address": 0,
+        "ward": 0,
+        "layout": 0,
+        "station_raw": 0,
+        "built_year": 208
+      }
+    },
+    "discovered_ward_slugs": [
+      "osakashiabeno",
+      "osakashiasahi",
+      "osakashichuo",
+      "osakashifukushima",
+      "osakashihigashinari",
+      "osakashihigashisumiyoshi",
+      "osakashihigashiyodogawa",
+      "osakashihirano",
+      "osakashiino",
+      "osakashijoto",
+      "osakashikita",
+      "osakashikonohana",
+      "osakashiminato",
+      "osakashimiyakojima",
+      "osakashinaniwa",
+      "osakashinishi",
+      "osakashinishinari",
+      "osakashinishiyodogawa",
+      "osakashisuminoe",
+      "osakashisumiyoshi",
+      "osakashitaisho",
+      "osakashitennoji",
+      "osakashitsurumi",
+      "osakashiyodogawa"
+    ],
+    "coverage_note": "Bounded discovered routes only; compare discovered ward names against Osaka-shi roster in manual audit. Missing route is not zero inventory.",
+    "unvisited_next_links": [
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashiabeno/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashifukushima/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashisumiyoshi/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashiino/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashiminato/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashimiyakojima/?page=3",
+      "https://suumo.jp/chukoikkodate/osaka/sc_osakashinishinari/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashiino/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashikonohana/?page=3",
+      "https://suumo.jp/ikkodate/osaka/sc_osakashiminato/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashifukushima/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashiyodogawa/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashiino/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashikonohana/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashiminato/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashimiyakojima/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashinaniwa/?page=3",
+      "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/?page=3",
+      "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/?page=3"
+    ],
+    "config": {
+      "max_requests": 180,
+      "delay": 3.0,
+      "details": 40,
+      "pages_per_stratum": 2,
+      "parser_version": "round2.2",
+      "seed_dirs": [
+        "output\\cache",
+        "output\\recrawl-20261013-20261013T133145677Z\\inspection"
+      ]
+    }
+  },
+  "observed_utc": [
+    "2026-10-22T23:51:13.844457+00:00",
+    "2026-10-22T23:51:43.827019+00:00",
+    "2026-10-22T23:52:13.142789+00:00",
+    "2026-10-22T23:52:43.146003+00:00",
+    "2026-10-22T23:53:13.205226+00:00",
+    "2026-10-22T23:53:43.558297+00:00",
+    "2026-10-22T23:54:13.548419+00:00",
+    "2026-10-22T23:54:43.546835+00:00",
+    "2026-10-22T23:55:13.378140+00:00",
+    "2026-10-22T23:55:43.426197+00:00",
+    "2026-10-22T23:56:13.497727+00:00",
+    "2026-10-22T23:56:43.434730+00:00",
+    "2026-10-22T23:57:13.507005+00:00",
+    "2026-10-22T23:57:43.480876+00:00",
+    "2026-10-22T23:58:13.529200+00:00",
+    "2026-10-22T23:58:43.578606+00:00",
+    "2026-10-22T23:59:13.612230+00:00",
+    "2026-10-22T23:59:43.444408+00:00",
+    "2026-10-23T00:00:13.453121+00:00",
+    "2026-10-23T00:00:43.508654+00:00",
+    "2026-10-23T00:01:13.552976+00:00",
+    "2026-10-23T00:01:43.469412+00:00",
+    "2026-10-23T00:02:13.478463+00:00",
+    "2026-10-23T00:02:43.528120+00:00",
+    "2026-10-23T00:03:13.636155+00:00",
+    "2026-10-23T00:03:43.548002+00:00",
+    "2026-10-23T00:04:13.735526+00:00",
+    "2026-10-23T00:04:43.582279+00:00",
+    "2026-10-23T00:05:13.642802+00:00",
+    "2026-10-23T00:05:43.768030+00:00",
+    "2026-10-23T00:06:13.671781+00:00",
+    "2026-10-23T00:06:43.840191+00:00",
+    "2026-10-23T00:07:13.617716+00:00",
+    "2026-10-23T00:07:43.673350+00:00",
+    "2026-10-23T00:08:13.875762+00:00",
+    "2026-10-23T00:08:43.509871+00:00",
+    "2026-10-23T00:09:13.640256+00:00",
+    "2026-10-23T00:09:43.511479+00:00",
+    "2026-10-23T00:10:13.591890+00:00",
+    "2026-10-23T00:10:43.476118+00:00",
+    "2026-10-23T00:11:13.532470+00:00",
+    "2026-10-23T00:11:43.777663+00:00",
+    "2026-10-23T00:12:13.497545+00:00",
+    "2026-10-23T00:12:43.477348+00:00",
+    "2026-10-23T00:13:13.550930+00:00",
+    "2026-10-23T00:13:43.482805+00:00",
+    "2026-10-23T00:14:13.526060+00:00",
+    "2026-10-23T00:14:43.552593+00:00",
+    "2026-10-23T00:15:13.494985+00:00",
+    "2026-10-23T00:15:43.590139+00:00",
+    "2026-10-23T00:16:13.692176+00:00",
+    "2026-10-23T00:16:43.542215+00:00",
+    "2026-10-23T00:17:13.543993+00:00",
+    "2026-10-23T00:17:43.563310+00:00",
+    "2026-10-23T00:18:13.627628+00:00",
+    "2026-10-23T00:18:43.527313+00:00",
+    "2026-10-23T00:19:13.446270+00:00",
+    "2026-10-23T00:19:43.473974+00:00",
+    "2026-10-23T00:20:13.417385+00:00",
+    "2026-10-23T00:20:43.741415+00:00",
+    "2026-10-23T00:21:13.531417+00:00",
+    "2026-10-23T00:21:44.064748+00:00",
+    "2026-10-23T00:22:13.572887+00:00",
+    "2026-10-23T00:22:43.544139+00:00",
+    "2026-10-23T00:23:13.694664+00:00",
+    "2026-10-23T00:23:43.571399+00:00",
+    "2026-10-23T00:24:13.575325+00:00",
+    "2026-10-23T00:24:43.554082+00:00",
+    "2026-10-23T00:25:13.586519+00:00",
+    "2026-10-23T00:25:43.493439+00:00",
+    "2026-10-23T00:26:13.444706+00:00",
+    "2026-10-23T00:26:43.708503+00:00",
+    "2026-10-23T00:27:13.449361+00:00",
+    "2026-10-23T00:27:43.548157+00:00",
+    "2026-10-23T00:28:13.534220+00:00",
+    "2026-10-23T00:28:43.562779+00:00",
+    "2026-10-23T00:29:13.635221+00:00",
+    "2026-10-23T00:29:43.480789+00:00",
+    "2026-10-23T00:30:13.548887+00:00",
+    "2026-10-23T00:30:43.570474+00:00",
+    "2026-10-23T00:31:13.531357+00:00",
+    "2026-10-23T00:31:43.612408+00:00",
+    "2026-10-23T00:32:13.523395+00:00",
+    "2026-10-23T00:32:43.720854+00:00",
+    "2026-10-23T00:33:13.414361+00:00",
+    "2026-10-23T00:33:43.568658+00:00",
+    "2026-10-23T00:34:13.457035+00:00",
+    "2026-10-23T00:34:43.645196+00:00",
+    "2026-10-23T00:35:13.554463+00:00",
+    "2026-10-23T00:35:43.547150+00:00",
+    "2026-10-23T00:36:13.523663+00:00",
+    "2026-10-23T00:36:43.596594+00:00",
+    "2026-10-23T00:37:13.560368+00:00",
+    "2026-10-23T00:37:43.705256+00:00",
+    "2026-10-23T00:38:13.639885+00:00",
+    "2026-10-23T00:38:43.231891+00:00",
+    "2026-10-23T00:39:13.325388+00:00",
+    "2026-10-23T00:39:43.289577+00:00",
+    "2026-10-23T00:40:13.356450+00:00",
+    "2026-10-23T00:40:43.379059+00:00",
+    "2026-10-23T00:41:13.270022+00:00",
+    "2026-10-23T00:41:44.122952+00:00",
+    "2026-10-23T00:42:13.388841+00:00",
+    "2026-10-23T00:42:43.253551+00:00",
+    "2026-10-23T00:43:13.257047+00:00",
+    "2026-10-23T00:43:43.326363+00:00",
+    "2026-10-23T00:44:13.347615+00:00",
+    "2026-10-23T00:44:43.233977+00:00",
+    "2026-10-23T00:45:13.264291+00:00",
+    "2026-10-23T00:45:43.388550+00:00",
+    "2026-10-23T00:46:13.328622+00:00",
+    "2026-10-23T00:46:43.277526+00:00",
+    "2026-10-23T00:47:13.281871+00:00",
+    "2026-10-23T00:47:43.273240+00:00",
+    "2026-10-23T00:48:13.251851+00:00",
+    "2026-10-23T00:48:43.287192+00:00",
+    "2026-10-23T00:49:13.261505+00:00",
+    "2026-10-23T00:49:43.369058+00:00",
+    "2026-10-23T00:50:13.439273+00:00",
+    "2026-10-23T00:50:43.400449+00:00",
+    "2026-10-23T00:51:13.303550+00:00",
+    "2026-10-23T00:51:43.439100+00:00",
+    "2026-10-23T00:52:13.441715+00:00",
+    "2026-10-23T00:52:43.329664+00:00",
+    "2026-10-23T00:53:13.280496+00:00",
+    "2026-10-23T00:53:43.408907+00:00",
+    "2026-10-23T00:54:13.361484+00:00",
+    "2026-10-23T00:54:43.286364+00:00",
+    "2026-10-23T00:55:13.598000+00:00",
+    "2026-10-23T00:55:43.302427+00:00",
+    "2026-10-23T00:56:13.382933+00:00",
+    "2026-10-23T00:56:43.264976+00:00",
+    "2026-10-23T00:57:13.284007+00:00",
+    "2026-10-23T00:57:43.509136+00:00",
+    "2026-10-23T00:58:13.397983+00:00",
+    "2026-10-23T00:58:43.595860+00:00",
+    "2026-10-23T00:59:13.694461+00:00",
+    "2026-10-23T00:59:43.546455+00:00",
+    "2026-10-23T01:00:13.559542+00:00",
+    "2026-10-23T01:00:43.578343+00:00",
+    "2026-10-23T01:01:13.611344+00:00",
+    "2026-10-23T01:01:43.695471+00:00",
+    "2026-10-23T01:02:13.680013+00:00",
+    "2026-10-23T01:02:43.699109+00:00",
+    "2026-10-23T01:03:13.678677+00:00",
+    "2026-10-23T01:03:43.670012+00:00",
+    "2026-10-23T01:04:13.604096+00:00",
+    "2026-10-23T01:04:43.606412+00:00",
+    "2026-10-23T01:05:13.555863+00:00",
+    "2026-10-23T01:05:43.584059+00:00",
+    "2026-10-23T01:06:13.631778+00:00",
+    "2026-10-23T01:06:43.497288+00:00",
+    "2026-10-23T01:07:13.504038+00:00",
+    "2026-10-23T01:07:43.592994+00:00",
+    "2026-10-23T01:08:13.802871+00:00",
+    "2026-10-23T01:08:43.638684+00:00",
+    "2026-10-23T01:09:13.657815+00:00",
+    "2026-10-23T01:09:43.702930+00:00",
+    "2026-10-23T01:10:13.675730+00:00",
+    "2026-10-23T01:10:43.715618+00:00",
+    "2026-10-23T01:11:13.660751+00:00",
+    "2026-10-23T01:11:43.570054+00:00",
+    "2026-10-23T01:12:13.518199+00:00",
+    "2026-10-23T01:12:43.589262+00:00",
+    "2026-10-23T01:13:13.597218+00:00",
+    "2026-10-23T01:13:43.565233+00:00",
+    "2026-10-23T01:14:13.653164+00:00",
+    "2026-10-23T01:14:43.540001+00:00",
+    "2026-10-23T01:15:13.525677+00:00",
+    "2026-10-23T01:15:43.613934+00:00",
+    "2026-10-23T01:16:13.786613+00:00",
+    "2026-10-23T01:16:43.514648+00:00",
+    "2026-10-23T01:17:13.629960+00:00",
+    "2026-10-23T01:17:43.755123+00:00",
+    "2026-10-23T01:18:13.611415+00:00",
+    "2026-10-23T01:18:43.515076+00:00",
+    "2026-10-23T01:19:13.528315+00:00",
+    "2026-10-23T01:19:43.643239+00:00",
+    "2026-10-23T01:20:13.592709+00:00",
+    "2026-10-23T01:20:44.489133+00:00"
+  ],
+  "acquisition_status": {
+    "ok": 180,
+    "budget_exhausted": 22
+  },
+  "detail_field_advertised": {
+    "rights": 31,
+    "road": 20,
+    "management_fee": 11,
+    "repair_fee": 11,
+    "energy": 1,
+    "renovation": 7
+  },
+  "checks": {
+    "sqlite_integrity": true,
+    "url_unique": true,
+    "summary_reconciled": true
+  },
+  "interpretation": "listing URLs, not dwellings; partial bounded sample; advertised not verified"
+}

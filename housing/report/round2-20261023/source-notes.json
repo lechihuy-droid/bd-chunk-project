@@ -1,0 +1,33 @@
+{
+  "audience": "product stakeholders",
+  "surface": "HTML user requested",
+  "section_map": [
+    "title",
+    "executive-summary",
+    "key-findings",
+    "recommended-next-steps",
+    "further-questions",
+    "caveats-and-assumptions"
+  ],
+  "chart_contract": {
+    "question": "How many observed exact-price unit URLs are in the preferred band by category?",
+    "family": "comparison horizontal bar",
+    "rows": 4,
+    "baseline": "zero",
+    "denominator": "bounded observed URLs, not homes or market",
+    "palette": "single blue root, direct category labels",
+    "height": 360,
+    "fallback": "same-data semantic table",
+    "no_trend": "two non-equivalent bounded snapshots"
+  },
+  "run": "output\\round2-20261023-luna",
+  "old_database": "output\\suumo-pilot.sqlite",
+  "validation": "counts and SQLite integrity checked; browser QA and manual raw source audit separate",
+  "not_collected": [
+    "hazard",
+    "transactions",
+    "demographics",
+    "development events",
+    "lender quotes"
+  ]
+}

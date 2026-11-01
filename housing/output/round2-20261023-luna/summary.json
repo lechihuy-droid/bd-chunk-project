@@ -1,0 +1,158 @@
+{
+  "run_id": "round2-20261023-luna",
+  "mode": "live",
+  "status": "verification_incomplete",
+  "parser_version": "round2.2",
+  "network_requests": 180,
+  "access_stop": false,
+  "unique_listing_urls": 2179,
+  "grain": "listing URL, not unique dwelling",
+  "preferred_exact_unit_candidates": 295,
+  "project_overlap_candidates": 53,
+  "by_category": {
+    "used_house": {
+      "observed": 764,
+      "preferred_exact": 67,
+      "projects": 0,
+      "routes_discovered": 24
+    },
+    "used_condo": {
+      "observed": 800,
+      "preferred_exact": 106,
+      "projects": 0,
+      "routes_discovered": 24
+    },
+    "new_house": {
+      "observed": 407,
+      "preferred_exact": 122,
+      "projects": 95,
+      "routes_discovered": 24
+    },
+    "new_condo": {
+      "observed": 208,
+      "preferred_exact": 0,
+      "projects": 198,
+      "routes_discovered": 18
+    }
+  },
+  "detail_pages_ok": 40,
+  "page_status_counts": {
+    "ok": 4,
+    "parsed": 135,
+    "budget_exhausted": 22
+  },
+  "missing_counts": {
+    "used_house": {
+      "price_jpy": 2,
+      "address": 0,
+      "ward": 0,
+      "layout": 0,
+      "station_raw": 0,
+      "built_year": 0
+    },
+    "used_condo": {
+      "price_jpy": 0,
+      "address": 0,
+      "ward": 0,
+      "layout": 0,
+      "station_raw": 0,
+      "built_year": 0
+    },
+    "new_house": {
+      "price_jpy": 72,
+      "address": 0,
+      "ward": 0,
+      "layout": 0,
+      "station_raw": 0,
+      "built_year": 407
+    },
+    "new_condo": {
+      "price_jpy": 70,
+      "address": 0,
+      "ward": 0,
+      "layout": 0,
+      "station_raw": 0,
+      "built_year": 208
+    }
+  },
+  "discovered_ward_slugs": [
+    "osakashiabeno",
+    "osakashiasahi",
+    "osakashichuo",
+    "osakashifukushima",
+    "osakashihigashinari",
+    "osakashihigashisumiyoshi",
+    "osakashihigashiyodogawa",
+    "osakashihirano",
+    "osakashiino",
+    "osakashijoto",
+    "osakashikita",
+    "osakashikonohana",
+    "osakashiminato",
+    "osakashimiyakojima",
+    "osakashinaniwa",
+    "osakashinishi",
+    "osakashinishinari",
+    "osakashinishiyodogawa",
+    "osakashisuminoe",
+    "osakashisumiyoshi",
+    "osakashitaisho",
+    "osakashitennoji",
+    "osakashitsurumi",
+    "osakashiyodogawa"
+  ],
+  "coverage_note": "Bounded discovered routes only; compare discovered ward names against Osaka-shi roster in manual audit. Missing route is not zero inventory.",
+  "unvisited_next_links": [
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashiabeno/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashifukushima/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashisumiyoshi/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashiino/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashiminato/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashimiyakojima/?page=3",
+    "https://suumo.jp/chukoikkodate/osaka/sc_osakashinishinari/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashiino/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashikonohana/?page=3",
+    "https://suumo.jp/ikkodate/osaka/sc_osakashiminato/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashifukushima/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashiyodogawa/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashiino/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashikonohana/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashiminato/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashimiyakojima/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashinaniwa/?page=3",
+    "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/?page=3",
+    "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/?page=3"
+  ],
+  "config": {
+    "max_requests": 180,
+    "delay": 3.0,
+    "details": 40,
+    "pages_per_stratum": 2,
+    "parser_version": "round2.2",
+    "seed_dirs": [
+      "output\\cache",
+      "output\\recrawl-20261013-20261013T133145677Z\\inspection"
+    ]
+  }
+}

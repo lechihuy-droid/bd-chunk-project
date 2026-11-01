@@ -1,0 +1,1209 @@
+[
+  {
+    "category": "used_house",
+    "ward_slug": "osakashiabeno",
+    "ward_name": "阿倍野区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiabeno/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashiasahi",
+    "ward_name": "旭区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiasahi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashichuo",
+    "ward_name": "中央区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 23,
+    "parsed_cards": 23
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashifukushima",
+    "ward_name": "福島区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashifukushima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashihigashinari",
+    "ward_name": "東成区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashinari/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashihigashisumiyoshi",
+    "ward_name": "東住吉区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashihigashiyodogawa",
+    "ward_name": "東淀川区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihigashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashihirano",
+    "ward_name": "平野区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashihirano/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashiino",
+    "ward_name": "生野区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiino/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashijoto",
+    "ward_name": "城東区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashijoto/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashikita",
+    "ward_name": "北区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikita/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 31,
+    "parsed_cards": 31
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashikonohana",
+    "ward_name": "此花区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashikonohana/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashiminato",
+    "ward_name": "港区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiminato/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashimiyakojima",
+    "ward_name": "都島区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashimiyakojima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashinaniwa",
+    "ward_name": "浪速区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashinaniwa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 29,
+    "parsed_cards": 29
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashinishi",
+    "ward_name": "西区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashinishi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 21,
+    "parsed_cards": 21
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashinishinari",
+    "ward_name": "西成区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashinishinari/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashinishiyodogawa",
+    "ward_name": "西淀川区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashinishiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashisuminoe",
+    "ward_name": "住之江区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisuminoe/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashisumiyoshi",
+    "ward_name": "住吉区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashitaisho",
+    "ward_name": "大正区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitaisho/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashitennoji",
+    "ward_name": "天王寺区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitennoji/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashitsurumi",
+    "ward_name": "鶴見区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashitsurumi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_house",
+    "ward_slug": "osakashiyodogawa",
+    "ward_name": "淀川区",
+    "route": "https://suumo.jp/chukoikkodate/osaka/sc_osakashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashiabeno",
+    "ward_name": "阿倍野区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashiabeno/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashiasahi",
+    "ward_name": "旭区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashiasahi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashichuo",
+    "ward_name": "中央区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashifukushima",
+    "ward_name": "福島区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashifukushima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashihigashinari",
+    "ward_name": "東成区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashinari/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashihigashisumiyoshi",
+    "ward_name": "東住吉区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashihigashiyodogawa",
+    "ward_name": "東淀川区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashihigashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashihirano",
+    "ward_name": "平野区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashihirano/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashiino",
+    "ward_name": "生野区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashiino/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashijoto",
+    "ward_name": "城東区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashijoto/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashikita",
+    "ward_name": "北区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashikita/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashikonohana",
+    "ward_name": "此花区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashikonohana/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashiminato",
+    "ward_name": "港区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashiminato/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashimiyakojima",
+    "ward_name": "都島区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashimiyakojima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashinaniwa",
+    "ward_name": "浪速区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashinaniwa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashinishi",
+    "ward_name": "西区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 40
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashinishinari",
+    "ward_name": "西成区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishinari/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashinishiyodogawa",
+    "ward_name": "西淀川区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashinishiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashisuminoe",
+    "ward_name": "住之江区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashisumiyoshi",
+    "ward_name": "住吉区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashitaisho",
+    "ward_name": "大正区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashitaisho/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashitennoji",
+    "ward_name": "天王寺区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashitennoji/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashitsurumi",
+    "ward_name": "鶴見区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashitsurumi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "used_condo",
+    "ward_slug": "osakashiyodogawa",
+    "ward_name": "淀川区",
+    "route": "https://suumo.jp/ms/chuko/osaka/sc_osakashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 20
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashiabeno",
+    "ward_name": "阿倍野区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 23
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashiasahi",
+    "ward_name": "旭区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 16
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashichuo",
+    "ward_name": "中央区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashichuo/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 6,
+    "parsed_cards": 5
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashifukushima",
+    "ward_name": "福島区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashifukushima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 12,
+    "parsed_cards": 6
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashihigashinari",
+    "ward_name": "東成区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashinari/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 25
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashihigashisumiyoshi",
+    "ward_name": "東住吉区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 18
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashihigashiyodogawa",
+    "ward_name": "東淀川区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashihigashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 31
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashihirano",
+    "ward_name": "平野区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashihirano/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 29
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashiino",
+    "ward_name": "生野区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashiino/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 30
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashijoto",
+    "ward_name": "城東区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashijoto/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 21
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashikita",
+    "ward_name": "北区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashikita/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 10,
+    "parsed_cards": 4
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashikonohana",
+    "ward_name": "此花区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashikonohana/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 22
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashiminato",
+    "ward_name": "港区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashiminato/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 40,
+    "parsed_cards": 36
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashimiyakojima",
+    "ward_name": "都島区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashimiyakojima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 35,
+    "parsed_cards": 17
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashinaniwa",
+    "ward_name": "浪速区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashinaniwa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 3,
+    "parsed_cards": 1
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashinishi",
+    "ward_name": "西区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashinishi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 13,
+    "parsed_cards": 8
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashinishinari",
+    "ward_name": "西成区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashinishinari/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 13
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashinishiyodogawa",
+    "ward_name": "西淀川区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 18
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashisuminoe",
+    "ward_name": "住之江区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashisuminoe/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 18
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashisumiyoshi",
+    "ward_name": "住吉区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 16
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashitaisho",
+    "ward_name": "大正区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashitaisho/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 18
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashitennoji",
+    "ward_name": "天王寺区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashitennoji/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 13,
+    "parsed_cards": 8
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashitsurumi",
+    "ward_name": "鶴見区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashitsurumi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 9
+  },
+  {
+    "category": "new_house",
+    "ward_slug": "osakashiyodogawa",
+    "ward_name": "淀川区",
+    "route": "https://suumo.jp/ikkodate/osaka/sc_osakashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "budget_exhausted"
+    ],
+    "raw_cards": 20,
+    "parsed_cards": 15
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashiabeno",
+    "ward_name": "阿倍野区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiabeno/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 3,
+    "parsed_cards": 3
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashiasahi",
+    "ward_name": "旭区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 8,
+    "parsed_cards": 8
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashichuo",
+    "ward_name": "中央区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 29,
+    "parsed_cards": 29
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashifukushima",
+    "ward_name": "福島区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 30,
+    "parsed_cards": 30
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashihigashinari",
+    "ward_name": "東成区",
+    "route": null,
+    "state": "route_not_discovered",
+    "page_statuses": [],
+    "raw_cards": 0,
+    "parsed_cards": 0
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashihigashisumiyoshi",
+    "ward_name": "東住吉区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihigashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 2,
+    "parsed_cards": 2
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashihigashiyodogawa",
+    "ward_name": "東淀川区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihigashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 1,
+    "parsed_cards": 1
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashihirano",
+    "ward_name": "平野区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 6,
+    "parsed_cards": 6
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashiino",
+    "ward_name": "生野区",
+    "route": null,
+    "state": "route_not_discovered",
+    "page_statuses": [],
+    "raw_cards": 0,
+    "parsed_cards": 0
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashijoto",
+    "ward_name": "城東区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 4,
+    "parsed_cards": 4
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashikita",
+    "ward_name": "北区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed",
+      "parsed"
+    ],
+    "raw_cards": 60,
+    "parsed_cards": 60
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashikonohana",
+    "ward_name": "此花区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashikonohana/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 4,
+    "parsed_cards": 4
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashiminato",
+    "ward_name": "港区",
+    "route": null,
+    "state": "route_not_discovered",
+    "page_statuses": [],
+    "raw_cards": 0,
+    "parsed_cards": 0
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashimiyakojima",
+    "ward_name": "都島区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashimiyakojima/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 13,
+    "parsed_cards": 13
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashinaniwa",
+    "ward_name": "浪速区",
+    "route": null,
+    "state": "route_not_discovered",
+    "page_statuses": [],
+    "raw_cards": 0,
+    "parsed_cards": 0
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashinishi",
+    "ward_name": "西区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 7,
+    "parsed_cards": 7
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashinishinari",
+    "ward_name": "西成区",
+    "route": null,
+    "state": "route_not_discovered",
+    "page_statuses": [],
+    "raw_cards": 0,
+    "parsed_cards": 0
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashinishiyodogawa",
+    "ward_name": "西淀川区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashinishiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 1,
+    "parsed_cards": 1
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashisuminoe",
+    "ward_name": "住之江区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisuminoe/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 3,
+    "parsed_cards": 3
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashisumiyoshi",
+    "ward_name": "住吉区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 5,
+    "parsed_cards": 5
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashitaisho",
+    "ward_name": "大正区",
+    "route": null,
+    "state": "route_not_discovered",
+    "page_statuses": [],
+    "raw_cards": 0,
+    "parsed_cards": 0
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashitennoji",
+    "ward_name": "天王寺区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashitennoji/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 25,
+    "parsed_cards": 25
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashitsurumi",
+    "ward_name": "鶴見区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashitsurumi/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 3,
+    "parsed_cards": 3
+  },
+  {
+    "category": "new_condo",
+    "ward_slug": "osakashiyodogawa",
+    "ward_name": "淀川区",
+    "route": "https://suumo.jp/ms/shinchiku/osaka/sc_osakashiyodogawa/",
+    "state": "attempted",
+    "page_statuses": [
+      "parsed"
+    ],
+    "raw_cards": 4,
+    "parsed_cards": 4
+  }
+]

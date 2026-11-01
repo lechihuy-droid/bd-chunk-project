@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+    "field": "rights",
+    "label": "土地の権利形態",
+    "parsed": "所有権",
+    "source_cells": [],
+    "source_context": "土地の権利形態 ヒント 所有権 構造・工法 ヒント 木造2階建 エネルギー消費性能 ヒント - 断熱性能 ヒント - 目安光熱費 ヒント <input value=\"/front/edit/yogo/021_meyasukounetsuhi.html\" id=\"jsiHintKodateMeyasukounetsuhiUrl\" type=\"hidden",
+    "numeric_jpy": null
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashichuo/nc_21819579/",
+    "field": "road",
+    "label": "私道負担・道路",
+    "parsed": "無",
+    "source_cells": [],
+    "source_context": "私道負担・道路 ヒント 無 完成時期（築年月） ヒント 1977年9月 住所 大阪府大阪市中央区上本町西２ [ ■ 周辺環境 ] 交通 地下鉄谷町線「谷町六丁目」歩3分 <input type=\"hidden\" name=\"lndmk\"",
+    "numeric_jpy": null
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+    "field": "rights",
+    "label": "土地の権利形態",
+    "parsed": "所有権",
+    "source_cells": [],
+    "source_context": "土地の権利形態 ヒント 所有権 構造・工法 ヒント 木造3階建 エネルギー消費性能 ヒント - 断熱性能 ヒント - 目安光熱費 ヒント <input value=\"/front/edit/yogo/021_meyasukounetsuhi.html\" id=\"jsiHintKodateMeyasukounetsuhiUrl\" type=\"hidden",
+    "numeric_jpy": null
+  },
+  {
+    "url": "https://suumo.jp/chukoikkodate/osaka/sc_osakashisumiyoshi/nc_21571442/",
+    "field": "road",
+    "label": "私道負担・道路",
+    "parsed": "無、南5ｍ幅",
+    "source_cells": [],
+    "source_context": "私道負担・道路 ヒント 無、南5ｍ幅 完成時期（築年月） ヒント 2022年1月 住所 大阪府大阪市住吉区沢之町２ [ ■ 周辺環境 ] 交通 南海高野線「我孫子前」歩4分 <input type=\"hidden\" name=\"lndmk\" value",
+    "numeric_jpy": null
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+    "field": "rights",
+    "label": "敷地の権利形態",
+    "parsed": "所有権",
+    "source_cells": [],
+    "source_context": "ell\">- 敷地の権利形態 ヒント 所有権 用途地域 ヒント 商業 駐車場 ヒント - 会社情報 会社概要 ＜仲介＞ 国土交通大臣（4）第008026号 (一社)不動産流通経営協会会員 (公社)首都圏不動産公正取引協議会加盟 / (一社)不動産協会会員 (公社)首都圏不動産公正取引協議会加盟 (株)長谷工リアルエステート関西営業センター 〒541-0045 大阪府大阪市中央区道修町1-5-18 朝日生命道修町ビル1階 問い合わせ先 (株)長谷工リアルエステート関西営業センター <input value=\"https://suumo.",
+    "numeric_jpy": null
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+    "field": "management_fee",
+    "label": "管理費",
+    "parsed": "8140円／月（委託(通勤)）",
+    "source_cells": [],
+    "source_context": "nt\" /> 管理費 ヒント 8140円／月（委託(通勤)） 修繕積立金 ヒント 1万2430円／月 修繕積立基金 ヒント - 諸費用 ヒント - 間取り ヒント 1DK+S（納戸） <th class=\"w11",
+    "numeric_jpy": 8140
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashichuo/nc_21698599/",
+    "field": "repair_fee",
+    "label": "修繕積立金",
+    "parsed": "1万2430円／月",
+    "source_cells": [],
+    "source_context": "修繕積立金 ヒント 1万2430円／月 修繕積立基金 ヒント - 諸費用 ヒント - 間取り ヒント 1DK+S（納戸） 専有面積 ヒント 42.85m 2 （壁芯） <",
+    "numeric_jpy": 12430
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+    "field": "rights",
+    "label": "敷地の権利形態",
+    "parsed": "所有権",
+    "source_cells": [],
+    "source_context": "ell\">- 敷地の権利形態 ヒント 所有権 用途地域 ヒント 近隣商業 駐車場 ヒント 敷地内（5000円～2万円／月） 物件の特徴 支払い例 プレサンスロジェ住之江レジデンス 4190万円の場合 月々１１３，０７８円（ボーナス時加算無し） 価格4190万円、頭金0万円、借入額4190万円 年利0.73％（変動金利）、返済期間35年（当初5年） 建都住宅販売では、経験豊富なスタッフによる住宅ローンの無料相談を承っております。 ●自己資金０円 ●できるだけ低い金利でローンを組みたい",
+    "numeric_jpy": null
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+    "field": "management_fee",
+    "label": "管理費",
+    "parsed": "6430円／月（委託(通勤)）",
+    "source_cells": [],
+    "source_context": "nt\" /> 管理費 ヒント 6430円／月（委託(通勤)） 修繕積立金 ヒント 4500円／月 修繕積立基金 ヒント - 諸費用 ヒント - 間取り ヒント 3LDK <th class=\"w118 thSid",
+    "numeric_jpy": 6430
+  },
+  {
+    "url": "https://suumo.jp/ms/chuko/osaka/sc_osakashisuminoe/nc_21218341/",
+    "field": "repair_fee",
+    "label": "修繕積立金",
+    "parsed": "4500円／月",
+    "source_cells": [],
+    "source_context": "修繕積立金 ヒント 4500円／月 修繕積立基金 ヒント - 諸費用 ヒント - 間取り ヒント 3LDK 専有面積 ヒント 64.26m 2 <th class=\"w",
+    "numeric_jpy": 4500
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "offline_replay": {
+    "mode": "cache_replay",
+    "network_requests": 0,
+    "no_network_confirmed_by_runner_counter": true
+  },
+  "counts": {
+    "live_summary_listings": 2179,
+    "replay_summary_listings": 2179,
+    "live_csv_rows": 2179,
+    "replay_csv_rows": 2179,
+    "live_db_observations": 2179,
+    "replay_db_observations": 2179,
+    "live_detail_records": 40,
+    "replay_detail_records": 40,
+    "live_successful_acquisitions": 180,
+    "replay_successful_acquisitions": 180
+  },
+  "parity": {
+    "listing_url_sets_equal": true,
+    "listing_csv_rows_equal_by_url": true,
+    "observation_payloads_and_timestamps_equal": true,
+    "detail_payloads_and_timestamps_equal": true,
+    "page_timestamp_and_status_equal": true,
+    "acquisition_timestamp_status_hash_equal": true
+  },
+  "raw_acquisition_hashes": {
+    "checked": 180,
+    "all_match": true,
+    "failed": []
+  },
+  "request_timing": {
+    "fetched_at_entries": 180,
+    "completion_gap_min_seconds": 29.265889,
+    "completion_gap_max_seconds": 30.896424,
+    "interpretation": "fetched_at is recorded after each response; completion gaps are not request-start timestamps. Runner code enforces sequential requests and a delay of at least 3 seconds between starts."
+  },
+  "saved_baseline_manifest": {
+    "manifest": "output\\recrawl-20261013-20261013T133145677Z\\inspection\\baseline-protection-manifest.json",
+    "listed_files": 64,
+    "files_present_and_matching": 62,
+    "files_missing_or_changed": [
+      {
+        "baseline": "crawl_round2.py",
+        "present": true,
+        "length_matches": false,
+        "hash_matches": false
+      },
+      {
+        "baseline": "crawl_round2_parse.py",
+        "present": true,
+        "length_matches": false,
+        "hash_matches": false
+      }
+    ],
+    "scope_note": "This manifest lists the earlier pilot database, runner/parser files, and legacy cache entries. It does not contain a saved hash baseline for the 65-file Luna predecessor set."
+  }
+}
