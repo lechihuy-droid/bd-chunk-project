@@ -15,6 +15,11 @@
     "sha256": "f8714708c90f80c98dbda7ad81a2bd39f86f757cbcd6e1e32aeb8cffcb85868f"
   },
   {
+    "path": "index.html",
+    "bytes": 312474,
+    "sha256": "0725827301c1295e6a0783c4efd094b0054db1317f73591ddbd9d307195dc68f"
+  },
+  {
     "path": "output/round2-20261023-luna/all-listings.csv",
     "bytes": 771071,
     "sha256": "4346ee5ed6f8c239a6f5af87c52f0e442c243d6e5d17728806a2ed691cd74a32"
@@ -61,8 +66,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 3783,
-    "sha256": "12088f589f488f5d6f4ef85a7ec009bcca2fd649bd722bee41586adb59bc0971"
+    "bytes": 4060,
+    "sha256": "d0727d517dd711ddc6aa554dd4d7ed328e8b01fe9df20042a0be9bd34f529cae"
   },
   {
     "path": "report/bo-tieu-chuan-mua-nha.html",

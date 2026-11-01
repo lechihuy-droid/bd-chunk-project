@@ -2,6 +2,10 @@
 
 Bản chia sẻ kết quả, upload ngày 02/11/2026. **Dữ liệu crawl gần nhất trong gói này được thu ngày 23/10/2026**, không phải danh sách đang bán được xác nhận hôm nay.
 
+## Xem danh sách trên điện thoại
+
+**[Mở danh sách 295 tin](https://lechihuy-droid.github.io/bd-chunk-project/housing/)** — tìm theo ga/địa chỉ/bố trí phòng, lọc loại nhà và quận, sắp xếp giá. [Tải HTML để mở offline](index.html).
+
 ## Đọc báo cáo
 
 - [Báo cáo kết quả crawl lần 2](report/round2-20261023/report.html): bảng theo quận/loại nhà, 295 tin trong dải giá, ánh xạ hai bộ tiêu chuẩn và giới hạn dữ liệu.
