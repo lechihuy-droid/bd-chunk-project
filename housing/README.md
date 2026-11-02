@@ -1,3 +1,9 @@
+# Housing — ver2.0-20261102
+
+[Mở danh sách mới](https://lechihuy-droid.github.io/bd-chunk-project/housing/) · [CSV gốc mới](ver2.0-20261102/all-listings.csv) · [Kiểm link và dữ liệu phiên bản](ver2.0-20261102/README.md).
+
+Các mục dưới đây giữ tài liệu và snapshot trước để đối chiếu.
+
 # Housing — nghiên cứu mua nhà Osaka-shi
 
 Bản chia sẻ kết quả, upload ngày 02/11/2026. **Dữ liệu crawl gần nhất trong gói này được thu ngày 23/10/2026**, không phải danh sách đang bán được xác nhận hôm nay.

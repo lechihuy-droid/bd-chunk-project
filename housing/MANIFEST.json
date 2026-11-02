@@ -16,8 +16,8 @@
   },
   {
     "path": "index.html",
-    "bytes": 358179,
-    "sha256": "dcfe36accd0ff14bf337ba1742095ec648a0a259a400a592948ddc065863ae15"
+    "bytes": 2011561,
+    "sha256": "bef0af03b853aa42ccbed9712cdb6649279fdf6e648b95ac3094a178f1aacef9"
   },
   {
     "path": "output/round2-20261023-luna/all-listings.csv",
@@ -66,8 +66,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 4060,
-    "sha256": "d0727d517dd711ddc6aa554dd4d7ed328e8b01fe9df20042a0be9bd34f529cae"
+    "bytes": 4393,
+    "sha256": "c582d5918006c965bea6d565f26db526cc5252112ff651c9322cedca8076dfe3"
   },
   {
     "path": "report/bo-tieu-chuan-mua-nha.html",
@@ -118,5 +118,60 @@
     "path": "SOL-REVIEW.md",
     "bytes": 3367,
     "sha256": "a14d97d974249e073af92b28be3fbde97cc84165f23a2161c7f88023e5be0e99"
+  },
+  {
+    "path": "ver2.0-20261102/all-listings.csv",
+    "bytes": 4473549,
+    "sha256": "7e66f0bd32020c1abbd7af615cbe8c4b11681d6d95e09c8302361f571d685f06"
+  },
+  {
+    "path": "ver2.0-20261102/expired-listings.csv",
+    "bytes": 1133,
+    "sha256": "a3cf9241a61608005ff81de6da6d5e8cd19fde8dff2ccf6ca917c801e2f835e8"
+  },
+  {
+    "path": "ver2.0-20261102/index.html",
+    "bytes": 2011545,
+    "sha256": "9cd23efdc72ce68b2d62a978dce06e0352d0884b53d40bc827e9edc9f8c30dff"
+  },
+  {
+    "path": "ver2.0-20261102/old-listings-audit.csv",
+    "bytes": 873234,
+    "sha256": "09639ea2ddbb8c87c480ba5994451f97bf6ba80bcf97f72635c2941ffa1dbc64"
+  },
+  {
+    "path": "ver2.0-20261102/preferred-exact.csv",
+    "bytes": 741979,
+    "sha256": "b228c61a7385b4e04ac0d23fc0fab383fca6890740a0bbb68068445458f322e1"
+  },
+  {
+    "path": "ver2.0-20261102/preferred-unverified.csv",
+    "bytes": 694,
+    "sha256": "40f6720a730555e191fac2e598a2e2a03a1f02f830d7d76986aa797d9bf0f88c"
+  },
+  {
+    "path": "ver2.0-20261102/projects.csv",
+    "bytes": 116831,
+    "sha256": "78006e7d032229c618644d68fd2e8554121e4e83b4dd059593d65219ae95a226"
+  },
+  {
+    "path": "ver2.0-20261102/README.md",
+    "bytes": 1555,
+    "sha256": "c3cde465fd16dd7491c993e5d5ba758ddda4069a3e4f8d07ee657b6583b2326e"
+  },
+  {
+    "path": "ver2.0-20261102/summary.json",
+    "bytes": 4792,
+    "sha256": "139ae6ad690520643dbd0637ce7ddb5399d351d2b48d86390cd6840b69aecba0"
+  },
+  {
+    "path": "ver2.0-20261102/suumo-v2.sqlite.gz",
+    "bytes": 3841261,
+    "sha256": "2c98858f50c49e5e1bbc9648f5db695ca089ca21b17c10cf40b57197d0acecb8"
+  },
+  {
+    "path": "ver2.0-20261102/MANIFEST.json",
+    "bytes": 1428,
+    "sha256": "d71f37d908221e6efec356c818daa090c31620d31ddbb225640f27919aa43a25"
   }
 ]

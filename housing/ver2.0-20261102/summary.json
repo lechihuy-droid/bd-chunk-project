@@ -1,0 +1,154 @@
+{
+  "audit_scope": "preferred",
+  "version": "ver2.0-20261102",
+  "finalized_at": "2026-11-02T15:25:52.879000+00:00",
+  "catalog": {
+    "run_id": "catalog",
+    "status": "complete",
+    "crawl_complete": true,
+    "frontier_exhausted": true,
+    "pending_frontier_count": 0,
+    "pending_frontier": [],
+    "access_stop": false,
+    "budget_exhausted": false,
+    "failed_or_unconfirmed_page_count": 0,
+    "max_total_requests": 5000,
+    "initial_network_requests": 180,
+    "expansion_network_requests": 514,
+    "total_network_requests": 694,
+    "network_request_limit_respected": true,
+    "unique_listing_urls": 11463,
+    "preferred_exact_unit_candidates": 1754,
+    "project_overlap_candidates": 76,
+    "by_category": {
+      "used_house": {
+        "observed": 2750,
+        "preferred_exact": 329,
+        "routes_discovered": 24
+      },
+      "used_condo": {
+        "observed": 7739,
+        "preferred_exact": 1162,
+        "routes_discovered": 24
+      },
+      "new_house": {
+        "observed": 802,
+        "preferred_exact": 263,
+        "routes_discovered": 24
+      },
+      "new_condo": {
+        "observed": 172,
+        "preferred_exact": 0,
+        "routes_discovered": 18
+      }
+    },
+    "discovered_route_count": 90,
+    "unresolved_route_count": 6,
+    "unresolved_routes": [
+      {
+        "category": "new_condo",
+        "ward_slug": "osakashihigashinari",
+        "ward_name": "東成区",
+        "route": null,
+        "state": "route_not_discovered",
+        "page_count": 0,
+        "page_statuses": [],
+        "parsed_cards": 0
+      },
+      {
+        "category": "new_condo",
+        "ward_slug": "osakashiino",
+        "ward_name": "生野区",
+        "route": null,
+        "state": "route_not_discovered",
+        "page_count": 0,
+        "page_statuses": [],
+        "parsed_cards": 0
+      },
+      {
+        "category": "new_condo",
+        "ward_slug": "osakashiminato",
+        "ward_name": "港区",
+        "route": null,
+        "state": "route_not_discovered",
+        "page_count": 0,
+        "page_statuses": [],
+        "parsed_cards": 0
+      },
+      {
+        "category": "new_condo",
+        "ward_slug": "osakashinaniwa",
+        "ward_name": "浪速区",
+        "route": null,
+        "state": "route_not_discovered",
+        "page_count": 0,
+        "page_statuses": [],
+        "parsed_cards": 0
+      },
+      {
+        "category": "new_condo",
+        "ward_slug": "osakashinishinari",
+        "ward_name": "西成区",
+        "route": null,
+        "state": "route_not_discovered",
+        "page_count": 0,
+        "page_statuses": [],
+        "parsed_cards": 0
+      },
+      {
+        "category": "new_condo",
+        "ward_slug": "osakashitaisho",
+        "ward_name": "大正区",
+        "route": null,
+        "state": "route_not_discovered",
+        "page_count": 0,
+        "page_statuses": [],
+        "parsed_cards": 0
+      }
+    ],
+    "route_gaps_present": true,
+    "page_count": 649,
+    "page_status_counts": {
+      "parsed": 649
+    },
+    "actual_date_range_utc": {
+      "first": "2026-11-02T05:11:33.976514+00:00",
+      "last": "2026-11-02T10:58:17.539321+00:00"
+    },
+    "actual_crawl_date_jst": "2026-11-02",
+    "parser_version": "round2.2",
+    "robots_delay_seconds": 30.0,
+    "coverage_scope": "All discovered Osaka-shi category routes and parser-provided pagination links, subject to the recorded request ceiling.",
+    "coverage_note": "Only routes discovered in SUUMO HTML were traversed. An undiscovered expected Osaka ward is unknown coverage, not zero inventory. Parse failures, unsupported pages, network errors and pending frontier prevent a complete-crawl claim.",
+    "coverage_file": "coverage.json",
+    "next_links_file": "next-links.json"
+  },
+  "audit": {
+    "status": "complete",
+    "audit_scope": "preferred",
+    "version": "ver2.0-20261102",
+    "total_urls": 1754,
+    "old_urls": 0,
+    "fresh_urls": 11463,
+    "checked": 1754,
+    "counts": {
+      "active": 1751,
+      "not_found": 2,
+      "unverified": 1
+    },
+    "finished_at": "2026-11-02T15:25:46.862571+00:00",
+    "note": "Expired/not_found is not proof of a sale; timestamps are actual check times, not version label."
+  },
+  "fresh_urls": 11463,
+  "active_preferred": 1751,
+  "unverified_preferred": 1,
+  "fresh_status_counts": {
+    "not_checked": 9709,
+    "active": 1751,
+    "not_found": 2,
+    "unverified": 1
+  },
+  "observed_start": "2026-11-02T05:11:33.976514+00:00",
+  "observed_end": "2026-11-02T10:58:17.539321+00:00",
+  "note": "Source timestamps are actual. Absence from a bounded catalog or an expired ad does not prove a sale."
+}
