@@ -1,0 +1,864 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chuẩn 5 gate và kế hoạch v2</title><link rel="stylesheet" href="gate-doc.css"></head>
+<body><nav><strong>Tài liệu thiết kế — chưa chạy gate trên v2</strong><br>
+<a href="#plan">Đến kế hoạch và phân vai</a></nav>
+<p>Flow: G1 phạm vi → G2 khả thi → G3 nền tảng → G4 ưu tiên → G5 giao dịch.
+Thiếu bằng chứng đi vào nhánh nghiên cứu, không tự vượt gate.</p><h1>Chuẩn đánh giá nhà Osaka — 5 gate, phiên bản 1.0</h1>
+<p>Ngày chuẩn hóa: 03/11/2026 (JST). Chủ trì thiết kế: agent chính theo yêu cầu người dùng.</p>
+<p><strong>Mục đích:</strong> làm chuẩn triển khai filter và xếp ưu tiên cho dữ liệu <code>ver2.0-20261102</code>. Đây là chính sách nghiên cứu/ra quyết định của dự án, không phải tiêu chuẩn pháp lý quốc gia, mô hình dự báo tăng giá hay xác nhận đủ điều kiện vay.</p>
+<p><strong>Trạng thái:</strong> đã chuẩn hóa tài liệu để triển khai; chưa chạy gate engine trên v2. Trọng số và quy tắc bên dưới là thiết kế vận hành v1.0, chưa được hiệu chuẩn bằng kết quả giao dịch. Chỉ thay đổi qua phiên bản chính sách mới, không sửa ngầm sau khi thấy thứ hạng.</p>
+<h2>1. Quan hệ với ba tài liệu gốc</h2>
+<table>
+<thead>
+<tr>
+<th>Nguồn</th>
+<th>Vai trò trong chuẩn hợp nhất</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../CRITERIA.md">CRITERIA.md</a>, tám nhóm A–H</td>
+<td>Lớp phân tích vị trí, thị trường, giá, rủi ro và tài sản; chủ yếu G2–G4</td>
+</tr>
+<tr>
+<td><a href="../../report/bo-tieu-chuan-mua-nha.html">Bộ Osaka</a></td>
+<td>Mục tiêu cá nhân, giữ tài sản dài hạn, ưu tiên giá/chất lượng/bán lại; tiện ích cá nhân là phụ</td>
+</tr>
+<tr>
+<td><a href="../../report/tieu-chuan-mua-nha-nhat-va-review-osaka.html">Bộ Nhật + review Osaka</a>, J01–J16</td>
+<td>Nền thẩm định, hồ sơ và kiểm soát giao dịch; chủ yếu G1–G3 và G5</td>
+</tr>
+</tbody>
+</table>
+<p>Chuẩn này thay thế cách ghép các tài liệu khi triển khai gate engine mới, không xóa hoặc sửa tài liệu lịch sử. Khi mâu thuẫn: chỉ dẫn mới của người dùng &gt; cấu hình cá nhân đã xác nhận &gt; chuẩn này &gt; đề xuất cũ. Không biến các ngưỡng tuổi nhà, phút đi bộ, tỷ lệ chi nhà hay số tháng dự phòng trong tài liệu cũ thành điều kiện loại tự động.</p>
+<p>Phân biệt phiên bản: <code>policy_version=HOUSING-GATES-1.0</code>, <code>dataset_version=ver2.0-20261102</code>, <code>evaluation_run_id</code> là ngày/giờ thực chạy. Ngày version dữ liệu không phải ngày cập nhật tất cả bằng chứng.</p>
+<h2>2. Flow: phễu quyết định và nhánh nghiên cứu</h2>
+<pre><code class="language-mermaid">flowchart TD
+    A[Toàn bộ CSV v2] --&gt; G1[G1: đúng phạm vi và nhu cầu]
+    G1 --&gt;|đủ thông tin phạm vi| G2[G2: tài chính, quyền, kỹ thuật, rủi ro]
+    G1 --&gt;|dự án / giá khoảng / thiếu dữ liệu| Q[Hàng đợi làm rõ; không xóa]
+    G2 --&gt;|đạt| G3[G3: nền tảng tài sản và giá mua]
+    G2 --&gt;|chưa rõ, chưa có lỗi loại đã xác nhận| R[Nghiên cứu có điều kiện]
+    G3 --&gt;|đạt| G4[G4: xếp ưu tiên 100 điểm + độ phủ]
+    G3 --&gt;|chưa rõ| R
+    R --&gt; P[Ưu tiên bổ sung dữ liệu; điểm sơ bộ nếu đủ điều kiện]
+    G4 --&gt; G5[G5: hồ sơ giao dịch và quyết định cụ thể]
+    G5 --&gt; D[Mua / đàm phán / tiếp tục xác minh / bỏ qua]
+    G2 --&gt;|không đạt có bằng chứng| X[Giữ lịch sử và lý do loại]
+    G3 --&gt;|không đạt có bằng chứng| X
+</code></pre>
+<p><strong>Không có PASS tạm:</strong> nghiên cứu tiếp không đồng nghĩa vượt gate. Nếu tài chính cá nhân còn thiếu, mọi căn liên quan giữ G2=REVIEW; vẫn được phân tích vị trí/tài sản trong nhánh nghiên cứu. Chỉ danh sách đã PASS G1–G3 mới được gọi là đủ điều kiện xếp ưu tiên thẩm định cuối; không gọi đó là đủ điều kiện mua.</p>
+<p>Có thể đọc và chuẩn bị bằng chứng G3/G4 song song để tiết kiệm thời gian. <code>highest_passed_gate</code> chỉ tính chuỗi PASS liên tiếp, không nhảy qua G2 chưa đạt. G4 là tầng sắp thứ tự, không phải một ngưỡng điểm loại nhà.</p>
+<h2>3. Hợp đồng trạng thái và bằng chứng</h2>
+<p>Mỗi mục checklist có: <code>criterion_id</code>, <code>applicability</code>, <code>status</code>, <code>reason_code</code>, <code>evidence_ids</code>, <code>checked_at</code>, <code>reviewer</code>, <code>next_action</code>, <code>owner</code>, <code>due_before</code>. Mỗi record gắn URL tin; chỉ thêm property_id khi đủ bằng chứng ghép căn.</p>
+<table>
+<thead>
+<tr>
+<th>Giá trị</th>
+<th>Nghĩa và điều kiện</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PASS</td>
+<td>Đủ bằng chứng phù hợp cấp độ tiêu chí; điều kiện đã đáp ứng</td>
+</tr>
+<tr>
+<td>REVIEW</td>
+<td>Thiếu, lỗi, cũ, mâu thuẫn, chưa có ngưỡng cá nhân hoặc chưa có người có thẩm quyền xác minh</td>
+</tr>
+<tr>
+<td>NOT_EVALUATED</td>
+<td>Chưa thực hiện việc đánh giá mục này; không đồng nghĩa đã kiểm và thiếu hồ sơ</td>
+</tr>
+<tr>
+<td>FAIL</td>
+<td>Bằng chứng xác nhận vi phạm điều kiện đã xác định; có rule_id và lý do cụ thể. Không FAIL chỉ vì không tìm thấy dữ liệu</td>
+</tr>
+<tr>
+<td>NA</td>
+<td>Không áp dụng theo loại tài sản/tình huống, có lý do; không dùng để né mục chưa biết</td>
+</tr>
+</tbody>
+</table>
+<p>Gate bắt buộc: FAIL &gt; REVIEW &gt; NOT_EVALUATED &gt; PASS; bỏ NA khỏi phép gộp; tất cả mục áp dụng PASS thì PASS. Một gate không có mục áp dụng là lỗi cấu hình, không tự PASS. Các mục chỉ ghi nhận sở thích chưa chốt được NA với lý do <code>preference_not_configured</code>, không chặn G1; phải xuất riêng danh sách sở thích chưa chốt. Gate phía sau chưa chạy là NOT_EVALUATED, dù gate trước đã FAIL; nếu chủ động nghiên cứu song song thì lưu kết quả thực, nhưng không nâng highest_passed_gate qua một gate trước chưa PASS.</p>
+<p><code>scope_status</code> tách khỏi gate: <code>in_scope</code>, <code>out_of_scope</code>, <code>project_queue</code>, <code>scope_review</code>. Giá ngoài vùng mong muốn là ngoài phạm vi shortlist chính, không chứng minh nhà xấu. <code>availability</code> cũng tách riêng: active/expired/not_found/unverified/network_error/not_checked; link còn mở không chứng minh còn bán hoặc pháp lý tốt.</p>
+<p><strong>Cấp bằng chứng:</strong> E1 quảng cáo/nguồn thứ cấp; E2 nguồn chính thức, giao dịch hoặc quan sát có phạm vi phù hợp; E3 hồ sơ tài sản/kiểm định/hợp đồng/báo giá xác nhận bởi chủ thể có thẩm quyền. E2 không tự đủ cho mọi kết luận của E3. Không nâng E1 thành E3 vì đã parse được hoặc thấy cùng nội dung ở nhiều môi giới.</p>
+<p>Evidence phải giữ <code>source_url_or_private_ref</code>, ngày quan sát, ngày hiệu lực/nội dung, raw claim, hash khi có file, cấp bằng chứng, độ chính xác vị trí, phạm vi áp dụng và mâu thuẫn. Tọa độ tâm quận/phường không dùng để kết luận hazard cho căn. Bằng chứng từ cache giữ timestamp gốc; chạy lại ngày mới không làm dữ liệu mới hơn.</p>
+<p>Không có một TTL chung giả định cho mọi nguồn. Tin/giá phải xác nhận lại trước đề nghị mua; dự án và bản đồ phải lưu phiên bản và kiểm nguồn mới nhất trước kết luận; giấy tờ phải xác nhận còn áp dụng tại thời điểm giao dịch. Chính sách freshness theo từng nguồn được ghi vào run manifest; chưa kiểm độ mới thì đánh dấu <code>freshness_unchecked</code>.</p>
+<h2>4. G1 — Đúng phạm vi và nhu cầu</h2>
+<p>Mục tiêu: lập tập ứng viên, tách các hàng đợi; không dùng điều kiện chưa được người dùng xác nhận để loại.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Checklist cần kiểm</th>
+<th>Bằng chứng/field và quy tắc</th>
+<th>Khi chưa đủ / người xử lý</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1-01</td>
+<td>Địa chỉ thuộc Osaka-shi</td>
+<td>Địa chỉ/quận từ nguồn; mâu thuẫn URL–địa chỉ cần kiểm. Ngoài thành phố → out_of_scope</td>
+<td>REVIEW / parser rồi reviewer</td>
+</tr>
+<tr>
+<td>G1-02</td>
+<td>Nhà riêng hoặc căn hộ; mới/cũ xác định</td>
+<td><code>category</code>, nguyên văn loại tài sản. Nhà liền kề/terrace/thuê đất gắn subtype, không giả như nhà độc lập</td>
+<td>REVIEW / parser</td>
+</tr>
+<tr>
+<td>G1-03</td>
+<td>Giá cụ thể trong 40–50 triệu JPY, gồm hai đầu</td>
+<td>Giá exact cùng một căn; không dùng giá thấp nhất dự án. Ngoài dải → out_of_scope; dự án/giá khoảng → project_queue</td>
+<td>REVIEW nếu giá không rõ / parser</td>
+</tr>
+<tr>
+<td>G1-04</td>
+<td>Phân biệt tin–căn–dự án; trùng URL</td>
+<td>URL chuẩn, ID nguồn, loại tin. Giữ mọi raw row và mapping; chỉ khử bản sao URL ở view unique; nghi cùng căn giữ duplicate_group, không gộp cưỡng bức</td>
+<td>REVIEW nếu identity mâu thuẫn / reviewer</td>
+</tr>
+<tr>
+<td>G1-05</td>
+<td>Có thể dùng để ở theo nhu cầu đã chốt</td>
+<td>Hiện trạng cho thuê/owner-change, ngày bàn giao, quyền sử dụng. Quảng cáo vấn đề → REVIEW; chỉ FAIL khi xác nhận không thể đáp ứng nhu cầu đã chốt</td>
+<td>REVIEW / hồ sơ + người mua</td>
+</tr>
+<tr>
+<td>G1-06</td>
+<td>Đáp ứng nhu cầu tối thiểu đã xác nhận</td>
+<td>Phòng, diện tích, thang máy/cầu thang, chỗ xe, thú nuôi, điểm đến và hạn đi làm. Chỉ so các trường có cấu hình được duyệt</td>
+<td>Chưa cấu hình → NA; đã cấu hình nhưng thiếu data → REVIEW</td>
+</tr>
+</tbody>
+</table>
+<p><code>candidate_scope</code> xác định từ G1-01…04; PASS G1 còn đòi G1-05 và các nhu cầu G1-06 đang áp dụng. Do đó ứng viên theo giá chưa mặc nhiên PASS G1. Link availability là lớp vận hành: expired/not_found loại khỏi view đang xem được, giữ lịch sử; unverified vào hàng đợi. Không tải lại toàn bộ URL chỉ để thực hiện gate này.</p>
+<h2>5. G2 — Có thể mua và nắm giữ</h2>
+<p>Đây là kiểm tra trở ngại trọng yếu, không phải chứng nhận bằng tin rao. Tài chính là dependency chung của người mua, tính một lần theo kịch bản rồi gắn tác động từng căn; không bắt thu thập lặp cho hàng nghìn tin.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Checklist cần kiểm</th>
+<th>Điều kiện PASS / bằng chứng bắt buộc</th>
+<th>Trường hợp chưa rõ hoặc FAIL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G2-01</td>
+<td>Đủ vốn tại từng mốc thanh toán</td>
+<td>Hồ sơ riêng: giá, phí/thuế, sửa, tiền cọc, giải ngân; không đếm cùng khoản hai lần</td>
+<td>Thiếu thu nhập/chi/nợ/dự toán → REVIEW; xác nhận thiếu vốn không có phương án → FAIL</td>
+</tr>
+<tr>
+<td>G2-02</td>
+<td>Dòng tiền và dự phòng chịu được</td>
+<td>Kịch bản cơ sở + stress đã thống nhất; khoản vay, chi sở hữu và nghĩa vụ khác; không cần tăng giá để trả nợ</td>
+<td>Không tự áp 30%/40% hay 12 tháng như luật; ngưỡng chưa chốt → REVIEW</td>
+</tr>
+<tr>
+<td>G2-03</td>
+<td>Khoản vay khả thi cho người mua và căn này</td>
+<td>Báo giá/đánh giá ngân hàng phù hợp giai đoạn, lãi/kỳ hạn/phí/điều kiện, bảo hiểm khoản vay; G5 xác nhận cuối</td>
+<td>Không có báo giá → REVIEW; vĩnh trú không thay phê duyệt</td>
+</tr>
+<tr>
+<td>G2-04</td>
+<td>Quyền mua và sử dụng rõ</td>
+<td>Đăng ký, chủ thể/ủy quyền, thuê đất/thời hạn/nghĩa vụ, người thuê, xử lý thế chấp và bàn giao</td>
+<td>E1 chỉ tạo cờ; xác nhận quyền không giải quyết được cho mục đích ở → FAIL</td>
+</tr>
+<tr>
+<td>G2-05</td>
+<td>Đất/đường/xây lại và hạ tầng dùng được</td>
+<td>Hồ sơ đường, ranh, setback, quyền đi/đào, quy hoạch và chuyên môn kiểm chứng phương án sửa/xây cần thiết</td>
+<td>Nhà riêng bắt buộc; căn hộ kiểm phần đất chung liên quan. Không dùng số mét đường đơn lẻ để xác nhận pháp lý</td>
+</tr>
+<tr>
+<td>G2-06</td>
+<td>Không có vấn đề kỹ thuật trọng yếu chưa kiểm soát</td>
+<td>Hồ sơ xây dựng/chịu động đất, kiểm định thực trạng, lịch sửa và phương án chi phí cho lỗi trọng yếu</td>
+<td>Năm xây/ảnh đẹp không đủ PASS; lỗi không khắc phục được trong ngân sách đã chốt → FAIL</td>
+</tr>
+<tr>
+<td>G2-07</td>
+<td>Rủi ro vị trí có phương án chấp nhận</td>
+<td>Định vị đủ chính xác, lớp hazard đúng kịch bản, lối thoát/thiết bị, tổn thất còn lại và phương án bảo hiểm</td>
+<td>Tâm quận/thiếu hồ sơ → REVIEW; không tự FAIL mọi vùng có màu hazard</td>
+</tr>
+<tr>
+<td>G2-08</td>
+<td>Nghĩa vụ quản lý/sửa lớn không có trở ngại chưa xử lý</td>
+<td>Căn hộ: quy chế, quỹ/nợ/kế hoạch/thu bổ sung; nhà riêng: nghĩa vụ đường chung/đất chung nếu có</td>
+<td>Phí tháng thấp không đủ PASS; phần không áp dụng phải giải thích NA</td>
+</tr>
+</tbody>
+</table>
+<p>G2-01…03 là private. Bản public chỉ ghi <code>private_review_required</code>, không xuất số tiền, thu nhập, nợ, tình trạng cư trú cá nhân hoặc hồ sơ ngân hàng. Không liên hệ ngân hàng/môi giới hay gửi hồ sơ thay người dùng trong nhiệm vụ dữ liệu này.</p>
+<p>Nếu phương án mua không vay đã được xác nhận, G2-03 và phần vay/bảo hiểm khoản vay của G5-04 là NA; phần vốn/bảo hiểm tài sản/lịch thanh toán vẫn áp dụng. Chưa biết phương án tài trợ là REVIEW. G1-05: chưa chốt ngày cần ở thì không tự đặt hạn bàn giao; tình trạng người thuê/quyền sử dụng còn mơ hồ vẫn REVIEW khi ảnh hưởng mục đích để ở.</p>
+<h2>6. G3 — Nền tảng tài sản và giá mua</h2>
+<p>Mục tiêu: có lý do sở hữu ngay cả khi giá không tăng. Gate đánh giá tính đầy đủ và chấp nhận của phương án, không dùng tổng điểm G4 để tự PASS.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Checklist cần kiểm</th>
+<th>Điều kiện/đầu ra cần có</th>
+<th>Nguồn ưu tiên và xử lý thiếu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G3-01</td>
+<td>Giá mua so với tài sản tương đồng</td>
+<td>Bộ comparables cùng loại/quyền, diện tích/tuổi/vị trí/kỳ; điều chỉnh có giải thích; khoảng giá trị và mức bất định</td>
+<td>Giao dịch E2; giá rao chỉ so giá rao. Thiếu mẫu phù hợp → REVIEW, không gắn nhãn rẻ</td>
+</tr>
+<tr>
+<td>G3-02</td>
+<td>Tổng chi phí vào ở và giữ 10/20 năm</td>
+<td>Tách phí mua, sửa ban đầu, phí định kỳ, sửa lớn và chi phí bán; không đếm gốc vay hai lần</td>
+<td>Hồ sơ/phí/báo giá; thiếu khoản trọng yếu → REVIEW</td>
+</tr>
+<tr>
+<td>G3-03</td>
+<td>Chất lượng và bảo trì có cơ sở</td>
+<td>Căn hộ: quản lý/quỹ/kế hoạch/thực hiện. Nhà riêng: đất, kết cấu, mái/ống/chống thấm, khả năng sửa</td>
+<td>E3; E1 không đủ kết luận chất lượng thực</td>
+</tr>
+<tr>
+<td>G3-04</td>
+<td>Có nhóm người mua/thuê ở thực phù hợp</td>
+<td>Kiểu hộ, quy mô căn, mạng việc làm/kết nối hiện hữu và nhu cầu phân khúc</td>
+<td>Thống kê E2 cùng địa giới/kỳ; tăng dân số thành phố không thay bằng chứng phân khúc</td>
+</tr>
+<tr>
+<td>G3-05</td>
+<td>Khả năng thoát sau 10/20 năm</td>
+<td>Tuổi khi bán, thời hạn quyền đất, khả năng tiếp cận/cải tạo, nhóm người mua tiếp, rủi ro vay/bán</td>
+<td>Không giả định luôn được cho thuê bằng khoản vay để ở; cần điều kiện thực</td>
+</tr>
+<tr>
+<td>G3-06</td>
+<td>Kịch bản không tăng giá và bán sớm vẫn được hiểu</td>
+<td>Tách giá trị tài sản, dòng tiền chủ nhà và lợi ích ở; chi phí thoát và dư nợ; ghi rõ giả định</td>
+<td>Không gán tăng giá/xác suất mặc định; người mua chấp nhận kịch bản trước PASS</td>
+</tr>
+</tbody>
+</table>
+<p>PASS G3 yêu cầu mỗi mục áp dụng có evidence và nhận định reviewer rõ ràng; không có ngưỡng tài chính/định giá được chấp thuận thì REVIEW. FAIL là mâu thuẫn đã xác nhận với điều kiện của người mua, không phải kết luận tự động từ giá cao hơn trung vị.</p>
+<p>G3-06 phải xem thêm giảm giá và bán chậm theo mức stress được ghi rõ là giả định; không có xác suất mặc định. G3-03 gồm chứng từ hiệu suất năng lượng, thông gió/ẩm, quyền cải tạo và giới hạn của kiểm định; không dùng cải tạo nội thất để chứng minh chịu động đất.</p>
+<h2>7. G4 — Một thang 100 điểm, không trùng nguyên nhân</h2>
+<p>Chỉ áp cho từng căn/nhà đủ xác định, không trộn điểm dự án với căn. Điểm là công cụ ưu tiên thẩm định, không phải xác suất tăng giá hoặc khuyến nghị mua.</p>
+<p>Mỗi mục có <code>rating</code> 0–4 hoặc null. 0 = bất lợi đáng kể có bằng chứng; 1 = yếu hơn nhóm so; 2 = tương đương/không có lợi thế sau khi đã kiểm; 3 = có lợi thế rõ; 4 = lợi thế mạnh được kiểm chứng. Null = chưa biết, không phải 0 hoặc 2. Reviewer phải ghi nhóm so, evidence và lý do mức điểm; chỉ gán mức bằng quy tắc chuyên biệt trong bảng, không suy từ vẻ hấp dẫn của quảng cáo.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Nhóm / trọng số</th>
+<th>Nội dung kiểm để cho điểm và ranh giới tránh trùng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G4-P1</td>
+<td>Giá mua / 15</td>
+<td>Giá vào so giao dịch đã điều chỉnh: 0 bất lợi lớn không giải thích; 2 tương đương; 4 lợi thế lớn đã đối chiếu khác biệt/rủi ro. Không dùng giảm giá quảng cáo làm bằng chứng rẻ</td>
+</tr>
+<tr>
+<td>G4-P2</td>
+<td>Chi phí sở hữu / 10</td>
+<td>Chi phí 10/20 năm so sản phẩm thay thế: 0 nghĩa vụ cao chưa có lợi ích tương ứng; 2 tương đương; 4 lợi thế chi phí bền vững có hồ sơ. Không cộng lại chênh giá mua P1</td>
+</tr>
+<tr>
+<td>G4-Q1</td>
+<td>Chất lượng hiện tại / 10</td>
+<td>Kiểm định và mức sử dụng còn lại: 0 thiếu sót đáng kể đã xác minh; 2 mức thông thường; 4 chất lượng tốt chứng minh bằng hồ sơ/thực trạng. Không lấy mới xây làm 4 tự động</td>
+</tr>
+<tr>
+<td>G4-Q2</td>
+<td>Năng lực bảo trì / 10</td>
+<td>Quản lý/quỹ/thực hiện với condo; kế hoạch sửa và khả năng thực hiện với nhà riêng: 0 yếu đã xác minh; 2 đủ mức thông thường; 4 bền vững có lịch sử/nguồn lực. Chi phí tuyệt đối chỉ ở P2</td>
+</tr>
+<tr>
+<td>G4-Q3</td>
+<td>Thích ứng dài hạn / 5</td>
+<td>Mặt bằng, tiếp cận, quyền và khả năng cải tạo theo tuổi khi bán: 0 hạn chế đáng kể; 2 thông thường; 4 linh hoạt hơn nhóm so, có chứng cứ</td>
+</tr>
+<tr>
+<td>G4-L1</td>
+<td>Cầu ở thực / 10</td>
+<td>Hộ mục tiêu và việc làm đa dạng, dữ liệu đúng phân khúc: 0 suy yếu; 2 ổn định; 4 mạnh/đa dạng có chuỗi dữ liệu. Không đếm lượt khách du lịch là người mua ở</td>
+</tr>
+<tr>
+<td>G4-L2</td>
+<td>Kết nối hiện hữu / 8</td>
+<td>Tuyến/cửa ga/đường đi thực và điểm đến thị trường: 0 bất tiện tương đối; 2 tương đương; 4 lợi thế rõ so nhóm so. Không đưa ga chưa mở vào mục này</td>
+</tr>
+<tr>
+<td>G4-L3</td>
+<td>Cạnh tranh và khả năng bán lại / 7</td>
+<td>Sản phẩm thay thế, cung sắp bàn giao, nhóm mua tiếp và giao dịch: 0 cạnh tranh bất lợi; 2 cân bằng; 4 khan hiếm có cầu chứng minh. Ít tin không tự có điểm cao</td>
+</tr>
+<tr>
+<td>G4-U1</td>
+<td>Giao thông tương lai / 5</td>
+<td>Cơ chế cải thiện tiếp cận đúng căn, tiến độ/nguồn chính thức: 0 tác động ròng xấu; 2 đã kiểm và không có lợi thế; 4 cải thiện mạnh có cơ sở triển khai. Ý tưởng chưa chắc chắn tối đa 2; chưa nghiên cứu là null</td>
+</tr>
+<tr>
+<td>G4-U2</td>
+<td>Tái phát triển/việc làm tương lai / 5</td>
+<td>Công năng, tiến độ, đối tượng hưởng lợi, tiếng ồn/che sáng/cung mới: 0 ròng xấu; 2 không lợi thế; 4 lợi ích ròng mạnh có bằng chứng. Ý tưởng tối đa 2</td>
+</tr>
+<tr>
+<td>G4-U3</td>
+<td>Lợi ích còn lại sau mức giá đã phản ánh / 5</td>
+<td>Kiểm mức premium hiện tại so khu/căn thay thế và chi phí hưởng lợi: 0 kỳ vọng đắt/rủi ro bất lợi; 2 không thấy upside thêm; 4 lợi ích chưa phản ánh có bằng chứng so sánh. Thiếu comparables → null</td>
+</tr>
+<tr>
+<td>G4-S1</td>
+<td>Di chuyển cá nhân / 4</td>
+<td>Cửa–cửa tới điểm đến người dùng xác nhận, giờ/đổi tàu/tiếp cận: 0 không thuận; 2 đáp ứng thông thường; 4 rất phù hợp. Chưa biết điểm đến → null</td>
+</tr>
+<tr>
+<td>G4-S2</td>
+<td>Giáo dục/chăm sóc / 2</td>
+<td>Nhu cầu cụ thể, tuyến trường/chỗ học thực, lộ trình: 0 không phù hợp; 2 đáp ứng; 4 phù hợp rõ. Không suy trường tốt từ gần trường</td>
+</tr>
+<tr>
+<td>G4-S3</td>
+<td>Tiện ích và môi trường / 4</td>
+<td>Mua sắm/y tế/công viên, nắng/ồn, tiếp cận sinh hoạt: 0 bất lợi; 2 thông thường; 4 lợi thế được kiểm. Không dùng lại ga/dự án làm điểm độc lập</td>
+</tr>
+</tbody>
+</table>
+<p>Các mức 1 và 3 là bằng chứng nằm giữa hai mốc liền kề, reviewer phải giải thích. Tổng nhóm: P=25, Q=25, L=25, U=15, S=10. Điểm pháp lý/an toàn không nằm trong 100 điểm; đó là điều kiện gate.</p>
+<h3>Tính điểm và độ phủ</h3>
+<ul>
+<li><code>known_weight = sum(weight)</code> của mục có rating và bằng chứng đủ cấp/phạm vi; <code>coverage = known_weight / 100</code>.</li>
+<li><code>score_observed = sum(weight * rating / 4)</code> trên mục đã biết; không hiển thị riêng như điểm tổng khi coverage &lt;100%.</li>
+<li><code>score_lower = score_observed</code>; <code>score_upper = score_observed + (100-known_weight)</code>. Đây là biên do thiếu dữ liệu, <strong>không phải khoảng tin cậy thống kê</strong>. Không chuẩn hóa điểm đã biết lên 100.</li>
+<li>Chỉ ghi <code>score_total/100</code> khi đủ 100 điểm trọng số có bằng chứng. Khi thiếu, hiển thị khoảng, coverage, số mục thiếu và điểm theo từng nhóm.</li>
+<li>NA trong thang điểm không được phân bổ lại trọng số tùy căn. Nếu người mua không cần giáo dục, cần profile trọng số mới áp nhất quán cho toàn cohort; cho đến lúc đó S2=null. NA hợp lệ của checklist G1–G3/G5 không làm tăng điểm G4.</li>
+<li>Không xuất thứ hạng số chung cho các căn chưa đủ dữ liệu. Với cùng loại nhà và cùng profile: chỉ kết luận A chắc hơn B theo thang hiện tại khi lower(A)&gt;upper(B); khoảng chồng lấn → chưa phân thứ tự. Full-score xếp giảm dần; hòa điểm giữ đồng hạng. Không gọi đây là chắc chắn hơn về giá tương lai.</li>
+<li>Hàng đợi nghiên cứu có thể sắp bằng lower giảm dần, coverage giảm dần, URL để ổn định, nhưng phải ghi <code>research_priority</code>, không gọi là thứ hạng đầu tư. Căn có lỗi trọng yếu chưa giải quyết luôn nằm ở nhóm riêng, không bị điểm cao che khuất.</li>
+</ul>
+<p><code>event_id</code> chung cho một dự án/ga và các tác động liên quan. L2 chấm kết nối đang vận hành, U1 chấm thay đổi tương lai; cùng một cải thiện không cho cả hai. L3 đo cung/cầu thay thế, U3 kiểm premium; P1 đo mức giá mua so chất lượng hiện tại. Reviewer ghi <code>double_count_check</code> cho các cặp P1/U3, L1/U2, L2/U1 và L3/U2. Nếu chưa phân tách được tác động, mục phụ thuộc để null kèm <code>overlapping_evidence</code>.</p>
+<h3>Điều kiện score, cohort và G4</h3>
+<ul>
+<li><code>score_state=COMPLETE</code> khi đủ14 rating có evidence đạt yêu cầu; còn lại INCOMPLETE; chưa chạy scoring là NOT_EVALUATED. G4 chỉ PASS khi G1–G3 PASS, availability=active, score_state=COMPLETE và kiểm double-count hoàn tất. Có điểm đầy đủ nhưng G2 REVIEW → G4 REVIEW; điểm thấp không tự FAIL G4.</li>
+<li><code>gate_qualified</code> = G1–G3 PASS. <code>ranking_eligible</code> = gate_qualified + active + score COMPLETE + double-count clear. Chỉ ranking_eligible mới thuộc ranked_ready. Gate-qualified nhưng score thiếu ở review_required với reason <code>score_incomplete</code>.</li>
+<li>Cohort cố định theo loại nhà, mới/cũ, quyền đất, policy/profile version. Comparables phải thêm diện tích/tuổi/vùng tiếp cận/kỳ giao dịch phù hợp; reviewer công bố cách chọn và khác biệt. Không so rank condo với nhà riêng hoặc đổi cohort riêng để nâng một căn.</li>
+<li>P1 cần giao dịch E2 phù hợp và adjustment memo; P2 cần khoản chi trọng yếu E2/E3; Q1/Q2/Q3 cần hồ sơ/quan sát E3 đúng nội dung; L1/L3 cần dữ liệu thị trường/thống kê E2; L2 cần tuyến/cửa ga/lộ trình E2; U1/U2 cần tiến độ chính thức E2; U3 cần P1 cùng evidence premium; S1 cần nhu cầu đã xác nhận + lộ trình; S2 cần nhu cầu + nguồn trường/cơ sở; S3 cần nguồn tiện ích và quan sát phù hợp. Không đủ cấp/phạm vi, conflict chưa giải quyết hoặc freshness chưa kiểm thì rating=null.</li>
+<li>“Lợi thế lớn” không có ngưỡng số phổ quát trong chuẩn này: không cho agent tự suy số. Trước chấm từng cohort, Terra đề xuất comparison memo có ranh giới 0/2/4 và cách nội suy 1/3 theo dữ liệu thực; parent duyệt và khóa <code>rubric_revision</code>. Chưa có memo → rating null. Nếu thay rubric, chấm lại toàn cohort, không sửa riêng một căn.</li>
+<li>Evidence ledger có evidence_id → claim_id → effect_id → score_owner_id. Cùng effect chỉ có một score owner; E1 được dùng để định hướng nghiên cứu, không làm nguồn duy nhất để đạt full score. L2 và S1 chỉ cùng có điểm nếu tách được lợi thế thị trường và tiện ích cá nhân thực; không tách được thì mục phụ thuộc null.</li>
+<li>Coverage đo đủ dữ liệu theo trọng số, không đo độ chắc chắn của dự báo. Report thêm cấp bằng chứng, conflicts và rubric revision.</li>
+</ul>
+<h2>8. G5 — Quyết định giao dịch</h2>
+<p>Không có G5 PASS bằng crawler. Gate này yêu cầu hồ sơ căn cụ thể và xác nhận của con người ở đúng thời điểm.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Checklist cần hoàn tất</th>
+<th>Bằng chứng / thời điểm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G5-01</td>
+<td>Chủ bán, đại diện, môi giới, phí và kênh thanh toán đã xác minh</td>
+<td>Hồ sơ chủ thể/ủy quyền/giấy phép và người kiểm chứng; trước chuyển tiền/cam kết</td>
+</tr>
+<tr>
+<td>G5-02</td>
+<td>Giá đề nghị và tổng chi đã cập nhật theo kiểm định</td>
+<td>Biên bản xem nhà, phạm vi kiểm định, báo giá sửa; so sánh mua/thuê và kịch bản G3-06 được người mua chấp nhận</td>
+</tr>
+<tr>
+<td>G5-03</td>
+<td>Quyền, ranh, đường, quản lý và thông tin trọng yếu được giải thích</td>
+<td>Hồ sơ áp dụng cho căn; chuyên gia phù hợp xử lý mâu thuẫn; các mục G2/G3 còn REVIEW phải đóng</td>
+</tr>
+<tr>
+<td>G5-04</td>
+<td>Vay, vốn, bảo hiểm và lịch thanh toán khả thi</td>
+<td>Điều kiện ngân hàng có văn bản, mốc cọc/giải ngân, bảo hiểm; kiểm trước từng nghĩa vụ ràng buộc, không đợi sau khi cọc</td>
+</tr>
+<tr>
+<td>G5-05</td>
+<td>Hợp đồng/cọc/điều kiện hủy và chế tài được hiểu</td>
+<td>Bản điều khoản cụ thể, điều kiện khoản vay, hạn thông báo, thiết bị/tài sản để lại; người mua/chuyên gia xác nhận</td>
+</tr>
+<tr>
+<td>G5-06</td>
+<td>Khuyết tật, bảo hành, thuế và đứng tên đã làm rõ</td>
+<td>Phạm vi trách nhiệm, thời hạn/thủ tục, ưu đãi thực đủ điều kiện; kiểm phiên bản quy định hiện hành với chuyên gia</td>
+</tr>
+<tr>
+<td>G5-07</td>
+<td>Bàn giao/đăng ký/giải chấp và nhà mới đang xây có kế hoạch</td>
+<td>Checklist nghiệm thu, lỗi/sửa, chậm tiến độ/thay đổi thiết kế, hồ sơ/chìa khóa, trình tự tiền–quyền–tài sản</td>
+</tr>
+<tr>
+<td>G5-08</td>
+<td>Quyết định và kế hoạch sau mua được ghi nhận</td>
+<td>Người mua quyết định; giới hạn giá/điều kiện; lịch bảo trì và giữ hồ sơ; phương án bán sớm/giữ lâu. Không tự giao dịch bởi agent</td>
+</tr>
+</tbody>
+</table>
+<p>G5 là checklist nhiều mốc: trước đề nghị có ràng buộc, trước ký/cọc, trước giải ngân/bàn giao. PASS cuối chỉ khi tất cả mục áp dụng đã hoàn tất; trước đó có thể có quyết định đàm phán có điều kiện, không phải giấy phép tự ký/chuyển tiền.</p>
+<p><code>G5_stage</code> và due_checks phải tách để không đòi hoàn tất bàn giao trước khi ký:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Mục phải được kiểm ở mốc này</th>
+<th>Ai xác nhận / điều kiện dừng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>before_binding_offer</td>
+<td>G5-01/02, phần nghĩa vụ ràng buộc G5-04/05, quyết định có điều kiện G5-08</td>
+<td>Người mua; unresolved nghĩa vụ tài chính/quyền hoặc điều khoản đề nghị → chưa cam kết</td>
+</tr>
+<tr>
+<td>before_signing_deposit</td>
+<td>G5-01…06 và kế hoạch G5-07/08</td>
+<td>Người mua + chuyên môn theo hồ sơ; mục đến hạn REVIEW/FAIL → dừng ký/chuyển cọc</td>
+</tr>
+<tr>
+<td>before_settlement_handover</td>
+<td>Tái xác nhận G5-03/04/05/06; thực hiện G5-07; kế hoạch G5-08</td>
+<td>Người mua, ngân hàng và người phụ trách quyền/kiểm tra; điều kiện thanh toán/bàn giao chưa đủ → giữ lại để xử lý</td>
+</tr>
+<tr>
+<td>after_handover</td>
+<td>Hoàn tất/ghi lỗi G5-07, hồ sơ và lịch G5-08</td>
+<td>Người mua, người xử lý sửa/bảo hành; ghi người chịu trách nhiệm và hạn thông báo lỗi</td>
+</tr>
+</tbody>
+</table>
+<p>Mỗi check có stage_state và evidence phiên bản; stage PASS không phải G5 cuối PASS. G5-06 tách phạm vi bảo hành/trách nhiệm theo luật, hợp đồng hậu mãi và bảo hiểm nhà mới; không coi ba thứ tương đương. Thuế/đứng tên kiểm nguồn tiền góp và tỷ lệ quyền; số liệu nằm private. G5-07/08 giữ người phụ trách, lịch sửa và hạn thông báo lỗi, không chờ sau mua mới nghĩ tới.</p>
+<h2>9. Ma trận bao phủ tài liệu cũ</h2>
+<table>
+<thead>
+<tr>
+<th>Nguồn</th>
+<th>Gate/checklist kế thừa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>J01</td>
+<td>G1-05/06, G3-06, G5-02/08</td>
+</tr>
+<tr>
+<td>J02</td>
+<td>G2-01/02, G3-02/06, G5-04</td>
+</tr>
+<tr>
+<td>J03</td>
+<td>G2-03, G5-04</td>
+</tr>
+<tr>
+<td>J04</td>
+<td>G5-01</td>
+</tr>
+<tr>
+<td>J05</td>
+<td>G2-04, G5-03/07</td>
+</tr>
+<tr>
+<td>J06</td>
+<td>G2-05, G3-03/05, G5-03</td>
+</tr>
+<tr>
+<td>J07</td>
+<td>G2-06, G3-03, G5-02/03</td>
+</tr>
+<tr>
+<td>J08</td>
+<td>G2-08, G3-02/03, G5-03</td>
+</tr>
+<tr>
+<td>J09</td>
+<td>G2-07, G5-04</td>
+</tr>
+<tr>
+<td>J10</td>
+<td>G2-06, G3-02/03, G4-Q/S, G5-02</td>
+</tr>
+<tr>
+<td>J11</td>
+<td>G1-06, G4-S1/S2/S3</td>
+</tr>
+<tr>
+<td>J12</td>
+<td>G3-01/04/05, G4-P/L/U3, G5-02</td>
+</tr>
+<tr>
+<td>J13</td>
+<td>G5-05</td>
+</tr>
+<tr>
+<td>J14</td>
+<td>G5-06/07</td>
+</tr>
+<tr>
+<td>J15</td>
+<td>G2-01, G5-06</td>
+</tr>
+<tr>
+<td>J16</td>
+<td>G3-05/06, G5-07/08</td>
+</tr>
+<tr>
+<td>A giao thông</td>
+<td>G4-L2/U1/S1, phân biệt tác động thị trường và tiện ích cá nhân</td>
+</tr>
+<tr>
+<td>B tái phát triển</td>
+<td>G4-U2/U3</td>
+</tr>
+<tr>
+<td>C nhu cầu dân cư</td>
+<td>G3-04, G4-L1</td>
+</tr>
+<tr>
+<td>D cung cạnh tranh</td>
+<td>G3-05, G4-L3/U3</td>
+</tr>
+<tr>
+<td>E tiện ích hiện hữu</td>
+<td>G1-06, G4-L2/S1/S2/S3</td>
+</tr>
+<tr>
+<td>F thiên tai/môi trường</td>
+<td>G2-07, G4-S3 cho tiện nghi; hazard không bị điểm bù</td>
+</tr>
+<tr>
+<td>G giá/giao dịch</td>
+<td>G3-01/02/06, G4-P1/P2/U3</td>
+</tr>
+<tr>
+<td>H chất lượng/quyền/tuổi bán</td>
+<td>G2-04/05/06/08, G3-03/05, G4-Q1/Q2/Q3</td>
+</tr>
+</tbody>
+</table>
+<h2>10. Áp dụng vào v2 và đầu ra bắt buộc</h2>
+<p>Input bất biến: <code>output/ver2.0-20261102/catalog/all-listings.csv</code> (11.463 URL), SQLite catalog và bằng chứng đã lưu. 1.754 ứng viên giá exact của pipeline cũ là <strong>baseline để đối chiếu</strong>, không phải danh sách đã PASS gate. 1.751 active, 2 not_found, 1 unverified ở lượt kiểm trước; khi triển khai phải tính lại từ file và giữ ngày kiểm gốc. Không chỉ đọc 1.751 hàng HTML vì sẽ làm mất dự án, ca lỗi và các ứng viên cần làm rõ.</p>
+<p>Dữ liệu danh sách được thu 02/11/2026; kiểm link kéo sang 03/11 JST. Còn thiếu route căn hộ mới ở 6 quận. Run đánh giá mới không được gọi là crawl toàn bộ thị trường hôm nay.</p>
+<p>Output mới <code>output/ver2.0-20261102/gates/&lt;evaluation_run_id&gt;/</code>, không ghi đè snapshot/public v2 hiện hành:</p>
+<ol>
+<li><code>run-manifest.json</code>: hash input, policy/profile versions, mốc dữ liệu, phạm vi, giới hạn, counters.</li>
+<li><code>criteria-results.csv</code>: mỗi URL × mỗi checklist áp dụng, kể cả REVIEW/NA; reason và evidence_ref.</li>
+<li><code>listing-decisions.csv</code>: scope, availability, G1…G5, highest_passed_gate, blockers, missing, next action, public-safe profile dependency.</li>
+<li><code>scores.csv</code>: 14 mục G4, rating/null, weight, evidence, biên điểm và coverage; điểm sơ bộ tách khỏi quyết định gate.</li>
+<li><code>research-queue.csv</code>, <code>review-required.csv</code>, <code>excluded.csv</code>, <code>projects-review.csv</code>: mỗi view có định nghĩa; view có thể giao nhau nhưng báo cáo phải dùng bucket disposition duy nhất khi cộng tổng.</li>
+<li><code>evidence.csv</code> và <code>gate-evaluation.sqlite</code>: provenance và kết quả; bản public loại bỏ private_ref nhạy cảm, nội dung tài chính và đường dẫn máy cá nhân.</li>
+<li><code>index.html</code>: lọc theo gate/trạng thái/loại/quận; lý do, bằng chứng, thiếu gì, ngày dữ liệu; giữ sao theo URL và key cũ.</li>
+<li><code>quality-report.md</code>: số lượng từng nhánh, lỗi, độ phủ; không giả tất cả đã được đánh giá đầy đủ.</li>
+</ol>
+<p><code>disposition</code> duy nhất để đối soát số URL canonical: out_of_scope → project_queue → scope_review → unavailable → confirmed_fail → review_required → ranked_ready (xét theo thứ tự này). unavailable chỉ cho expired/not_found; trạng thái unverified/network_error/not_checked/redirect_unverified/access_blocked chưa đủ để rank, vào review_required hoặc scope_review. confirmed_fail vẫn được lưu trong checklist dù disposition ưu tiên khác. Report riêng nghiên cứu có điều kiện nằm trong review_required, không trộn ranked_ready.</p>
+<p>Giữ <code>source_row_id</code> và mọi dòng raw; view unique khử trùng URL có bảng mapping raw→canonical, mỗi raw row kế thừa disposition URL, nghi cùng căn khác URL không gộp. Báo cả raw_row_count, unique_url_count và duplicate_row_count; cộng disposition theo unique_url_count, không so nhầm với raw rows.</p>
+<h3>Mapping input và xuất bản</h3>
+<p>CSV catalog: url→listing_url; category/listing_level→scope hints (unverified_unit vẫn chưa xác nhận căn); price_jpy JPY exact nullable cùng price_raw; land/building/unit_m2 giữ riêng m²; address/ward chưa thay tọa độ; built_year khác completion_raw dự kiến; station_raw là claim; observed_at là thời điểm crawler quan sát. Ngày đăng/cập nhật do nguồn công bố, nếu có, lưu riêng source_updated_at, không suy từ observed_at. Fields chi tiết replay từ cache và <code>detail_claims</code>, không chỉ dùng 40 detail mẫu ban đầu.</p>
+<p>Join availability theo URL từ <code>preferred-link-audit/checks.json</code>; ngoài tập đó có thể dùng <code>link-audit/checks.json</code> như bằng chứng bổ sung nếu hash/timestamp hợp lệ. Nếu có nhiều record, dùng record mới nhất còn hợp lệ; bất đồng classification/evidence → REVIEW và giữ cả nguồn. Không có check → not_checked. Không đổi observed_at khi join. Missing reasons: not_collected, not_disclosed, parse_error, source_blocked, unknown, not_applicable; chưa đánh giá còn có assessment_status riêng.</p>
+<p>Bản public dùng allowlist field/value và reason template cố định, không chỉ xóa tên cột private. Review cả free text reason/blockers/next_action, logs, manifests, SQLite và HTML; private reference được thay bằng mã dependency chung. Không đưa private database vào bundle rồi hy vọng redaction đủ. Trước commit so danh sách file, nội dung và diff remote hiện tại; không xóa hoặc viết lại lịch sử Git trong task này.</p>
+<h2>11. Điều kiện nghiệm thu chuẩn triển khai</h2>
+<ul>
+<li>Không làm mất URL gốc; đúng đơn vị tiền/diện tích, giá khoảng không trở thành giá căn.</li>
+<li>Mọi FAIL/PASS có rule và evidence; thiếu dữ liệu không sinh PASS/FAIL, trừ ngoài phạm vi rõ ràng.</li>
+<li>G1…G5 và trạng thái link tách biệt; gate không được nhảy; private dependency được giữ REVIEW.</li>
+<li>Đủ mapping J01–J16 và A–H; cùng nguyên nhân không cộng hai lần.</li>
+<li>14 mục điểm có trọng số tổng 100; null giữ null, khoảng bao trùm bất định do thiếu; không có thứ hạng chính thức khi chưa đủ điều kiện.</li>
+<li>Nhà mới/dự án/giá chưa công bố có hàng đợi cụ thể; không bị lặng lẽ biến mất.</li>
+<li>Kiểm hồ sơ/snapshot bằng chứng, test ca thiếu/mâu thuẫn/lỗi; count/SQLite/HTML khớp; sao không mất.</li>
+<li>Tài chính, giấy tờ và thông tin cá nhân không lên public Git; chỉ tài liệu chuẩn và output đã làm sạch.</li>
+<li>Không thay trang public bằng một danh sách rỗng chỉ vì gate tài chính chưa đủ; UI phải thể hiện hàng đợi nghiên cứu và lý do.</li>
+</ul>
+<p>Nguồn pháp lý/tài chính chi tiết tiếp tục tham chiếu tài liệu gốc; trước khi đánh giá căn hoặc giao dịch phải kiểm lại nguồn hiện hành. Chuẩn này không đưa kết luận pháp lý hay mức vay mới.</p>
+<hr><section id="plan"><h1>Áp dụng 5 gate vào v2 — kế hoạch thực thi</h1>
+<blockquote>
+<p>For agentic workers: triển khai theo <code>subagent-driven-development</code> khi bắt đầu giai đoạn code, từng task có test và review độc lập. Hiện tại chỉ chuẩn hóa tài liệu, kiểm kê input và planning; không chạy filter mới hay thay giao diện v2 trong lượt lập kế hoạch này.</p>
+</blockquote>
+<p><strong>Goal:</strong> đánh giá toàn bộ snapshot v2 theo <a href="../standards/HOUSING-GATES-v1.0.md">HOUSING-GATES-v1.0</a>, xuất checklist kiểm được cho từng tin, nhánh nghiên cứu, điểm có mức độ đủ dữ liệu và UI minh bạch.</p>
+<p><strong>Architecture:</strong> input v2 bất biến → chuẩn hóa facts/evidence → gate engine thuần → enrichment theo hàng đợi → scoring → output độc lập → review → xuất bản. Tái sử dụng trang chi tiết đã lưu; không crawl lại toàn SUUMO. Private buyer profile nằm ngoài thư mục public.</p>
+<p><strong>Tech Stack:</strong> Python hiện có, CSV/JSON/SQLite, HTML hiện có, Playwright cho kiểm giao diện, GitHub connector/API cho xuất bản. Không cài thư viện hoặc hệ thống mới nếu chưa có nhu cầu thực tế.</p>
+<h2>1. Các ràng buộc chung</h2>
+<ul>
+<li>Chuẩn duy nhất: <code>policy_version=HOUSING-GATES-1.0</code>, 5 gate, 42 mục kiểm/chấm điểm, 14 mục điểm tổng 100.</li>
+<li>Dữ liệu đầu vào: catalog v2 có 11.463 URL, baseline 1.754 ứng viên giá exact; kết quả kiểm link cũ 1.751 active / 2 not_found / 1 unverified. Tính lại con số từ file khi chạy, không hardcode kết quả nghiệp vụ.</li>
+<li>Ngày catalog 02/11/2026, kiểm link sang 03/11 JST; policy/run date không đổi ngày nguồn. 6 route new-condo chưa phát hiện phải còn trong coverage.</li>
+<li>Mỗi URL luôn có disposition duy nhất để đối soát. Dự án/giá khoảng có queue riêng; không đánh giá như căn đơn.</li>
+<li>E1 quảng cáo không tự xác nhận tài chính/pháp lý/kỹ thuật. Null khác 0; NOT_EVALUATED khác REVIEW và PASS; bất kỳ FAIL phải có rule và bằng chứng. G4 có score_state riêng, G5 có stage_state; không nhảy gate.</li>
+<li>Chưa có private input thì giữ REVIEW và nghiên cứu có điều kiện, không ra kết luận ngân sách hoặc khả năng mua.</li>
+<li>Bản public không chứa profile, tài chính, giấy tờ cá nhân hoặc đường dẫn máy. Không sao chép dữ liệu thật vào fixtures.</li>
+<li>Không tự thêm tuổi tối đa, diện tích tối thiểu, phút ga tối đa hay ngưỡng stress. Không tự gọi agent/model khác loại được phân công.</li>
+<li>Không sửa <code>catalog</code>, <code>crawl</code>, <code>link-audit</code>, <code>preferred-link-audit</code> hoặc <code>public</code> lịch sử. Output nằm dưới <code>gates/&lt;run_id&gt;</code>; publication mới tách version.</li>
+<li>Chỉ một client SUUMO khi thực sự cần tải thêm; khoảng cách tối thiểu 3 giây hoặc delay lớn hơn của nhóm UA phù hợp; dừng khi 401/403/429/challenge. Không dùng scope mới để bỏ qua access-stop. Không tải thêm nếu cache đủ.</li>
+<li>Dữ liệu nguồn ngoài chỉ thu theo nhu cầu tiêu chí và từ nguồn được phép; không mua dữ liệu, liên hệ bên thứ ba hay gửi hồ sơ. Chỉ dẫn mới về network phải ghi vào run manifest.</li>
+</ul>
+<h2>2. Phân vai theo độ phức tạp</h2>
+<table>
+<thead>
+<tr>
+<th>Vai</th>
+<th>Model</th>
+<th>Trách nhiệm</th>
+<th>Không tự làm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chủ trì</td>
+<td>Agent chính</td>
+<td>Suy luận, policy, chốt interface, phân xử review, kiểm nghiệm thu, quyết định có đủ cơ sở xuất bản</td>
+<td>Không coi báo cáo subagent là kiểm chứng cuối</td>
+</tr>
+<tr>
+<td>Terra-Policy/Engine</td>
+<td>GPT-6.1 Terra high</td>
+<td>State machine, schema, gate dependencies, evidence resolution, scoring intervals, xử lý mâu thuẫn</td>
+<td>Không tự thay mục tiêu/ngưỡng cá nhân</td>
+</tr>
+<tr>
+<td>Terra-Research</td>
+<td>GPT-6.1 Terra high</td>
+<td>Thiết kế ghép vị trí/hazard/comparables/dự án; đánh giá ý nghĩa, độ phủ, chống cộng trùng</td>
+<td>Không kết luận pháp lý hoặc dùng tọa độ thô như vị trí căn</td>
+</tr>
+<tr>
+<td>Terra-Reviewer</td>
+<td>GPT-6.1 Terra high, instance độc lập</td>
+<td>Review logic, false-pass/false-fail, provenance, quyền riêng tư, nghiệm thu mẫu</td>
+<td>Không tự review phần mình vừa triển khai</td>
+</tr>
+<tr>
+<td>Luna-Data</td>
+<td>GPT-6 Luna medium</td>
+<td>Kiểm kê, trích fields theo schema đã chốt, replay HTML, batch offline, xuất CSV/SQLite, đếm và lập missingness</td>
+<td>Không tự định rubric hay kết luận căn tốt/xấu</td>
+</tr>
+<tr>
+<td>Luna-View/Runner</td>
+<td>GPT-6 Luna medium</td>
+<td>Hiển thị schema đã ổn định, giữ sao, chạy test/script được bàn giao, đóng gói output</td>
+<td>Không sửa policy để làm số lượng đẹp hơn</td>
+</tr>
+</tbody>
+</table>
+<p>Tối đa 3 subagent cùng lúc cộng agent chính. Không để hai agent sửa cùng file. Vai có thể dùng lại slot tuần tự; reviewer phải là instance khác người viết task. Không dùng Luna 6.1 vì lựa chọn hiện có và yêu cầu là Luna 6.</p>
+<p><strong>Trong lượt planning:</strong> Terra chỉ review tài liệu; Luna chỉ kiểm kê input đọc local. Các task triển khai dưới đây đều chưa chạy.</p>
+<h2>3. Thứ tự và phụ thuộc</h2>
+<pre><code class="language-mermaid">flowchart LR
+    T0[T0: khóa chuẩn + input] --&gt; T1[T1: schema + rule manifest]
+    T1 --&gt; T2[T2: replay facts/evidence]
+    T1 --&gt; T3[T3: gate engine + scoring]
+    T2 --&gt; T4[T4: chạy baseline offline]
+    T3 --&gt; T4
+    T4 --&gt; T5[T5: enrichment pilot có mục tiêu]
+    T5 --&gt; T6[T6: tái đánh giá + mở rộng theo chất lượng]
+    T6 --&gt; T7[T7: HTML + xuất dữ liệu]
+    T7 --&gt; T8[T8: review + publish]
+</code></pre>
+<p>T2 và T3 chạy song song sau khi T1 được parent chốt. T5 có thể chuẩn bị source registry song song T2/T3 nhưng chưa tải hàng loạt hoặc gắn score. T7 chỉ dùng schema đã chốt, không tự thêm nhãn “đạt mua”.</p>
+<h2>4. File và interface dự kiến</h2>
+<table>
+<thead>
+<tr>
+<th>File tạo mới</th>
+<th>Trách nhiệm / owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gate_policy.json</code>, <code>gate_models.py</code></td>
+<td>IDs, weights, enum, rule/applicability và schema — Terra-Engine</td>
+</tr>
+<tr>
+<td><code>gate_extract.py</code></td>
+<td>Adapt <code>detail_claims</code> và CSV sang facts có evidence — Luna-Data</td>
+</tr>
+<tr>
+<td><code>gate_engine.py</code>, <code>gate_score.py</code></td>
+<td>Pure evaluation, state/score không gọi mạng — Terra-Engine</td>
+</tr>
+<tr>
+<td><code>gate_enrichment.py</code>, <code>gate_sources.json</code></td>
+<td>Ghép nguồn ngoài được kiểm chứng, precision, event_id — Terra-Research</td>
+</tr>
+<tr>
+<td><code>run_gate_evaluation.py</code>, <code>export_gate_results.py</code></td>
+<td>Orchestration offline và output riêng — Luna-Data</td>
+</tr>
+<tr>
+<td><code>build_gate_view.py</code>, <code>publish_gate_results.py</code></td>
+<td>View và publisher tách khỏi v2 gốc — Luna-View, parent phụ trách publication</td>
+</tr>
+<tr>
+<td><code>tests/test_gate_policy.py</code>, <code>test_gate_extract.py</code>, <code>test_gate_engine.py</code>, <code>test_gate_score.py</code>, <code>test_gate_exports.py</code></td>
+<td>Fixture synthetic, oracle độc lập, không dữ liệu tài chính thật</td>
+</tr>
+</tbody>
+</table>
+<p>Không đổi hành vi <code>run_v2_pipeline.py</code>/<code>finalize_v2.py</code> cũ để giả v2 đã chạy gate. Có thể tái dùng helper nhưng không sửa snapshot cũ.</p>
+<p>Các interface công khai phải thống nhất từ T1:</p>
+<pre><code class="language-python">load_policy(path: Path) -&gt; dict
+extract_facts(row: dict, acquisitions: list[dict]) -&gt; dict
+evaluate_listing(facts: dict, policy: dict, buyer_profile: dict | None) -&gt; dict
+score_listing(ratings: dict, policy: dict) -&gt; dict
+enrich_listing(facts: dict, source_records: list[dict], policy: dict) -&gt; dict
+export_results(results: list[dict], output: Path, manifest: dict) -&gt; dict
+build_gate_view(decisions_csv: Path, scores_csv: Path, output: Path) -&gt; None
+</code></pre>
+<p><code>facts</code>: <code>listing_url</code>, <code>fields</code>, <code>evidence</code>, <code>conflicts</code>, <code>availability</code>, <code>scope_hints</code>. Mỗi field gồm value/raw/evidence_ids/missing_reason; không có giá trị dùng null. <code>buyer_profile=None</code> là chưa có dependency tài chính, không phải chi phí bằng 0.</p>
+<p><code>result</code>: URL, scope_status, availability, checklist list, gates G1…G5, highest_passed_gate, disposition, blockers, next_actions, evidence references, score object. Score object có item ratings, known_weight, coverage, lower, upper, total (nullable), ranking_eligibility và lý do. <code>reviewed_rating</code> do reviewer cung cấp qua file riêng, engine không tự sinh nhận định chủ quan từ keyword quảng cáo.</p>
+<h2>5. Task thực thi và tiêu chí bàn giao</h2>
+<h3>T0 — Khóa chuẩn, kiểm kê và lưu Git</h3>
+<p>Owner: parent; Terra review tài liệu, Luna inventory. Đây là deliverable của lượt hiện tại.</p>
+<ul>
+<li>[ ] Lưu chuẩn có ID, checklist, state/evidence, rubric, crosswalk và plan.</li>
+<li>[ ] Review đủ J01–J16/A–H, trọng số 100, nhánh REVIEW không bị gọi PASS.</li>
+<li>[ ] Kiểm số dòng/field/nguồn bằng local file; phân biệt policy đã lưu và engine chưa có.</li>
+<li>[ ] Lưu file public-safe vào <code>housing/docs/</code> trên Git; đọc lại so byte/hash; không sửa trang nhà hiện hành.</li>
+</ul>
+<p>Exit: docs commit + inventory + review response, không có claim “đã lọc theo gate”.</p>
+<h3>T1 — Schema và policy manifest</h3>
+<p>Owner: Terra-Engine. Reviewer: parent, sau đó Terra-Reviewer khi tích hợp.</p>
+<ul>
+<li>[ ] Viết fixture kỳ vọng 42 ID duy nhất, đủ 14 score item, weight sum 100, mọi J/A–H có mapping.</li>
+<li>[ ] Chạy <code>python -m unittest discover -s tests -p test_gate_policy.py</code>; xác nhận lỗi thiếu schema trước khi triển khai.</li>
+<li>[ ] Tạo JSON từ document; validate enum, applicability và required evidence. Không copy dữ liệu người dùng vào policy.</li>
+<li>[ ] Chạy lại test; parent so rule ID/weight/doc. Khóa policy hash và interface để T2/T3 dùng chung.</li>
+</ul>
+<p>Ví dụ assertion bắt buộc:</p>
+<pre><code class="language-python">assert sum(x['weight'] for x in policy['score_items']) == 100
+assert len({x['id'] for x in policy['criteria']}) == 42
+assert policy['missing_state'] == 'REVIEW'
+</code></pre>
+<p>Exit: manifest/schema có test; mọi thay đổi sau đó tăng version hoặc có migration rõ ràng trước run thật.</p>
+<h3>T2 — Trích facts/evidence từ cache</h3>
+<p>Owner: Luna-Data. Dependency T1. Reviewer: Terra-Research.</p>
+<ul>
+<li>[ ] Viết fixture giá exact/range/undisclosed, tháng/năm hoàn thành dự kiến, phí tháng/một lần, leasehold, owner-change, đường/khả năng xây lại, nhà liền kề.</li>
+<li>[ ] Chạy <code>python -m unittest discover -s tests -p test_gate_extract.py</code> trước/sau implementation.</li>
+<li>[ ] Dùng <code>detail_claims</code> hiện có nếu đủ; preserve raw label và acquisition hash/timestamp. Một field nhiều nguồn bất đồng tạo conflict, không âm thầm lấy giá trị thuận lợi.</li>
+<li>[ ] Replay các trang đã lưu của ứng viên; chỉ ghi URL chưa có detail vào missing queue, không tải mới ở T2.</li>
+<li>[ ] Xuất bảng missingness theo category × criterion; kiểm mẫu raw DOM độc lập với parser.</li>
+</ul>
+<p>Oracle: <code>3900–5200万円</code> không thành exact 3900; <code>未定</code> là null; construction future không thành tuổi âm; thiếu phí không bằng 0; parse được <code>再建築不可</code> tạo risk claim REVIEW, không tự kết luận pháp lý.</p>
+<p>Exit: facts có provenance cho mỗi field, giữ mọi URL và dự án, không network.</p>
+<h3>T3 — Gate engine và score engine thuần</h3>
+<p>Owner: Terra-Engine. Dependency T1. Reviewer độc lập: Terra-Reviewer.</p>
+<ul>
+<li>[ ] Viết unit tests cho status aggregation (FAIL &gt; REVIEW &gt; NOT_EVALUATED &gt; PASS), applicability, scope/disposition priority, consecutive gate, evidence insufficient, conflicts, private missing, G5_stage và NA khoản vay khi mua không vay đã xác nhận.</li>
+<li>[ ] Viết score tests trước implementation: null khác 0, không chuẩn hóa thiếu dữ liệu lên 100, không tự đổi weights do NA, interval overlap không sinh rank chắc chắn.</li>
+<li>[ ] Implement <code>evaluate_listing</code> và <code>score_listing</code> không I/O mạng; evidence-level decision tách khỏi keyword extraction.</li>
+<li>[ ] Test invariant bằng fixture synthetic: điểm 100 không cứu G2 FAIL; G2 REVIEW vẫn có research record; chưa xác nhận nhu cầu không tạo FAIL.</li>
+<li>[ ] Parent review giao kèo với doc; Terra-Reviewer kiểm false PASS trước khi chạy thật.</li>
+</ul>
+<p>Oracle số học: chỉ P1=4 (weight15), các mục khác null → known_weight=15, coverage=.15, lower=15, upper=100, total=null; tất cả14 mục rating2 → total=50; tất cả null → [0,100], không rank. Availability lưu thành field riêng, không xác nhận pháp lý/kỹ thuật; riêng G4 PASS/ranking_eligible đòi active. Test full-score + not_checked → không G4 PASS; full-score + active nhưng G2 REVIEW cũng không G4 PASS.</p>
+<p>Exit: pure engine kiểm chứng được, chưa kết luận căn nào đạt.</p>
+<h3>T4 — Baseline offline toàn snapshot</h3>
+<p>Owner: Luna-Data chạy, parent nghiệm thu. Dependencies T2+T3.</p>
+<ul>
+<li>[ ] Tạo run_id thật, manifest hash các input/policy; không dùng ngày chạy làm observed_at.</li>
+<li>[ ] Chạy <code>python -X utf8 run_gate_evaluation.py --dataset output/ver2.0-20261102 --policy gate_policy.json --mode offline --output &lt;run-directory&gt;</code>; run-directory là thư mục mới tạo cho lần chạy, script từ chối output đã tồn tại.</li>
+<li>[ ] Đối chiếu total URL/disposition với input; so tập candidate_scope với baseline1754, giải thích mọi sai khác do quy tắc/parse (không ép ra đúng số).</li>
+<li>[ ] Xuất checklist, missing queue, initial scores; dự kiến nhiều REVIEW và chưa có official rank là kết quả hợp lệ.</li>
+<li>[ ] Parent chọn enrichment tranche từ queue, không tự loại hàng còn lại.</li>
+</ul>
+<p>Exit: baseline thật có số từng gate và lý do, cho thấy phần cần bổ sung; không có full-score giả.</p>
+<h3>T5 — Enrichment pilot theo tiêu chí</h3>
+<p>Owner: Terra-Research thiết kế/đánh giá; Luna-Data tải hoặc batch theo adapter đã review. Không chạy hai client SUUMO đồng thời.</p>
+<ul>
+<li>[ ] Lập <code>gate_sources.json</code>: tiêu chí, cơ quan nguồn, URL/dataset/version/date, độ chính xác, phép dùng, lịch sử, giới hạn; ưu tiên nguồn chính thức Osaka/MLIT/chủ dự án. Kiểm URL hiện hành khi thực thi, không đoán endpoint.</li>
+<li>[ ] Chọn pilot tối đa24 ứng viên: mỗi tổ hợp 3 loại unit thực có ×4 vùng bắc/nam/đông/tây tối đa2; thiếu strata thì ghi thiếu, không bù bằng gọi mẫu đại diện thị trường. Thêm tối đa8 project cases riêng, không trộn điểm căn.</li>
+<li>[ ] Kiểm vị trí/cửa ga và đường đi; nguồn địa chỉ mờ giữ precision thấp. Hazard only join ở độ chính xác phù hợp; không kết luận từ tâm quận.</li>
+<li>[ ] Ghép nguồn giao dịch phù hợp, dân cư theo kỳ/địa giới, dự án theo stage/event_id, nguồn cung cùng phân khúc. Ghi matched/unmatched/conflict, không biến không có nguồn thành không có rủi ro.</li>
+<li>[ ] Terra-Research lập comparison memo/rubric_revision theo cohort và trình parent khóa mốc 0/2/4 cùng cách xác định 1/3 trước khi chấm. Viết rationale từng rating đủ bằng chứng; mục phụ thuộc private/hồ sơ để null. Ledger effect_id→score_owner_id ngăn cộng trùng. Terra-Reviewer audit ít nhất các ca đầy đủ/thiếu/mâu thuẫn/đang xây.</li>
+</ul>
+<p>Budget pilot đề xuất: tối đa60 request bổ sung SUUMO gồmrobots nếu cần, tốc độ theo policy; ưu tiên cache. Nguồn ngoài tối đa100 request công khai theo giới hạn từng nhà cung cấp, ưu tiên dataset dùng chung; stop khi truy cập bị chặn. Budget là trần công việc của kế hoạch, không chỉ tiêu phải dùng hết.</p>
+<p>Exit: chứng minh một chuỗi evidence→rating→gate có thể truy lại; chưa mở rộng khi còn false-pass nghiêm trọng hoặc ghép sai vị trí.</p>
+<h3>T6 — Mở rộng đánh giá theo kết quả pilot</h3>
+<p>Owner: parent chốt phạm vi; Terra-Research xử lý suy luận, Luna-Data chạy adapter.</p>
+<ul>
+<li>[ ] Reviewer xác nhận oracle giá/quyền/tọa độ và chống double-count đạt; nếu không, sửa và replay pilot trước.</li>
+<li>[ ] Ưu tiên nguồn dùng chung cho toàn v2 (dự án/dân cư/cung), sau đó enrich theo tranche100 ứng viên từ research queue; lưu checkpoint mỗi URL/source.</li>
+<li>[ ] Tái đánh giá toàn bộ records sau mỗi tranche, không xóa ứng viên ngoài tranche. Không tự chạy vượt budget T5; parent lập budget bổ sung cụ thể dựa trên missingness và báo trước phạm vi.</li>
+<li>[ ] Mục không thể xác minh công khai chuyển hồ sơ yêu cầu người mua/chuyên gia, không kéo dài crawl để giả đã giải quyết.</li>
+<li>[ ] Xuất coverage, số record có rating, số gate REVIEW, lỗi theo nguồn; phân biệt full ranking với thứ tự ưu tiên nghiên cứu.</li>
+</ul>
+<p>Exit có thể là danh sách nghiên cứu được làm giàu một phần; phải công bố phạm vi và missingness. Không yêu cầu đạt đủ điểm bằng mọi giá.</p>
+<h3>T7 — View và artifact có thể kiểm</h3>
+<p>Owner: Luna-View. Reviewer: parent + Terra-Reviewer.</p>
+<ul>
+<li>[ ] Viết fixtures cùng gate PASS/REVIEW/FAIL, điểm thiếu, project, expired và private dependency.</li>
+<li>[ ] Build HTML từ decision/score CSV: trạng thái từng gate, lý do, link evidence, timestamp, next action; không hiển thị chỉ một điểm gây hiểu nhầm.</li>
+<li>[ ] Giữ canonical URL và key <code>osaka-housing:stars:v1</code>; danh sách mới phải đọc được sao cũ, không xóa sao của tin không còn trong view.</li>
+<li>[ ] Kiểm390px/320px, filter/type/ward/gate, sao rồi reload, localStorage lỗi và no-JS; CSV/SQLite/cardcount cùng bộ lọc phải khớp.</li>
+<li>[ ] Verify export không private profile/reference/path; manifest hash từng artifact. Xử lý file SQLite nén khi xuất bản như v2 hiện có.</li>
+</ul>
+<p>Exit: UI đọc được trên điện thoại, cho thấy cả nhánh REVIEW; không thay mặc định bằng danh sách rỗng vì chưa có hồ sơ ngân hàng.</p>
+<h3>T8 — Review cuối và xuất bản riêng</h3>
+<p>Owner: Terra-Reviewer độc lập; parent quyết định xuất bản, Luna chạy lệnh đã duyệt.</p>
+<ul>
+<li>[ ] Chọn tối thiểu30 URL phân tầng category/disposition, gồm project/giá khoảng/thiếu/expired/mâu thuẫn; cộng tất cả ca FAIL hiếm trong pilot nếu dưới10. So với raw evidence, không chỉ CSV do cùng parser tạo.</li>
+<li>[ ] Kiểm không false-pass tài chính/pháp lý, false-fail vì thiếu data, điểm cộng trùng, mẫu số/đơn vị sai. Lỗi trọng yếu → dừng xuất bản và replay phần bị ảnh hưởng.</li>
+<li>[ ] Đối soát counts, input hashes unchanged, SQLite integrity, score bounds, mapping, freshness và privacy; lưu review và response.</li>
+<li>[ ] Publish <code>housing/ver2.0-20261102-gates-&lt;run_id&gt;/</code> sau khi đủ nghiệm thu; version v2 cũ còn nguyên. Chỉ đổi trang index hiện hành khi bản mới có giao diện queue rõ ràng và được parent kiểm nội dung.</li>
+<li>[ ] Đọc lại Git blobs/hash và kiểm Pages thực; receipt ghi commit, URL, policy hash, coverage. Báo rõ bao nhiêu căn đã qua gate nào, bao nhiêu chỉ là research candidates.</li>
+</ul>
+<p>Exit: bản công khai kiểm được, không hứa kết quả mua/tăng giá, không có hành động giao dịch thay người dùng.</p>
+<h2>6. Tiêu chí kết thúc theo mức deliverable</h2>
+<table>
+<thead>
+<tr>
+<th>Mức</th>
+<th>Có thể xác nhận hoàn thành khi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tài liệu/planning (lượt này)</td>
+<td>Spec+plan+inventory+review đã lưu local/Git, các mâu thuẫn trọng yếu được xử lý</td>
+</tr>
+<tr>
+<td>Filter baseline</td>
+<td>Mọi URL có checklist/disposition có thể truy lại; thiếu dữ liệu giữ đúng trạng thái</td>
+</tr>
+<tr>
+<td>Research enrichment</td>
+<td>Những tranche đã công bố có provenance và review; phần chưa phủ công khai</td>
+</tr>
+<tr>
+<td>Xếp hạng đầy đủ</td>
+<td>Chỉ trong cohort đủ điều kiện gate và 100% score coverage; nếu chưa có căn nào thì công bố chưa đủ</td>
+</tr>
+<tr>
+<td>Đủ điều kiện mua</td>
+<td>Chỉ khi G5 hoàn tất với người mua/chuyên gia; không thuộc nhiệm vụ tự động hóa crawl</td>
+</tr>
+</tbody>
+</table>
+<p>Không có deadline giả trước khi kiểm khối lượng evidence. Đo throughput ở T2/T5 rồi cập nhật ước tính cho từng tranche. Khâu thiếu dữ liệu private/hồ sơ không cản việc hoàn thành baseline và research view, nhưng vẫn cản kết luận đủ điều kiện mua.</p>
+<h2>7. Checklist tự review kế hoạch</h2>
+<ul>
+<li>[ ] Từng gate và mọi ID có task thực hiện/kiểm chứng; J01–J16 và A–H không thất lạc.</li>
+<li>[ ] T2/T3 có interface chung; không trùng file ownership; reviewer không tự duyệt code của mình.</li>
+<li>[ ] Ngưỡng cá nhân chưa xác nhận không thành filter cứng; nhóm new-condo/project giữ queue.</li>
+<li>[ ] Phân biệt snapshot date, evidence date, evaluation date; không chạy crawl toàn bộ chỉ để làm mới nhãn.</li>
+<li>[ ] Không gọi nghiên cứu có điều kiện là qua gate; không tự hoàn thiện điểm bằng suy đoán.</li>
+<li>[ ] Phạm vi publication không bao gồm dữ liệu cá nhân; bản v2 hiện tại không đổi trong lượt planning.</li>
+</ul>
+</section></body></html>
