@@ -1,0 +1,12 @@
+{
+  "policy_version": "HOUSING-GATES-1.0",
+  "prior_evaluation_run": "evaluation-20261103T145600",
+  "prior_facts_sha256": "a8156fa8e9064c76b0a20f7b80d18a33c4fd870f89fd59a632850047af68dfe1",
+  "current_evaluation_run": "evaluation-20261104-pricefix",
+  "current_facts_sha256": "26cd64128e2617a637c15e49c408aab43d55c76dfb808cec251ea8dc885122e2",
+  "current_parser_sha256": "29dc11869547fa1af669463e02455285b3062e7b1692a77b80093a7e182c3e5b",
+  "catalog_sha256": "7c4bd2ad32bef65171637b9ac483d381839903106fb1f2745205b5a7f4754b66",
+  "audit_sha256": "e9fa9414e4831d8fdc1ebe48864692359d8312ab7273ab59efa1ca095fb426fc",
+  "change": "Offline replay after detail-price formatting parser fix; 30 previously ambiguous records resolve; one true conflict remains REVIEW.",
+  "network_requests": 0
+}

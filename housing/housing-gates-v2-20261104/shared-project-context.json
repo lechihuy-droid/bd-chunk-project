@@ -1,0 +1,67 @@
+[
+  {
+    "event_id": "umekita_north_park_expansion",
+    "stage": "planned",
+    "date_or_target": "2026-11-20",
+    "description": "North Park opening area expansion planned.",
+    "source_url": "https://www.city.osaka.lg.jp/osakatokei/page/0000005308.html",
+    "source_sha256": "a657b75253fbbb5b992fe91c5568116a46e248430731c8782594465d51124175",
+    "source_updated_at": "2026-10-27",
+    "retrieved_at": "2026-11-03T15:32:31.893235+00:00",
+    "geography_precision": "district_or_route",
+    "property_link_status": "unknown",
+    "limitation": "Area context only; no property route, benefit, exposure or distance has been established."
+  },
+  {
+    "event_id": "umekita_phase2_open",
+    "stage": "opened",
+    "date_or_target": "2024-09",
+    "description": "Partial opening; further areas opened March 2025.",
+    "source_url": "https://www.city.osaka.lg.jp/osakatokei/page/0000005308.html",
+    "source_sha256": "a657b75253fbbb5b992fe91c5568116a46e248430731c8782594465d51124175",
+    "source_updated_at": "2026-10-27",
+    "retrieved_at": "2026-11-03T15:32:31.893235+00:00",
+    "geography_precision": "district_or_route",
+    "property_link_status": "unknown",
+    "limitation": "Area context only; no property route, benefit, exposure or distance has been established."
+  },
+  {
+    "event_id": "umekita_phase2_completion",
+    "stage": "planned",
+    "date_or_target": "FY2027 / FY2028",
+    "description": "Overall opening targeted FY2027 and infrastructure completion targeted FY2028.",
+    "source_url": "https://www.city.osaka.lg.jp/osakatokei/page/0000005308.html",
+    "source_sha256": "a657b75253fbbb5b992fe91c5568116a46e248430731c8782594465d51124175",
+    "source_updated_at": "2026-10-27",
+    "retrieved_at": "2026-11-03T15:32:31.893235+00:00",
+    "geography_precision": "district_or_route",
+    "property_link_status": "unknown",
+    "limitation": "Area context only; no property route, benefit, exposure or distance has been established."
+  },
+  {
+    "event_id": "morinomiya_phase_1_5",
+    "stage": "planned",
+    "date_or_target": "spring 2028",
+    "description": "Phase 1.5 district opening target; page may need refreshing.",
+    "source_url": "https://www.city.osaka.lg.jp/osakatokei/page/0000621275.html",
+    "source_sha256": "d0610e94ee1199136be557c4bdbc7588fd99957216b6f144125a731ac73bc831",
+    "source_updated_at": "2026-08-31",
+    "retrieved_at": "2026-11-03T15:32:32.069230+00:00",
+    "geography_precision": "district_or_route",
+    "property_link_status": "unknown",
+    "limitation": "Area context only; no property route, benefit, exposure or distance has been established."
+  },
+  {
+    "event_id": "naniwasuji_line",
+    "stage": "under_construction",
+    "date_or_target": "spring 2031",
+    "description": "Opening target, not currently operational; source reports approximately 7.2 km.",
+    "source_url": "https://www.city.osaka.lg.jp/toshikeikaku/cmsfiles/contents/0000427/427888/youbousyo.pdf",
+    "source_sha256": "5e6afb49f976d5cdcd0e4a47f87deb39fea545911169acb03d693292a9178dc3",
+    "source_updated_at": "2026-06",
+    "retrieved_at": "2026-11-03T15:32:32.347950+00:00",
+    "geography_precision": "district_or_route",
+    "property_link_status": "unknown",
+    "limitation": "Area context only; no property route, benefit, exposure or distance has been established."
+  }
+]
