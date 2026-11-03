@@ -1,0 +1,65 @@
+{
+  "run_id": "evaluation-20261104-pricefix",
+  "run_at_utc": "2026-11-03T23:26:38.342437+00:00",
+  "mode": "offline",
+  "policy_version": "HOUSING-GATES-1.0",
+  "input_hashes": {
+    "catalog_sha256": "7c4bd2ad32bef65171637b9ac483d381839903106fb1f2745205b5a7f4754b66",
+    "policy_sha256": "8d920dadc99cab705e88b8756d2a757826a076eda93ffe4f9bbecfa953979442",
+    "facts_sha256": "26cd64128e2617a637c15e49c408aab43d55c76dfb808cec251ea8dc885122e2",
+    "catalog/preferred-exact.csv": "d3ba95ea8eb63445d530e25580b651720cc829a7a2336eac986f836a0e5ce327",
+    "catalog/projects.csv": "ee913ec8fa4ed092a5fbfe73a21f5ca288712c983c5e699827ae4e1c76df0546",
+    "link-audit/checks.json": "7ed6b2af09157f6117bbc8872402f4cd004cd28c582aba7632a6ff90bd500e54",
+    "preferred-link-audit/checks.json": "5b3a385f38cefa6157cf85e5698bfed7d38b745c8b7eb66dbdb9b1ea6d1607a0"
+  },
+  "facts_cache_validated": true,
+  "buyer_profile": "not_provided",
+  "network_requests": 0,
+  "counters": {
+    "raw_row_count": 11463,
+    "unique_url_count": 11463,
+    "duplicate_row_count": 0,
+    "divergent_duplicate_urls": 0,
+    "conflict_urls": 126,
+    "availability": {
+      "active": 4787,
+      "not_found": 7,
+      "not_checked": 6668,
+      "unverified": 1
+    },
+    "advertised_risks": {
+      "private_road_claim": 40,
+      "setback_claim": 20,
+      "terrace_claim": 9,
+      "tenanted_claim": 39,
+      "no_rebuild_claim": 2,
+      "leasehold_claim": 6
+    },
+    "dispositions": {
+      "out_of_scope": 9394,
+      "review_required": 1751,
+      "scope_review": 7,
+      "project_queue": 309,
+      "unavailable": 2
+    },
+    "gates": {
+      "G1:FAIL": 9394,
+      "G2:REVIEW": 11463,
+      "G3:NOT_EVALUATED": 11463,
+      "G4:NOT_EVALUATED": 11463,
+      "G5:NOT_EVALUATED": 11463,
+      "G1:REVIEW": 2069
+    },
+    "baseline_exact_unique": 1754,
+    "in_scope_unique": 1753,
+    "baseline_only": 1,
+    "in_scope_only": 0
+  },
+  "limitations": [
+    "Catalog and link-check source dates are retained in evidence; this is not a current market crawl.",
+    "Six new-condo routes were missing from source coverage.",
+    "Private financial criteria remain under review.",
+    "Views overlap; dispositions alone are mutually exclusive.",
+    "Baseline exact-price counts differ from scope when evidence, project classification, price parsing, conflicts, or location are uncertain."
+  ]
+}
