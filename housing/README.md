@@ -1,3 +1,7 @@
+# Housing gate evaluation housing-gates-v2-20261106-practical
+
+[Current gate app](https://lechihuy-droid.github.io/bd-chunk-project/housing/) | [Versioned gate app](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-gates-v2-20261106-practical/index.html) | [Data downloads](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-gates-v2-20261106-practical/downloads.html)
+
 # Housing gate evaluation housing-gates-v2-20261104
 
 [Current gate app](https://lechihuy-droid.github.io/bd-chunk-project/housing/) ? [Versioned gate app](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-gates-v2-20261104/index.html) ? [Data downloads](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-gates-v2-20261104/downloads.html)
