@@ -1,0 +1,19 @@
+{
+  "run_at_utc": "2026-11-03T23:27:23.905119+00:00",
+  "type": "additive_research_context",
+  "baseline_run_id": "evaluation-20261104-pricefix",
+  "input_hashes": {
+    "facts_sha256": "26cd64128e2617a637c15e49c408aab43d55c76dfb808cec251ea8dc885122e2",
+    "decisions_sha256": "54b884a574db4c2cc818100a18a3eb7adf599e22bf4797a14763fac6446bf2f2",
+    "ward_records_sha256": "b42eea4eaa6c3f2a7e3fdfc1f6aad2d51e740b332357172ad0f209abb3f68733",
+    "projects_sha256": "a8816bad08ed1bbd94921a432a92aacdd6f677b2fe0833f27d8d98d012524a65"
+  },
+  "counts": {
+    "urls": 11463,
+    "ward_match": {
+      "matched_ward": 11463
+    }
+  },
+  "scope": "Context sidecar only; join to unchanged baseline by listing_url. No scores, gate changes or property hazard conclusions.",
+  "network": "offline build from locally saved official sources; collection request details in source records and research report."
+}

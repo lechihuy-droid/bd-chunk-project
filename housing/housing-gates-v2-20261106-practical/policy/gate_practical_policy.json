@@ -1,0 +1,10 @@
+﻿{
+  "policy_version":"HOUSING-RESEARCH-2.0",
+  "purpose":"research_discovery_not_purchase_approval",
+  "price_min_jpy":40000000,
+  "price_max_jpy":50000000,
+  "source_policy":"docs/standards/GATE-PRACTICAL-REVIEW-20261106.md",
+  "source_snapshot":"ver2.0-20261102",
+  "research_states":["RESEARCH_PASS","RESEARCH_READY","HOLD","OUT_OF_SCOPE","PROJECT_QUEUE","NOT_EVALUATED"],
+  "verified_purchase_default":"REVIEW"
+}

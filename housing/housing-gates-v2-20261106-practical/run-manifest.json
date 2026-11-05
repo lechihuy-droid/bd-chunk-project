@@ -1,0 +1,63 @@
+{
+  "run_id": "evaluation-20261106-practical-r3",
+  "run_at_utc": "2026-11-05T15:43:38.639023+00:00",
+  "mode": "offline_cached_facts",
+  "policy_version": "HOUSING-RESEARCH-2.0",
+  "previous_policy_version": "HOUSING-GATES-1.0",
+  "previous_run_id": "evaluation-20261104-pricefix",
+  "input_hashes": {
+    "catalog_sha256": "7c4bd2ad32bef65171637b9ac483d381839903106fb1f2745205b5a7f4754b66",
+    "facts_sha256": "26cd64128e2617a637c15e49c408aab43d55c76dfb808cec251ea8dc885122e2",
+    "policy_sha256": "9ad56d548a47fe19c3e5c33664f9ea13d24a6c7637b37a2c3a84f169474367e0",
+    "parser_sha256": "29dc11869547fa1af669463e02455285b3062e7b1692a77b80093a7e182c3e5b",
+    "engine_sha256": "06aeb01a2ce10ec919f3312e63019abc941c893d3f2d5fd16a02b54a4d0ff4b6",
+    "baseline_decisions_sha256": "54b884a574db4c2cc818100a18a3eb7adf599e22bf4797a14763fac6446bf2f2"
+  },
+  "network_requests": 0,
+  "buyer_profile": "not_provided",
+  "counters": {
+    "raw_row_count": 11463,
+    "unique_url_count": 11463,
+    "duplicate_row_count": 0,
+    "dispositions": {
+      "out_of_scope": 9394,
+      "research_ready": 1750,
+      "scope_review": 7,
+      "hold": 1,
+      "project_queue": 309,
+      "unavailable": 2
+    },
+    "gate_status": {
+      "G1:OUT_OF_SCOPE": 9394,
+      "G2:NOT_EVALUATED": 9546,
+      "G3:NOT_EVALUATED": 9711,
+      "G4:NOT_EVALUATED": 11463,
+      "G5:REVIEW": 11463,
+      "G1:RESEARCH_PASS": 1753,
+      "G2:RESEARCH_PASS": 1752,
+      "G3:RESEARCH_READY": 1752,
+      "G2:HOLD": 165,
+      "G1:HOLD": 7,
+      "G1:PROJECT_QUEUE": 309
+    },
+    "availability": {
+      "active": 4787,
+      "not_found": 7,
+      "not_checked": 6668,
+      "unverified": 1
+    },
+    "old_G1_to_new_G1": {
+      "FAIL -> OUT_OF_SCOPE": 9394,
+      "REVIEW -> RESEARCH_PASS": 1753,
+      "REVIEW -> HOLD": 7,
+      "REVIEW -> PROJECT_QUEUE": 309
+    }
+  },
+  "limitations": [
+    "Research passes are not purchase, safety, legal or financial verification.",
+    "Listing observations and availability checks retain their original source dates.",
+    "Projects and price ranges remain separate queues.",
+    "No full score or investment ranking was produced.",
+    "Six new-condo routes were missing from source coverage."
+  ]
+}
