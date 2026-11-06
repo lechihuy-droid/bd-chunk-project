@@ -1,0 +1,86 @@
+{
+  "policy_version": "HOUSING-SELECTION-3.0",
+  "preset": {
+    "policy_version": "HOUSING-SELECTION-3.0",
+    "preset_id": "BALANCED_ASKING_RAIL_V1",
+    "walk_minutes_max": 10,
+    "min_peer_groups": 5,
+    "area_ratio_min": 0.8,
+    "area_ratio_max": 1.2,
+    "used_year_delta_max": 10,
+    "duplicate_heuristic": "address-category-areas-year-layout-floor-v1",
+    "reference_snapshot": "ver2.0-20261102",
+    "purpose": "research_order_not_valuation_or_purchase_approval"
+  },
+  "run_at_utc": "2026-11-06T09:38:09.189635+00:00",
+  "mode": "offline_cached_facts",
+  "network_requests": 0,
+  "source_snapshot": "ver2.0-20261102",
+  "baseline_run": "evaluation-20261106-practical-r3",
+  "url_count": 11463,
+  "selection_counts": {
+    "OUT_OF_SCOPE": 9394,
+    "ORDINARY:U": 920,
+    "ORDINARY:P2": 442,
+    "ORDINARY:P3": 28,
+    "SCOPE_REVIEW": 7,
+    "MATERIAL_REVIEW": 1,
+    "PROJECT_QUEUE": 309,
+    "ORDINARY:P1": 353,
+    "UNAVAILABLE": 2,
+    "SPECIALIST:SPECIALIST": 6,
+    "LINK_REVIEW": 1
+  },
+  "category_counts": {
+    "used_house": {
+      "OUT_OF_SCOPE": 2419,
+      "ORDINARY:U": 315,
+      "ORDINARY:P2": 7,
+      "ORDINARY:P3": 6,
+      "SCOPE_REVIEW": 2,
+      "MATERIAL_REVIEW": 1
+    },
+    "new_house": {
+      "OUT_OF_SCOPE": 386,
+      "PROJECT_QUEUE": 149,
+      "ORDINARY:U": 218,
+      "ORDINARY:P2": 23,
+      "ORDINARY:P1": 13,
+      "ORDINARY:P3": 4,
+      "UNAVAILABLE": 2,
+      "SCOPE_REVIEW": 5,
+      "SPECIALIST:SPECIALIST": 2
+    },
+    "used_condo": {
+      "OUT_OF_SCOPE": 6577,
+      "ORDINARY:U": 387,
+      "ORDINARY:P1": 340,
+      "ORDINARY:P2": 412,
+      "SPECIALIST:SPECIALIST": 4,
+      "ORDINARY:P3": 18,
+      "LINK_REVIEW": 1
+    },
+    "new_condo": {
+      "PROJECT_QUEUE": 160,
+      "OUT_OF_SCOPE": 12
+    }
+  },
+  "input_hashes": {
+    "facts_sha256": "26cd64128e2617a637c15e49c408aab43d55c76dfb808cec251ea8dc885122e2",
+    "baseline_decisions_sha256": "f669e0502c73c82d2bb63aaa05d5e0ffcd3705edd6a8aac8b0e822376b94ddad",
+    "baseline_manifest_sha256": "c383f89c87a5aaf5408d319a7bbd15e768f3d320f490c440a84c2a8691642de7",
+    "facts_summary_sha256": "aa6478f8cf01958ae1c41118985973d185536496664b092c41e8fe874788f9dd",
+    "research_stages_sha256": "50765c6a1537076605e7f7c55549db49bdc097dfc22cc9e2af93ee821ff08e9f",
+    "catalog_sha256": "7c4bd2ad32bef65171637b9ac483d381839903106fb1f2745205b5a7f4754b66",
+    "policy_sha256": "3b5dd5ffb3f27dd6a5d7d716d2f591bfd180b99a22df4d78fc156e609313cbcf",
+    "features_sha256": "a9e427fc23d8a5a4d239f7d62ee73cdd747ecb8fec5e0a96b1cd1cc6a6d1c50e",
+    "peers_sha256": "5fde3abed565eac35e63f10807c358877f168ce606e8086b26476c57f60b78ab",
+    "runner_sha256": "1d051cdb9f6237fded708721939b7a3b459a28e441853c41bceb1ffa34d52b42"
+  },
+  "limitations": [
+    "Asking prices, not transactions or valuations.",
+    "Peer rights and identity often unknown; references are heuristic.",
+    "Availability and listing observations are historical.",
+    "Priority is research order, not investment forecast or purchase verification."
+  ]
+}
