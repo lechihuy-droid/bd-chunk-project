@@ -1,0 +1,1 @@
+﻿{"policy_version":"HOUSING-SELECTION-3.0","preset_id":"BALANCED_ASKING_RAIL_V1","walk_minutes_max":10,"min_peer_groups":5,"area_ratio_min":0.8,"area_ratio_max":1.2,"used_year_delta_max":10,"duplicate_heuristic":"address-category-areas-year-layout-floor-v1","reference_snapshot":"ver2.0-20261102","purpose":"research_order_not_valuation_or_purchase_approval"}
