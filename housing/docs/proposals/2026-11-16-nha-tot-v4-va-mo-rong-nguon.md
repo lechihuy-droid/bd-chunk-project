@@ -41,6 +41,8 @@ Mọi thứ còn lại (giao dịch thật, hazard, quỹ sửa chữa, dự án
 
 ### A4. Đề xuất v4: năm trụ độc lập, không cộng điểm
 
+> Cập nhật 17/11/2026: phần xếp hạng bằng năm trụ ở mục này đã được thay bằng một tiêu chí duy nhất, xem [HOUSING-SELECTION-4.0](../standards/HOUSING-SELECTION-4.0.md). Bước 0–2 và bước 5 vẫn dùng.
+
 Nguyên tắc: giữ kỷ luật "chưa biết khác với xấu", nhưng hệ thống phải dẫn tới 20–30 **căn** (không phải tin) để đi xem 5–10 căn.
 
 **Bước 0 — Khử trùng về cấp căn trước mọi phép đếm.** Khóa gom ở mục C3.

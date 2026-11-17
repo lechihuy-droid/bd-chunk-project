@@ -1,0 +1,130 @@
+{
+ "policy_version": "HOUSING-SELECTION-4.0",
+ "price_basis": "asking_prices_snapshot_ver2.0-20261102",
+ "properties": 1108,
+ "comparison_pool": {
+  "used_condo_groups": 4750,
+  "old_house_land_groups": 1024
+ },
+ "by_category": {
+  "new_house": {
+   "properties": 219,
+   "bands": {
+    "A": 49,
+    "B": 49,
+    "C": 49,
+    "D": 49,
+    "S": 3,
+    "U": 20
+   },
+   "separate_review_reasons": {
+    "queue:UNAVAILABLE": 2,
+    "queue:SPECIALIST": 1,
+    "rights_not_freehold": 1
+   },
+   "unknown_reasons": {
+    "building_area_unknown": 17,
+    "land_estimate_exceeds_price": 3
+   },
+   "residual_basis": {
+    "station_old_house_land_proxy": 148,
+    "ward_old_house_land_proxy_coarse": 48
+   },
+   "net_cost_jpy_month_quartiles": [
+    108817,
+    130728,
+    144540
+   ],
+   "net_cost_jpy_m2_month_quartiles": [
+    1000,
+    1204,
+    1430
+   ],
+   "keep_ratio_quartiles": [
+    0.45,
+    0.5,
+    0.62
+   ]
+  },
+  "used_condo": {
+   "properties": 635,
+   "bands": {
+    "A": 103,
+    "B": 106,
+    "C": 102,
+    "D": 103,
+    "S": 45,
+    "U": 176
+   },
+   "separate_review_reasons": {
+    "built_before_1982": 40,
+    "queue:SPECIALIST": 4,
+    "rights_not_freehold": 4,
+    "leasehold_claim": 4,
+    "queue:LINK_REVIEW": 1
+   },
+   "unknown_reasons": {
+    "insufficient_comparables": 175,
+    "fees_unknown": 1
+   },
+   "residual_basis": {
+    "ward": 318,
+    "station": 96
+   },
+   "net_cost_jpy_month_quartiles": [
+    97284,
+    108728,
+    118120
+   ],
+   "net_cost_jpy_m2_month_quartiles": [
+    1362,
+    1625,
+    1865
+   ],
+   "keep_ratio_quartiles": [
+    0.61,
+    0.65,
+    0.7
+   ]
+  },
+  "used_house": {
+   "properties": 254,
+   "bands": {
+    "A": 52,
+    "B": 53,
+    "C": 52,
+    "D": 52,
+    "S": 16,
+    "U": 29
+   },
+   "separate_review_reasons": {
+    "built_before_1982": 16,
+    "queue:MATERIAL_REVIEW": 1
+   },
+   "unknown_reasons": {
+    "land_estimate_exceeds_price": 25,
+    "building_area_unknown": 3,
+    "insufficient_comparables": 1
+   },
+   "residual_basis": {
+    "station_old_house_land_proxy": 150,
+    "ward_old_house_land_proxy_coarse": 59
+   },
+   "net_cost_jpy_month_quartiles": [
+    89564,
+    110939,
+    129742
+   ],
+   "net_cost_jpy_m2_month_quartiles": [
+    795,
+    1042,
+    1322
+   ],
+   "keep_ratio_quartiles": [
+    0.51,
+    0.62,
+    0.76
+   ]
+  }
+ }
+}
