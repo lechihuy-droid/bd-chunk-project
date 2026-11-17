@@ -76,7 +76,7 @@ Ngày vào ở của 85 dự án: 15 dự án đã xong hoặc vào ở ngay, 3 
 
 # Nhà riêng xây mới — nghiên cứu nguồn và độ phủ
 
-Bổ sung ngày 17/11/2026 theo yêu cầu của Huy. 29 request (SUUMO 15 trang, Yahoo! 11 trang, 住まいサーフィン 3 trang), cùng quy tắc như trên. Nhật ký: [requests-newhouse.log](requests-newhouse.log). Số tổng hợp: [newhouse-source-coverage.json](newhouse-source-coverage.json). Script: [`newhouse_sources.py`](../tools/newhouse_sources.py). Bảng từng tin gửi riêng cho Huy, không nằm trong repo.
+Bổ sung ngày 17/11/2026 theo yêu cầu của Huy. 28 request (SUUMO 15 trang, Yahoo! 11 trang, 住まいサーフィン 2 trang), cùng quy tắc như trên. Nhật ký: [requests-newhouse.log](requests-newhouse.log). Số tổng hợp: [newhouse-source-coverage.json](newhouse-source-coverage.json). Script: [`newhouse_sources.py`](../tools/newhouse_sources.py). Bảng từng tin gửi riêng cho Huy, không nằm trong repo.
 
 Phạm vi: nhà riêng mới ở Osaka-shi, mọi mức giá, chỉ trang danh sách.
 
