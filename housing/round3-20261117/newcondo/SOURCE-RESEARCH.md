@@ -85,7 +85,7 @@ Phạm vi: nhà riêng mới ở Osaka-shi, mọi mức giá, chỉ trang danh s
 | Nguồn | Truy cập | Số tin Osaka-shi | Ghi chú |
 |---|---|---:|---|
 | SUUMO | Được | 1.426 (đọc được 1.412) | Gồm hai loại: 817 tin nhà xây sẵn và 595 tin **đất kèm điều kiện xây** (建築条件付土地) |
-| Yahoo!不動産 | Được | 310 (đọc được 245, tức 79%) | Chỉ có nhà xây sẵn, từng căn |
+| Yahoo!不動産 | Được | 310 (đọc được 263, tức 85%) | Chỉ có nhà xây sẵn, từng căn |
 | 住まいサーフィン (mục nhà riêng) | Được | 243 tin mới toàn Osaka-fu | Tên tin trùng kiểu đặt tên của SUUMO, nhiều khả năng lấy dữ liệu từ SUUMO nên **không dùng làm nguồn đối chứng**; không tải tiếp |
 | 東急リバブル, 野村, リハウス, 大京 | Được (đợt 2) | 3 căn trong dải ở リバブル, còn lại 0 | Gần như không có nhà mới |
 | athome, LIFULL HOME'S, ニフティ | Bị chặn | — | |
@@ -109,17 +109,17 @@ Khớp theo địa chỉ cấp chome + diện tích đất + diện tích nhà; 
 
 | | Mọi giá | Trong dải 4.000–5.000万 |
 |---|---:|---:|
-| Căn trên Yahoo! | 187 | 93 |
-| — có trên SUUMO | 166 (89%) | 82 (88%) |
-| — không có trên SUUMO | 21 | 11 |
+| Căn trên Yahoo! | 199 | 96 |
+| — có trên SUUMO | 173 (87%) | 83 (86%) |
+| — không có trên SUUMO | 26 | 13 |
 | Mục nhà xây sẵn trên SUUMO (căn lẻ + tin gộp) | 649 | 296 |
-| — có trên Yahoo! | 190 (29%) | 96 (32%) |
-| — không có trên Yahoo! | 459 | 200 |
+| — có trên Yahoo! | 196 (30%) | 97 (33%) |
+| — không có trên Yahoo! | 453 | 199 |
 
 **Kết luận về nguồn:**
 
 - Với nhà riêng mới, SUUMO là nguồn chính; Yahoo! chỉ thấy khoảng một phần ba những gì SUUMO có.
-- Yahoo! vẫn thêm được khoảng 11% số căn không có trên SUUMO, nên giữ làm nguồn phụ.
+- Yahoo! vẫn thêm được khoảng 13% số căn không có trên SUUMO, nên giữ làm nguồn phụ.
 - Chưa có nguồn độc lập thứ ba để ước lượng phần cả hai cùng thiếu. athome và HOME'S (bị chặn từ đám mây) là hai nguồn đáng kiểm nhất, vì công ty xây nhà nhỏ ở địa phương hay đăng ở đó.
 
 ## 4. Trong dải 4.000–5.000万
@@ -128,14 +128,14 @@ Khớp theo địa chỉ cấp chome + diện tích đất + diện tích nhà; 
 |---|---:|
 | Mục nhà xây sẵn trên SUUMO | 296 (trong đó 97 tin gộp nhiều lô) |
 | Tin đất kèm điều kiện xây có giá đất chạm dải | 63 |
-| Căn trên Yahoo! | 93 (11 căn không có trên SUUMO) |
+| Căn trên Yahoo! | 96 (13 căn không có trên SUUMO) |
 
 Với tin gộp, "trong dải" nghĩa là khoảng giá công bố giao với 4.000–5.000万.
 
 ## 5. Giới hạn
 
 1. **Chưa biết căn nào đang xây, căn nào đã xong.** Trang danh sách của cả hai nguồn không ghi ngày hoàn thành; thông tin này nằm ở trang chi tiết.
-2. **Parser Yahoo! chỉ đọc được 245/310 tin**, nên tỷ lệ "Yahoo! có" đang bị tính thấp đi một chút.
+2. **Parser Yahoo! chỉ đọc được 263/310 tin** (14 tin PR ngoài Osaka-shi bị loại có chủ đích; khoảng 110 dòng còn lại chỉ có ảnh, giá và tên môi giới, không có địa chỉ/diện tích nên không đọc được), nên tỷ lệ "Yahoo! có" đang bị tính thấp đi một chút.
 3. **Một dự án có thể bị tách thành nhiều tin** (mỗi lô một tin, hoặc nhiều môi giới cùng đăng), nên 169 tin gộp không phải 169 dự án.
 4. **Phép khớp dựa vào diện tích ghi giống hệt nhau**; lệch vài phần trăm mét vuông giữa hai trang thì bị tính là không khớp.
 

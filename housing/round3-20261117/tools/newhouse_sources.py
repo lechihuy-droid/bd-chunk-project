@@ -38,11 +38,12 @@ for f in sorted(glob.glob(f'{src}/nh_suumo*.html')):
 Y = []
 for f in sorted(glob.glob(f'{src}/nh_yahoo*.html')):
     x = load(f); x = x[x.find('並び替え'):]
-    for m in re.finditer(r'⟦(https://realestate\.yahoo\.co\.jp/new/house/(?:detail_corp|dtl)/\w+/)[^⟧]*⟧ (?:(?!⟦https://realestate\.yahoo\.co\.jp/new/house/(?:detail_corp|dtl)/).){0,1500}?(大阪府大阪市\S+)(?: (\d{4})年(\d+)月\S*)? (\S+?)/(?:地上)?(\d+)階\S* 土地 ([\d.]+)m 2 / 建物 ([\d.]+)m 2 (?:(?!万円).){0,900}?((?:\d+億)?[\d,]*)万円', x):
-        p = man(m.group(9) + '万円')
+    for m in re.finditer(r'⟦(https://realestate\.yahoo\.co\.jp/new/house/(?:detail_corp|dtl)/\w+/)[^⟧]*⟧ (?:(?!⟦https://realestate\.yahoo\.co\.jp/new/house/(?:detail_corp|dtl)/).){0,1500}?(大阪府大阪市\S+)(?: (\d{4})年(\d+)月\S*)? (\S+?)/(\S+?) 土地 ([\d.]+)m 2(?: ～ ?([\d.]+)m 2)? / 建物 ([\d.]+)m 2(?: ～ ?([\d.]+)m 2)? (?:(?!万円).){0,900}?((?:(?:\d+億)?[\d,]*万円)(?:～(?:\d+億)?[\d,]*万円)?)', x):
+        p = man(m.group(11))  # a card may show a range (multi-lot project): land/building/price are then min～max
         if not p: continue
-        Y.append({'source': 'yahoo', 'kind': 'house', 'multi_lot': False, 'lots_total': '', 'name': '', 'address': m.group(2), 'ward': ward(m.group(2)), 'station_raw': '', 'price_min': p[0], 'price_max': p[0],
-                  'land_min': float(m.group(7)), 'land_max': float(m.group(7)), 'building_min': float(m.group(8)), 'building_max': float(m.group(8)), 'layout': m.group(5), 'completion': f'{m.group(3)}-{int(m.group(4)):02d}' if m.group(3) else '', 'url': m.group(1)})
+        lots = bool(m.group(8) or m.group(10) or len(p) > 1)
+        Y.append({'source': 'yahoo', 'kind': 'house', 'multi_lot': lots, 'lots_total': '', 'name': '', 'address': m.group(2), 'ward': ward(m.group(2)), 'station_raw': '', 'price_min': min(p), 'price_max': max(p),
+                  'land_min': float(m.group(7)), 'land_max': float(m.group(8) or m.group(7)), 'building_min': float(m.group(9)), 'building_max': float(m.group(10) or m.group(9)), 'layout': m.group(5), 'completion': f'{m.group(3)}-{int(m.group(4)):02d}' if m.group(3) else '', 'url': m.group(1)})
 def dedup(rows):
     seen = {}
     for r in rows: seen.setdefault(r['url'], r)

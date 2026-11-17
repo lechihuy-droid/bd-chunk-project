@@ -77,7 +77,7 @@ suumo,house,False,,in_yahoo,住吉区,大阪府大阪市住吉区帝塚山中４
 suumo,house,False,,in_yahoo,住吉区,大阪府大阪市住吉区帝塚山中４,,5780,5780,86.4,86.4,121.36,121.36,4LDK,,南海高野線「帝塚山」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_21872473/
 suumo,house,False,,in_yahoo,住吉区,大阪府大阪市住吉区帝塚山中４,,5780,5780,86.4,86.4,121.36,121.36,4LDK,,南海高野線「帝塚山」徒歩5分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_21124833/
 suumo,house,False,,in_yahoo,住吉区,大阪府大阪市住吉区帝塚山中４,,5780,5780,86.4,86.4,121.36,121.36,4LDK,,南海高野線「帝塚山」徒歩5分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_21139713/
-suumo,house,False,,not_in_yahoo,住吉区,大阪府大阪市住吉区庭井１,住吉区庭井1丁目新築戸建,3180,3180,41.35,41.35,80.3,80.3,3LDK,,地下鉄御堂筋線「あびこ」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_22183256/
+suumo,house,False,,in_yahoo,住吉区,大阪府大阪市住吉区庭井１,住吉区庭井1丁目新築戸建,3180,3180,41.35,41.35,80.3,80.3,3LDK,,地下鉄御堂筋線「あびこ」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_22183256/
 suumo,house,False,,not_in_yahoo,住吉区,大阪府大阪市住吉区庭井２,,4580,4580,65.68,65.68,99.63,99.63,4LDK,,地下鉄御堂筋線「あびこ」徒歩15分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_21293402/
 suumo,house,False,,not_in_yahoo,住吉区,大阪府大阪市住吉区我孫子３,,6180,6180,81.57,81.57,108.39,108.39,3LDK,,地下鉄御堂筋線「あびこ」徒歩8分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_21633403/
 suumo,house,False,,in_yahoo,住吉区,大阪府大阪市住吉区東粉浜２,,3080,3080,54.97,54.97,72.76,72.76,3LDK,,阪堺電気軌道阪堺線「東粉浜」徒歩2分,https://suumo.jp/ikkodate/osaka/sc_osakashisumiyoshi/nc_20894298/
@@ -287,10 +287,10 @@ suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区新森５,,6280,6
 suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区新森５-12番8付近,,6280,6280,98.18,98.18,114.74,114.74,4LDK,,京阪本線「森小路」徒歩9分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_78954582/
 suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区新森７,,4080,4080,49.79,49.79,77.04,77.04,3LDK,,地下鉄今里筋線「清水」徒歩3分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_22204210/
 suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区清水２,,5180,5180,70.91,70.91,105.57,105.57,4LDK,,地下鉄今里筋線「清水」徒歩7分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21700314/
-suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区清水２-5-12,,3380,3380,52.01,52.01,82.23,82.23,4LDK,,地下鉄今里筋線「清水」徒歩3分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_78775077/
+suumo,house,False,,in_yahoo,旭区,大阪府大阪市旭区清水２-5-12,,3380,3380,52.01,52.01,82.23,82.23,4LDK,,地下鉄今里筋線「清水」徒歩3分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_78775077/
 suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区生江１,大阪市旭区生江1丁目 新築戸建1棟,3530,3530,44.7,44.7,10.66,98.28,3LDK,,ＪＲおおさか東線「城北公園通」徒歩8分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_22047781/
 suumo,house,False,,not_in_yahoo,旭区,大阪府大阪市旭区高殿４,【SENSE】関目高殿駅前プロジェクト,6780,6780,86.62,86.62,128.62,128.62,3LDK,,地下鉄谷町線「関目高殿」徒歩4分,https://suumo.jp/ikkodate/osaka/sc_osakashiasahi/nc_21712604/
-suumo,house,False,,not_in_yahoo,東住吉区,大阪府大阪市東住吉区中野１-3-2,,3880,3880,59.05,59.05,101.04,101.04,4LDK,,地下鉄谷町線「駒川中野」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21695242/
+suumo,house,False,,in_yahoo,東住吉区,大阪府大阪市東住吉区中野１-3-2,,3880,3880,59.05,59.05,101.04,101.04,4LDK,,地下鉄谷町線「駒川中野」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_21695242/
 suumo,house,True,,in_yahoo,東住吉区,大阪府大阪市東住吉区今川３,,4980,5480,73.07,74.29,152.19,152.19,4LDK-,,ＪＲ関西本線「東部市場前」徒歩14分,https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_22107999/
 suumo,house,True,,in_yahoo,東住吉区,大阪府大阪市東住吉区今川３,,4980,5480,73.07,74.29,152.19,152.19,4LDK-,,ＪＲ関西本線「東部市場前」徒歩14分,https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_22107997/
 suumo,house,False,,not_in_yahoo,東住吉区,大阪府大阪市東住吉区今川３,,4080,4080,57.83,57.83,102.06,102.06,4LDK+S（納戸）,,ＪＲ関西本線「平野」徒歩16分,https://suumo.jp/ikkodate/osaka/sc_osakashihigashisumiyoshi/nc_22090008/
@@ -727,12 +727,12 @@ suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田
 suumo,house,True,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田５,オープンライブス大和田アクセス,3680,4580,50.96,60.24,72.86,100.51,2LDK+S（納戸）～3LDK,,阪神電鉄阪神なんば線「出来島」徒歩7分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_22061162/
 suumo,house,False,,not_in_yahoo,西淀川区,大阪府大阪市西淀川区大和田５,,3580,3580,50.89,50.89,103.65,103.65,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩7分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_20239928/
 suumo,house,False,1,not_in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,【NICO大和田】全1区画◆小学校4分×南向き×4L…,4780,4780,86.39,86.39,100.58,100.58,4LDK,,阪神電鉄阪神なんば線「出来島」徒歩9分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21953367/
-suumo,house,False,,not_in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,飯田グループホールディングス リーブルガーデン 西淀…,4480,4480,99.09,99.09,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21707603/
+suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,飯田グループホールディングス リーブルガーデン 西淀…,4480,4480,99.09,99.09,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21707603/
 suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4480,4480,97.66,97.66,93.98,93.98,3LDK+S（納戸）-,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21706289/
 suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4480,4480,97.66,97.66,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_22011668/
-suumo,house,False,,not_in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4590,4590,99.09,99.09,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21825823/
+suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4590,4590,99.09,99.09,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21825823/
 suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4590,4590,97.66,97.66,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_22126799/
-suumo,house,False,,not_in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4590,4590,99.09,99.09,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21870159/
+suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4590,4590,99.09,99.09,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21870159/
 suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区大和田６,,4590,4590,97.66,97.66,93.98,93.98,3LDK+S（納戸）,,阪神電鉄阪神なんば線「出来島」徒歩6分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_22037177/
 suumo,house,False,,not_in_yahoo,西淀川区,大阪府大阪市西淀川区大野３-5-21,,3580,3580,57.1,57.1,104.31,104.31,4LDK,,阪神電鉄阪神なんば線「福」徒歩7分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21800876/
 suumo,house,False,,in_yahoo,西淀川区,大阪府大阪市西淀川区姫島２,,4080,4080,41.86,41.86,92.16,92.16,3LDK,,阪神本線「姫島」徒歩9分,https://suumo.jp/ikkodate/osaka/sc_osakashinishiyodogawa/nc_21585351/
@@ -781,8 +781,8 @@ suumo,house,False,,in_yahoo,都島区,大阪府大阪市都島区都島本通３
 suumo,house,False,,not_in_yahoo,都島区,大阪府大阪市都島区都島本通５,,7880,7880,89.15,89.15,128.18,128.18,3LDK+S（納戸）,,地下鉄谷町線「野江内代」徒歩8分,https://suumo.jp/ikkodate/osaka/sc_osakashimiyakojima/nc_21779158/
 suumo,house,False,,not_in_yahoo,都島区,大阪府大阪市都島区都島本通５,【ondo都島・都島本通5丁目～モデルハウス～】,6080,6080,115.1,115.1,101.46,101.46,4LDK,,地下鉄谷町線「野江内代」徒歩7分,https://suumo.jp/ikkodate/osaka/sc_osakashimiyakojima/nc_20592316/
 suumo,house,False,,in_yahoo,阿倍野区,大阪府大阪市阿倍野区共立通１,オープンライブス共立通アクセス,4780,4780,52.29,52.29,91.69,91.69,3LDK,,阪堺電気軌道上町線「松虫」徒歩7分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_22158356/
-suumo,house,True,37,not_in_yahoo,阿倍野区,大阪府大阪市阿倍野区共立通２-93-12他,セキュレア阿倍野 （本店木造住宅事業部）(分譲住宅)…,11700,12000,112.46,121.37,106.82,108.89,4LDK,,地下鉄谷町線「阿倍野」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_20309299/
-suumo,house,True,37,not_in_yahoo,阿倍野区,大阪府大阪市阿倍野区共立通２-93番34他,セキュレア阿倍野（本店住宅事業部）(分譲住宅)【ダイ…,8180,11498,90.13,113.47,89.26,103.34,3LDK～4LDK,,地下鉄谷町線「阿倍野」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_20358682/
+suumo,house,True,37,in_yahoo,阿倍野区,大阪府大阪市阿倍野区共立通２-93-12他,セキュレア阿倍野 （本店木造住宅事業部）(分譲住宅)…,11700,12000,112.46,121.37,106.82,108.89,4LDK,,地下鉄谷町線「阿倍野」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_20309299/
+suumo,house,True,37,in_yahoo,阿倍野区,大阪府大阪市阿倍野区共立通２-93番34他,セキュレア阿倍野（本店住宅事業部）(分譲住宅)【ダイ…,8180,11498,90.13,113.47,89.26,103.34,3LDK～4LDK,,地下鉄谷町線「阿倍野」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_20358682/
 suumo,house,True,,not_in_yahoo,阿倍野区,大阪府大阪市阿倍野区天王寺町北２,,4680,4680,44.47,44.58,90.27,90.73,3LDK・4LDK,,ＪＲ大阪環状線「寺田町」徒歩5分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_21708569/
 suumo,house,False,,not_in_yahoo,阿倍野区,大阪府大阪市阿倍野区天王寺町北３,,5980,5980,63.01,63.01,111.69,111.69,4LDK,,ＪＲ大阪環状線「寺田町」徒歩9分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_21462226/
 suumo,house,False,,not_in_yahoo,阿倍野区,大阪府大阪市阿倍野区天王寺町南２,,8980,8980,70.85,70.85,110.31,110.31,4LDK,,地下鉄御堂筋線「天王寺」徒歩10分,https://suumo.jp/ikkodate/osaka/sc_osakashiabeno/nc_21964260/
@@ -1419,6 +1419,7 @@ yahoo,house,False,,not_in_suumo,住之江区,大阪府大阪市住之江区西�
 yahoo,house,False,,not_in_suumo,住之江区,大阪府大阪市住之江区西住之江3丁目,,3190,3190,51.51,51.51,79.9,79.9,1SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025321325/
 yahoo,house,False,,in_suumo,住之江区,大阪府大阪市住之江区西住之江3丁目,,3190,3190,51.42,51.42,79.9,79.9,1SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025321324/
 yahoo,house,False,,in_suumo,住之江区,大阪府大阪市住之江区西住之江3丁目,,3780,3780,70.01,70.01,100.92,100.92,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025462482/
+yahoo,house,False,,not_in_suumo,住之江区,大阪府大阪市住之江区西加賀屋4丁目,,3780,3780,63.09,63.09,100.92,100.92,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025677170/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区墨江3丁目,,6299,6299,89.49,89.49,102.47,102.47,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025251443/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区墨江3丁目,,5499,5499,99.44,99.44,100.39,100.39,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025135473/
 yahoo,house,False,,not_in_suumo,住吉区,大阪府大阪市住吉区墨江4丁目,,4680,4680,50.19,50.19,93.69,93.69,3SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025658402/
@@ -1428,6 +1429,7 @@ yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区大領2丁目,,
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区山之内2丁目,,5680,5680,86.52,86.52,116.82,116.82,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025568499/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区帝塚山中4丁目,,5780,5780,86.4,86.4,121.36,121.36,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025143540/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区帝塚山中4丁目,,5780,5780,86.4,86.4,121.36,121.36,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025135776/
+yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区庭井1丁目,,3180,3180,41.35,41.35,80.3,80.3,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025743285/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区東粉浜2丁目,,3080,3080,54.97,54.97,72.76,72.76,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025172932/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区清水丘1丁目,,4680,4680,66.08,66.08,127.42,127.42,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025249774/
 yahoo,house,False,,in_suumo,住吉区,大阪府大阪市住吉区清水丘1丁目,,4780,4780,53.41,53.41,106.77,106.77,2LDK＋2S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520336/
@@ -1446,6 +1448,7 @@ yahoo,house,False,,not_in_suumo,城東区,大阪府大阪市城東区鴫野東3�
 yahoo,house,False,,in_suumo,大正区,大阪府大阪市大正区三軒家西2丁目,,5580,5580,61.55,61.55,102.55,102.55,5LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025224438/
 yahoo,house,False,,in_suumo,大正区,大阪府大阪市大正区北恩加島1丁目,,3380,3380,52.1,52.1,103.33,103.33,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025224429/
 yahoo,house,False,,in_suumo,大正区,大阪府大阪市大正区北恩加島1丁目,,3560,3560,52.1,52.1,103.33,103.33,2LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025434840/
+yahoo,house,False,,not_in_suumo,天王寺区,大阪府大阪市天王寺区細工谷2丁目,,5480,5480,57.05,57.05,95.31,95.31,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024408283/
 yahoo,house,False,,in_suumo,平野区,大阪府大阪市平野区加美鞍作2丁目,,3390,3390,46.0,46.0,82.9,82.9,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025566137/
 yahoo,house,False,,in_suumo_project,平野区,大阪府大阪市平野区平野北2丁目,,4480,4480,63.32,63.32,127.95,127.95,3SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025054149/
 yahoo,house,False,,in_suumo_project,平野区,大阪府大阪市平野区平野北2丁目,,4580,4580,58.95,58.95,113.02,113.02,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025054151/
@@ -1488,7 +1491,10 @@ yahoo,house,False,,in_suumo_project,平野区,大阪府大阪市平野区長吉�
 yahoo,house,False,,in_suumo_project,平野区,大阪府大阪市平野区長吉長原2丁目,,4499,4499,74.02,74.02,122.0,122.0,2SSLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025276965/
 yahoo,house,False,,in_suumo_project,平野区,大阪府大阪市平野区長吉長原2丁目,,4599,4599,117.66,117.66,121.59,121.59,2SSLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025276966/
 yahoo,house,False,,in_suumo_project,平野区,大阪府大阪市平野区長吉長原2丁目,,4799,4799,79.35,79.35,114.6,114.6,4SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025276964/
+yahoo,house,False,,not_in_suumo,平野区,大阪府大阪市平野区長吉長原2丁目,,2780,2780,44.05,44.05,73.39,73.39,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025374402/
 yahoo,house,False,,in_suumo,旭区,大阪府大阪市旭区新森3丁目,,5380,5380,66.3,66.3,112.72,112.72,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025618127/
+yahoo,house,False,,in_suumo,旭区,大阪府大阪市旭区清水2丁目,,3380,3380,52.01,52.01,82.23,82.23,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024230897/
+yahoo,house,False,,in_suumo,東住吉区,大阪府大阪市東住吉区中野1丁目,,3880,3880,59.05,59.05,101.04,101.04,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025444283/
 yahoo,house,False,,in_suumo_project,東住吉区,大阪府大阪市東住吉区今川3丁目,,4980,4980,73.07,73.07,152.19,152.19,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025680713/
 yahoo,house,False,,in_suumo_project,東住吉区,大阪府大阪市東住吉区今川3丁目,,5480,5480,73.55,73.55,152.19,152.19,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025680715/
 yahoo,house,False,,in_suumo_project,東住吉区,大阪府大阪市東住吉区今川3丁目,,5480,5480,74.29,74.29,152.19,152.19,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025680716/
@@ -1519,6 +1525,7 @@ yahoo,house,False,,in_suumo_project,東住吉区,大阪府大阪市東住吉区�
 yahoo,house,False,,not_in_suumo,東住吉区,大阪府大阪市東住吉区公園南矢田3丁目,,5599,5599,112.09,112.09,125.47,125.47,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025091154/
 yahoo,house,False,,in_suumo,東住吉区,大阪府大阪市東住吉区公園南矢田4丁目,,3480,3480,61.3,61.3,88.92,88.92,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024579465/
 yahoo,house,False,,in_suumo,東住吉区,大阪府大阪市東住吉区公園南矢田4丁目,,3568,3568,61.3,61.3,88.92,88.92,2LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520278/
+yahoo,house,False,,not_in_suumo,東住吉区,大阪府大阪市東住吉区湯里2丁目,,4180,4180,57.09,57.09,98.33,98.33,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024724961/
 yahoo,house,False,,not_in_suumo,東住吉区,大阪府大阪市東住吉区照ケ丘矢田3丁目,,3880,3880,57.44,57.44,126.12,126.12,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025435189/
 yahoo,house,False,,in_suumo,東住吉区,大阪府大阪市東住吉区照ケ丘矢田3丁目,,3880,3880,88.42,88.42,101.65,101.65,2SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024552927/
 yahoo,house,False,,in_suumo,東住吉区,大阪府大阪市東住吉区駒川5丁目,,3480,3480,46.5,46.5,83.19,83.19,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025116112/
@@ -1561,6 +1568,7 @@ yahoo,house,False,,in_suumo_project,東淀川区,大阪府大阪市東淀川区�
 yahoo,house,False,,not_in_suumo,東淀川区,大阪府大阪市東淀川区大道南2丁目,,4690,4690,56.19,56.19,100.6,100.6,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025485592/
 yahoo,house,False,,in_suumo,東淀川区,大阪府大阪市東淀川区大道南2丁目,,4290,4290,74.35,74.35,91.49,91.49,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025485589/
 yahoo,house,False,,in_suumo_project,東淀川区,大阪府大阪市東淀川区大道南2丁目,,4690,4690,66.98,66.98,103.6,103.6,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025485590/
+yahoo,house,False,,in_suumo_project,東淀川区,大阪府大阪市東淀川区大道南2丁目,,5080,5080,70.03,70.03,110.04,110.04,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025499131/
 yahoo,house,False,,in_suumo_project,東淀川区,大阪府大阪市東淀川区大道南2丁目,,4690,4690,66.98,66.98,102.36,102.36,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025515917/
 yahoo,house,False,,not_in_suumo,東淀川区,大阪府大阪市東淀川区大道南2丁目,,4690,4690,56.19,56.19,98.12,98.12,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025515918/
 yahoo,house,False,,in_suumo,東淀川区,大阪府大阪市東淀川区大道南2丁目,,4290,4290,74.35,74.35,91.49,91.49,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025515916/
@@ -1581,6 +1589,7 @@ yahoo,house,False,,in_suumo,此花区,大阪府大阪市此花区酉島3丁目,,
 yahoo,house,False,,in_suumo,淀川区,大阪府大阪市淀川区加島4丁目,,4480,4480,64.81,64.81,130.27,130.27,3SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025386673/
 yahoo,house,False,,in_suumo,淀川区,大阪府大阪市淀川区加島4丁目,,4480,4480,64.81,64.81,130.27,130.27,3SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025534387/
 yahoo,house,False,,in_suumo,淀川区,大阪府大阪市淀川区十八条3丁目,,6480,6480,74.28,74.28,108.19,108.19,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025507823/
+yahoo,house,False,,in_suumo,淀川区,大阪府大阪市淀川区十八条3丁目,,6480,6480,74.28,74.28,108.19,108.19,4SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025502787/
 yahoo,house,False,,in_suumo,淀川区,大阪府大阪市淀川区田川1丁目,,3780,3780,43.9,43.9,78.53,78.53,3LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025635619/
 yahoo,house,False,,in_suumo,淀川区,大阪府大阪市淀川区田川1丁目,,3780,3780,43.9,43.9,78.53,78.53,3SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0023608681/
 yahoo,house,False,,not_in_suumo,港区,大阪府大阪市港区八幡屋3丁目,,2990,2990,44.15,44.15,81.1,81.1,2SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025558844/
@@ -1624,6 +1633,10 @@ yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1�
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,4199,4199,102.23,102.23,89.63,89.63,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025203151/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,4699,4699,85.96,85.96,90.79,90.79,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025203152/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,4498,4498,103.73,103.73,94.6,94.6,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025627976/
+yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,3799,3799,101.91,101.91,89.63,89.63,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025293329/
+yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,4199,4199,102.23,102.23,89.63,89.63,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025293328/
+yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,4699,4699,85.96,85.96,90.79,90.79,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025293330/
+yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,4799,4799,86.15,86.15,97.14,97.14,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025293331/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,3280,3280,66.1,66.1,116.32,116.32,1LDK＋3S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025023281/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区中島1丁目,,3280,3280,66.09,66.09,116.32,116.32,1LDK＋3S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025023282/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区佃1丁目,,3680,3680,48.17,48.17,98.21,98.21,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025394737/
@@ -1634,6 +1647,7 @@ yahoo,house,False,,in_suumo_project,西淀川区,大阪府大阪市西淀川区�
 yahoo,house,False,,in_suumo_project,西淀川区,大阪府大阪市西淀川区大和田5丁目,,3680,3680,57.0,57.0,72.86,72.86,2LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643359/
 yahoo,house,False,,in_suumo_project,西淀川区,大阪府大阪市西淀川区大和田5丁目,,4480,4480,55.44,55.44,94.23,94.23,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643358/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区大和田6丁目,,4480,4480,97.66,97.66,93.98,93.98,3SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025453109/
+yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区大和田6丁目,,4590,4590,99.09,99.09,93.98,93.98,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025570291/
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区姫島2丁目,,4080,4080,41.86,41.86,92.16,92.16,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025396382/
 yahoo,house,False,,not_in_suumo,西淀川区,大阪府大阪市西淀川区姫里3丁目,,4100,4100,49.61,49.61,93.92,93.92,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024853391/
 yahoo,house,False,,not_in_suumo,西淀川区,大阪府大阪市西淀川区姫里3丁目,,4100,4100,49.61,49.61,93.92,93.92,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025229403/
@@ -1648,11 +1662,15 @@ yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区竹島3�
 yahoo,house,False,,in_suumo,西淀川区,大阪府大阪市西淀川区竹島3丁目,,3280,3280,45.15,45.15,89.32,89.32,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025504617/
 yahoo,house,False,,in_suumo,都島区,大阪府大阪市都島区内代町3丁目,,6680,6680,74.94,74.94,102.21,102.21,3LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025583277/
 yahoo,house,False,,in_suumo,都島区,大阪府大阪市都島区東野田町4丁目,,6180,6180,62.87,62.87,107.72,107.72,2SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025406357/
+yahoo,house,False,,in_suumo,都島区,大阪府大阪市都島区東野田町4丁目,,6180,6180,62.87,62.87,107.72,107.72,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025499126/
 yahoo,house,False,,in_suumo_project,都島区,大阪府大阪市都島区東野田町5丁目,,7680,7680,55.67,55.67,108.67,108.67,3LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643355/
 yahoo,house,False,,in_suumo_project,都島区,大阪府大阪市都島区東野田町5丁目,,7580,7580,57.29,57.29,108.67,108.67,3LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643354/
 yahoo,house,False,,in_suumo_project,都島区,大阪府大阪市都島区東野田町5丁目,,7380,7380,53.93,53.93,102.52,102.52,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643356/
 yahoo,house,False,,in_suumo,都島区,大阪府大阪市都島区都島本通3丁目,,6480,6480,58.18,58.18,105.87,105.87,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025420596/
 yahoo,house,False,,in_suumo,阿倍野区,大阪府大阪市阿倍野区共立通1丁目,,4780,4780,52.29,52.29,91.69,91.69,3LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025727732/
+yahoo,house,True,,in_suumo_project,阿倍野区,大阪府大阪市阿倍野区共立通2丁目,,8180,11498,90.13,113.47,89.26,103.34,3LDK（27号地）、4LDK（32号地）,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024680445/
+yahoo,house,True,,in_suumo_project,阿倍野区,大阪府大阪市阿倍野区共立通2丁目,,11700,12000,112.46,121.37,106.82,108.89,4LDK（5号地、31号地）,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024680444/
 yahoo,house,False,,in_suumo,阿倍野区,大阪府大阪市阿倍野区阪南町6丁目,,5490,5490,51.14,51.14,92.21,92.21,2SLDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025170011/
 yahoo,house,False,,in_suumo,阿倍野区,大阪府大阪市阿倍野区阪南町6丁目,,5690,5690,51.14,51.14,92.21,92.21,2LDK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025247134/
+yahoo,house,False,,not_in_suumo,鶴見区,大阪府大阪市鶴見区今津北5丁目,,4180,4180,57.55,57.55,98.44,98.44,4LDK,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025504955/
 yahoo,house,False,,not_in_suumo,鶴見区,大阪府大阪市鶴見区緑3丁目,,4780,4780,65.82,65.82,117.95,117.95,2DK＋S,,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025635406/
