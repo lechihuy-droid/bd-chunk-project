@@ -1,0 +1,102 @@
+{
+ "suumo": {
+  "listing_urls": 1412,
+  "houses": 817,
+  "land_with_building_condition": 595,
+  "house_single_unit_groups": 480,
+  "house_multi_lot_entries": 169,
+  "multi_lot_with_stated_total": 37,
+  "lots_in_stated_totals": 257,
+  "land_condition_multi_lot_entries": 70
+ },
+ "yahoo": {
+  "listing_urls": 245,
+  "unit_groups": 187,
+  "with_completion_month": 0
+ },
+ "yahoo_units_vs_suumo": {
+  "all_prices": {
+   "groups": 187,
+   "by_match": {
+    "in_suumo": 93,
+    "in_suumo_project": 73,
+    "not_in_suumo": 21
+   }
+  },
+  "band_4000_5000": {
+   "groups": 93,
+   "by_match": {
+    "in_suumo": 37,
+    "in_suumo_project": 45,
+    "not_in_suumo": 11
+   }
+  }
+ },
+ "suumo_houses_vs_yahoo": {
+  "all_prices": {
+   "groups": 649,
+   "by_match": {
+    "in_yahoo": 189,
+    "in_yahoo_probable": 1,
+    "not_in_yahoo": 459
+   }
+  },
+  "band_4000_5000": {
+   "groups": 296,
+   "by_match": {
+    "in_yahoo": 95,
+    "in_yahoo_probable": 1,
+    "not_in_yahoo": 200
+   }
+  },
+  "multi_lot_all_prices": {
+   "groups": 169,
+   "by_match": {
+    "in_yahoo": 96,
+    "not_in_yahoo": 73
+   }
+  },
+  "multi_lot_band": {
+   "groups": 97,
+   "by_match": {
+    "in_yahoo": 59,
+    "not_in_yahoo": 38
+   }
+  }
+ },
+ "band_4000_5000_counts": {
+  "suumo_house_groups": 296,
+  "suumo_multi_lot": 97,
+  "suumo_land_condition_entries": 63,
+  "yahoo_unit_groups": 93
+ },
+ "yahoo_completion_years": {
+  "not_stated": 187
+ },
+ "suumo_house_wards": {
+  "東住吉区": 82,
+  "平野区": 77,
+  "生野区": 54,
+  "西淀川区": 51,
+  "住吉区": 48,
+  "東淀川区": 40,
+  "住之江区": 32,
+  "城東区": 31,
+  "西成区": 30,
+  "港区": 25,
+  "淀川区": 24,
+  "阿倍野区": 23,
+  "東成区": 21,
+  "旭区": 21,
+  "此花区": 20,
+  "大正区": 17,
+  "都島区": 16,
+  "鶴見区": 11,
+  "天王寺区": 8,
+  "西区": 5,
+  "福島区": 5,
+  "中央区": 4,
+  "北区": 3,
+  "浪速区": 1
+ }
+}

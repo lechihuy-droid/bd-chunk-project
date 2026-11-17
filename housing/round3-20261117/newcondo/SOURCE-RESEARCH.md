@@ -71,3 +71,76 @@ Ngày vào ở của 85 dự án: 15 dự án đã xong hoặc vào ở ngay, 3 
 2. Chạy マンションコミュニティ từ máy của Huy để bắt dự án chưa lên cổng.
 3. Lập danh sách theo dõi 18 dự án chưa công bố giá; kiểm lại định kỳ.
 4. Bổ sung cách tính chi phí ở thực cho chung cư mới vào chuẩn 4.0 khi đã có giá theo loại căn và phí.
+
+---
+
+# Nhà riêng xây mới — nghiên cứu nguồn và độ phủ
+
+Bổ sung ngày 17/11/2026 theo yêu cầu của Huy. 29 request (SUUMO 15 trang, Yahoo! 11 trang, 住まいサーフィン 3 trang), cùng quy tắc như trên. Nhật ký: [requests-newhouse.log](requests-newhouse.log). Số tổng hợp: [newhouse-source-coverage.json](newhouse-source-coverage.json). Script: [`newhouse_sources.py`](../tools/newhouse_sources.py). Bảng từng tin gửi riêng cho Huy, không nằm trong repo.
+
+Phạm vi: nhà riêng mới ở Osaka-shi, mọi mức giá, chỉ trang danh sách.
+
+## 1. Nguồn đã xét
+
+| Nguồn | Truy cập | Số tin Osaka-shi | Ghi chú |
+|---|---|---:|---|
+| SUUMO | Được | 1.426 (đọc được 1.412) | Gồm hai loại: 817 tin nhà xây sẵn và 595 tin **đất kèm điều kiện xây** (建築条件付土地) |
+| Yahoo!不動産 | Được | 310 (đọc được 245, tức 79%) | Chỉ có nhà xây sẵn, từng căn |
+| 住まいサーフィン (mục nhà riêng) | Được | 243 tin mới toàn Osaka-fu | Tên tin trùng kiểu đặt tên của SUUMO, nhiều khả năng lấy dữ liệu từ SUUMO nên **không dùng làm nguồn đối chứng**; không tải tiếp |
+| 東急リバブル, 野村, リハウス, 大京 | Được (đợt 2) | 3 căn trong dải ở リバブル, còn lại 0 | Gần như không có nhà mới |
+| athome, LIFULL HOME'S, ニフティ | Bị chặn | — | |
+| Trang riêng của công ty xây nhà (nhóm 飯田, オープンハウス, フジ住宅…) | Chưa xét | — | |
+
+## 2. SUUMO có gì
+
+| Loại | Số |
+|---|---:|
+| Nhà xây sẵn, một căn một tin (sau khi gom tin trùng) | 480 |
+| Nhà xây sẵn, tin gộp nhiều lô (giá ghi hai mức hoặc theo khoảng, hoặc ghi "全N区画") | 169 |
+| Đất kèm điều kiện xây | 595 tin, trong đó 70 tin gộp nhiều lô |
+
+- 37 trong 169 tin gộp ghi rõ tổng số lô, cộng lại 257 lô.
+- **Đất kèm điều kiện xây là loại chưa từng được thu ở các đợt trước.** Người mua mua đất rồi buộc phải xây với công ty chỉ định; giá rao **chưa gồm nhà**, nên không so thẳng được với nhà xây sẵn.
+- Snapshot 02/11 có 802 tin nhà mới; lần này 817 tin nhà xây sẵn.
+
+## 3. Độ phủ giữa hai nguồn
+
+Khớp theo địa chỉ cấp chome + diện tích đất + diện tích nhà; căn Yahoo! nằm trong khoảng giá và khoảng diện tích của một tin gộp SUUMO cùng khu được tính là thuộc tin gộp đó.
+
+| | Mọi giá | Trong dải 4.000–5.000万 |
+|---|---:|---:|
+| Căn trên Yahoo! | 187 | 93 |
+| — có trên SUUMO | 166 (89%) | 82 (88%) |
+| — không có trên SUUMO | 21 | 11 |
+| Mục nhà xây sẵn trên SUUMO (căn lẻ + tin gộp) | 649 | 296 |
+| — có trên Yahoo! | 190 (29%) | 96 (32%) |
+| — không có trên Yahoo! | 459 | 200 |
+
+**Kết luận về nguồn:**
+
+- Với nhà riêng mới, SUUMO là nguồn chính; Yahoo! chỉ thấy khoảng một phần ba những gì SUUMO có.
+- Yahoo! vẫn thêm được khoảng 11% số căn không có trên SUUMO, nên giữ làm nguồn phụ.
+- Chưa có nguồn độc lập thứ ba để ước lượng phần cả hai cùng thiếu. athome và HOME'S (bị chặn từ đám mây) là hai nguồn đáng kiểm nhất, vì công ty xây nhà nhỏ ở địa phương hay đăng ở đó.
+
+## 4. Trong dải 4.000–5.000万
+
+| | Số |
+|---|---:|
+| Mục nhà xây sẵn trên SUUMO | 296 (trong đó 97 tin gộp nhiều lô) |
+| Tin đất kèm điều kiện xây có giá đất chạm dải | 63 |
+| Căn trên Yahoo! | 93 (11 căn không có trên SUUMO) |
+
+Với tin gộp, "trong dải" nghĩa là khoảng giá công bố giao với 4.000–5.000万.
+
+## 5. Giới hạn
+
+1. **Chưa biết căn nào đang xây, căn nào đã xong.** Trang danh sách của cả hai nguồn không ghi ngày hoàn thành; thông tin này nằm ở trang chi tiết.
+2. **Parser Yahoo! chỉ đọc được 245/310 tin**, nên tỷ lệ "Yahoo! có" đang bị tính thấp đi một chút.
+3. **Một dự án có thể bị tách thành nhiều tin** (mỗi lô một tin, hoặc nhiều môi giới cùng đăng), nên 169 tin gộp không phải 169 dự án.
+4. **Phép khớp dựa vào diện tích ghi giống hệt nhau**; lệch vài phần trăm mét vuông giữa hai trang thì bị tính là không khớp.
+
+## 6. Việc tiếp theo đề xuất
+
+1. Tải trang chi tiết SUUMO cho các mục trong dải (khoảng 300 nhà xây sẵn) để lấy ngày hoàn thành, tổng số lô, loại người bán, công ty xây.
+2. Quyết định cách xử lý đất kèm điều kiện xây: cần thêm giá nhà tham khảo mới so được với nhà xây sẵn.
+3. Chạy athome và HOME'S từ máy của Huy cho mục nhà mới, cùng đợt với các việc trong brief.
