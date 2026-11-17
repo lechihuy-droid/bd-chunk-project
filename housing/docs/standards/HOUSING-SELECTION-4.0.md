@@ -95,7 +95,7 @@ Dữ liệu: 1.108 căn gom từ 1.753 tin SUUMO trong dải 4.000–5.000万, s
 So với bản 3.0:
 
 - Nhà riêng nay xếp được 405/473 căn; bản 3.0 gần như không xếp được.
-- 139 chung cư thuộc P1 cũ rải gần đều: 32 căn A, 36 B, 33 C, 38 D. Hai tiêu chí đo hai thứ khác nhau.
+- Trong 165 chung cư thuộc P1 cũ, 139 căn tính được và rải gần đều: 32 căn A, 36 B, 33 C, 38 D (còn lại 20 U, 6 S). Hai tiêu chí đo hai thứ khác nhau.
 - Chung cư nhóm D tập trung ở 中央区 và 北区; nhóm A nhiều ở 鶴見区, 淀川区, 都島区.
 
 ## 8. Giới hạn đã biết
