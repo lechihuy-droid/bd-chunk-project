@@ -1,0 +1,110 @@
+{
+ "site": "yahoo",
+ "requests_this_run": 0,
+ "pages": [
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000",
+   "cards": 129,
+   "in_band_rows": 41,
+   "site_total": 194
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000&page=2",
+   "cards": 83,
+   "in_band_rows": 38,
+   "site_total": 194
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000&page=3",
+   "cards": 73,
+   "in_band_rows": 36,
+   "site_total": 194
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000&page=4",
+   "cards": 67,
+   "in_band_rows": 34,
+   "site_total": 194
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000&page=5",
+   "cards": 36,
+   "in_band_rows": 29,
+   "site_total": 194
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000&page=6",
+   "cards": 17,
+   "in_band_rows": 15,
+   "site_total": 194
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/mansion/search/06/27/271/?p_from=40000000&p_to=50000000&page=7",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/house/search/06/27/271/?p_from=40000000&p_to=50000000",
+   "cards": 94,
+   "in_band_rows": 30,
+   "site_total": 88
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=2",
+   "cards": 73,
+   "in_band_rows": 30,
+   "site_total": 88
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=3",
+   "cards": 67,
+   "in_band_rows": 26,
+   "site_total": 88
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/used/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=4",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/new/house/search/06/27/271/?p_from=40000000&p_to=50000000",
+   "cards": 101,
+   "in_band_rows": 26,
+   "site_total": 134
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/new/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=2",
+   "cards": 83,
+   "in_band_rows": 30,
+   "site_total": 134
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/new/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=3",
+   "cards": 71,
+   "in_band_rows": 29,
+   "site_total": 134
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/new/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=4",
+   "cards": 70,
+   "in_band_rows": 25,
+   "site_total": 134
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/new/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=5",
+   "cards": 52,
+   "in_band_rows": 12,
+   "site_total": 134
+  },
+  {
+   "url": "https://realestate.yahoo.co.jp/new/house/search/06/27/271/?p_from=40000000&p_to=50000000&page=6",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  }
+ ],
+ "rows": 401,
+ "stopped": ""
+}

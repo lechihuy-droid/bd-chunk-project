@@ -1,0 +1,169 @@
+kind,category,ward,address,building_name,floor,unit_m2,land_m2,building_m2,layout,built_year,station_raw,price_min_jpy,price_max_jpy,sources,listing_count,suumo_status,suumo_prices,urls
+house,new_house,平野区,大阪府大阪市平野区西脇1丁目,,,,82.58,108.88,3SLDK,,,49990000,49990000,yahoo,1,in_suumo_other_price,5099万円,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024984214/
+house,new_house,東淀川区,大阪府大阪市東淀川区大道南2丁目,,,,61.84,119.66,3LDK＋S,,,49800000,49800000,yahoo,3,in_suumo_other_price,5180万円,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025635552/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025418685/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025444047/
+house,new_house,東淀川区,大阪府大阪市東淀川区大道南2丁目,,,,61.13,116.23,3LDK＋S,,,49800000,49800000,yahoo,4,in_suumo_other_price,5180万円,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025635549/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025418682/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025601047/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025444041/
+condo,used_condo,中央区,大阪府大阪市中央区安堂寺町２丁目,ロイヤル谷六駅前,13,55.13,,,2LD・K,2001,大阪メトロ谷町線「谷町六丁目」駅 徒歩1分 / 大阪メトロ長堀鶴見緑地線「谷町六丁目」駅 徒歩1分 / 大阪メトロ中央線「谷町四丁目」駅 徒歩8分,49800000,49800000,livable,1,in_suumo_other_price,5380万円,https://www.livable.co.jp/mansion/C27264B95/
+condo,used_condo,中央区,大阪府大阪市中央区玉造２丁目,カーサ雅城台,2,95.97,,,4LDK,1979,大阪メトロ長堀鶴見緑地線「玉造」駅 徒歩6分 / 大阪メトロ中央線「森ノ宮」駅 徒歩9分 / 大阪環状線「玉造」駅 徒歩11分,49800000,49800000,livable,1,in_suumo_other_price,5480万円,https://www.livable.co.jp/mansion/C27263F14/
+condo,used_condo,中央区,大阪府大阪市中央区松屋町住吉,シティハウス松屋町,9,56.97,,,1LDK,2005,大阪メトロ長堀鶴見緑地線「松屋町」駅 徒歩4分,49800000,49800000,livable,1,in_suumo_other_price,5050万円,https://www.livable.co.jp/mansion/C2726X341/
+condo,used_condo,中央区,大阪府大阪市中央区南船場１丁目,ソシオタワー南船場,14,50.19,,,1LDK,2000,大阪メトロ長堀鶴見緑地線 松屋町駅 徒歩4分,49800000,49800000,rehouse+stepon,2,in_suumo_other_price,5298万円,https://www.rehouse.co.jp/buy/mansion/bkdetail/F1GBTBBD/ https://www.stepon.co.jp/mansion/detail_C6253097/
+condo,used_condo,中央区,大阪府大阪市中央区農人橋１丁目,メロディーハイム東船場,10,124.78,,,2LDK,1979,大阪メトロ谷町線 谷町四丁目駅 徒歩3分,49800000,49800000,rehouse,1,in_suumo_other_price,5330万円,https://www.rehouse.co.jp/buy/mansion/bkdetail/FZDBEA02/
+condo,used_condo,中央区,大阪府大阪市中央区内本町１丁目,内本町ビューハイツ,11,72.5,,,2LDK,1981,大阪メトロ谷町線 谷町四丁目駅 徒歩3分,49800000,49800000,rehouse,1,in_suumo_other_price,5298万円,https://www.rehouse.co.jp/buy/mansion/bkdetail/FZDBRA0F/
+condo,used_condo,中央区,大阪府大阪市中央区南久宝寺町２丁目,リーガルタワー船場,6,62.54,,,ワンルーム,2004,大阪メトロ堺筋線 「 堺筋本町 」駅 徒歩5分 大阪メトロ中央線 「 堺筋本町 」駅 徒歩5分 大阪メトロ長堀鶴見線 「 長堀橋 」駅 徒歩7分,49800000,49800000,stepon,1,in_suumo_other_price,5150万円/5280万円/5998万円,https://www.stepon.co.jp/mansion/detail_36253244/
+condo,used_condo,住吉区,大阪府大阪市住吉区南住吉4丁目,,1,68.6,,,3LDK,2011,,42800000,42800000,yahoo,1,in_suumo_other_price,3998万円,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0024844773/
+condo,used_condo,住吉区,大阪府大阪市住吉区万代２丁目,ヴェリテ帝塚山万代,8,77.59,,,3LDK,2013,大阪メトロ御堂筋線 「 西田辺 」駅 徒歩11分 南海電鉄高野線 「 帝塚山 」駅 徒歩13分 阪堺電気軌道上町線 「 姫松 」駅 徒歩7分,50000000,50000000,daikyo+nomu,2,in_suumo_other_price,6980万円,https://www.daikyo-anabuki.co.jp/buy/detail/OAK98128/ https://www.nomu.com/mansion/id/UE070068/
+condo,used_condo,北区,大阪府大阪市北区西天満５丁目,エスリード西天満,6,63.65,,,2SLDK,2001,大阪メトロ堺筋線 「 南森町 」駅 徒歩6分 ＪＲ東西線 「 大阪天満宮 」駅 徒歩8分 大阪メトロ谷町線 「 南森町 」駅 徒歩6分,47800000,47800000,stepon,1,in_suumo_other_price,6380万円,https://www.stepon.co.jp/mansion/detail_36213274/
+condo,used_condo,北区,大阪府大阪市北区長柄西2丁目,,19,60.42,,,3LDK,1999,,49800000,49800000,yahoo,1,in_suumo_other_price,5298万円,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025688441/
+condo,used_condo,北区,大阪市北区大淀中2丁目,,3,55.64,,,2LDK,1999,阪急神戸線「中津」駅 徒歩12分 大阪環状線「福島」駅 徒歩13分,49980000,49980000,nomu+yahoo,2,in_suumo_other_price,5480万円,https://www.nomu.com/mansion/id/R9571752/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025733967/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区上汐４丁目,センティア四天王寺・夕陽ヶ丘,2,63.19,,,1SLDK,2005,大阪メトロ谷町線 四天王寺前夕陽ヶ丘駅 徒歩5分,47800000,47800000,rehouse,1,in_suumo_other_price,5780万円,https://www.rehouse.co.jp/buy/mansion/bkdetail/FSLBUA07/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区上本町８丁目,メロディーハイム四天王寺夕陽丘弐番館,6,57.07,,,2LDK,2003,近鉄難波・奈良線「大阪上本町」駅 徒歩6分 / 大阪メトロ谷町線「四天王寺前夕陽ヶ丘」駅 徒歩9分 / 大阪メトロ千日前線「谷町九丁目」駅 徒歩10分,49800000,49800000,livable+yahoo,2,in_suumo_other_price,5280万円/5290万円/5590万円/5798万円,https://www.livable.co.jp/mansion/C27266383/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025149295/
+condo,used_condo,此花区,大阪府大阪市此花区島屋６丁目,リバーガーデンこのはな,11,94.43,,,4LDK,2006,桜島線 ユニバーサルシティ駅 徒歩3分,40800000,40800000,rehouse,1,in_suumo_other_price,3890万円,https://www.rehouse.co.jp/buy/mansion/bkdetail/F6ABUA01/
+condo,used_condo,港区,大阪府大阪市港区弁天１丁目,オークプリオタワー,40,63.76,,,2LDK,1993,大阪メトロ中央線「弁天町」駅 徒歩5分 / 大阪環状線「弁天町」駅 徒歩5分,49800000,49800000,livable+nomu+yahoo,3,in_suumo_other_price,5290万円/5590万円,https://www.livable.co.jp/mansion/C27267H17/ https://www.nomu.com/mansion/id/R9571287/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025535412/
+condo,used_condo,西区,大阪府大阪市西区川口３丁目,シテヌーブ阿波座,2,90.22,,,3LDK,1992,大阪メトロ中央線 阿波座駅 徒歩9分,49800000,49800000,rehouse,1,in_suumo_other_price,5498万円/6299万円,https://www.rehouse.co.jp/buy/mansion/bkdetail/F0BBRA15/
+condo,used_condo,西区,大阪府大阪市西区新町2丁目,,7,40.02,,,1LDK,2021,,49800000,49800000,yahoo,1,in_suumo_other_price,5300万円,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025556029/
+condo,used_condo,西区,大阪府大阪市西区北堀江３丁目,ファミール北堀江,3,63.72,,,2LDK＋納戸×1,1997,大阪メトロ千日前線「西長堀」駅 徒歩4分 / 大阪メトロ長堀鶴見緑地線「西長堀」駅 徒歩4分,49990000,49990000,livable+nomu,2,in_suumo_other_price,5199万円,https://www.livable.co.jp/mansion/C27267881/ https://www.nomu.com/mansion/id/R9571133/
+house,used_house,大正区,大阪府大阪市大正区泉尾１丁目,,,,44.77,86.06,3LDK,2020,大阪メトロ長堀鶴見緑地線 大正駅 徒歩6分,48800000,48800000,rehouse,1,in_suumo_other_price,5280万円,https://www.rehouse.co.jp/buy/kodate/bkdetail/FWXBUA0C/
+house,used_house,此花区,大阪府大阪市此花区春日出中２丁目,,,,96.72,242.89,9LDK,2001,ＪＲ桜島線 「 安治川口 」駅 徒歩14分 阪神なんば線 「 千鳥橋 」駅 徒歩17分,44800000,44800000,stepon,1,in_suumo_other_price,5490万円,https://www.stepon.co.jp/kodate/detail_36252107/
+house,used_house,西成区,大阪府大阪市西成区天神ノ森2丁目,,,,80.98,99.22,3SLDK,2017,,49800000,49800000,yahoo,1,in_suumo_other_price,5180万円,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025551318/
+house,used_house,西淀川区,大阪府大阪市西淀川区姫里３丁目,,,,66.85,113.73,4LDK,2001,阪神本線 姫島駅 徒歩6分,43800000,43800000,rehouse,1,in_suumo_other_price,3480万円,https://www.rehouse.co.jp/buy/kodate/bkdetail/F6ABUA0D/
+house,used_house,都島区,大阪府大阪市都島区毛馬町３丁目,,,,100.53,92.73,4LDK,2015,ＪＲおおさか東線 「 城北公園通 」駅 徒歩14分 大阪メトロ堺筋線 「 天神橋筋六丁目 」駅 徒歩20分 大阪メトロ谷町線 「 都島 」駅 徒歩22分,47000000,47000000,stepon,1,in_suumo_other_price,5280万円,https://www.stepon.co.jp/kodate/detail_36542041/
+house,new_house,住吉区,大阪府大阪市住吉区墨江4丁目,,,,50.19,93.69,3SLDK,,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025658402/
+house,new_house,住吉区,大阪府大阪市住吉区清水丘1丁目,,,,53.41,106.77,2LDK＋2S,,,47800000,47800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520336/
+house,new_house,住吉区,大阪府大阪市住吉区清水丘3丁目,,,,65.94,130.67,3LDK,,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025440168/
+house,new_house,平野区,大阪府大阪市平野区瓜破5丁目,,,,115.31,103.27,2SLDK,,,40900000,41900000,yahoo,2,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024566232/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0024571104/
+house,new_house,平野区,大阪府大阪市平野区西脇2丁目,,,,57.76,113.52,4LDK,,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025375408/
+house,new_house,平野区,大阪府大阪市平野区平野北2丁目,,,,63.32,127.95,3SLDK,,,44800000,44800000,yahoo,3,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025054149/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025057932/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520301/
+house,new_house,平野区,大阪府大阪市平野区平野北2丁目,,,,60.79,116.54,3SLDK,,,44800000,44800000,yahoo,3,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025054150/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025057931/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520302/
+house,new_house,平野区,大阪府大阪市平野区長吉長原2丁目,,,,74.02,122,2SSLDK,,,44990000,44990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025276965/
+house,new_house,平野区,大阪府大阪市平野区平野北2丁目,,,,58.95,113.02,3LDK,,,45800000,45800000,yahoo,3,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025054151/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025057930/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520303/
+house,new_house,平野区,大阪府大阪市平野区長吉長原2丁目,,,,117.66,121.59,2SSLDK,,,45990000,45990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025276966/
+house,new_house,平野区,大阪府大阪市平野区瓜破5丁目,,,,102.3,98.81,2SLDK,,,47900000,47900000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024612029/
+house,new_house,平野区,大阪府大阪市平野区瓜破5丁目,,,,102.6,98.81,2SLDK,,,47900000,48900000,yahoo,2,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024566230/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0024571105/
+house,new_house,平野区,大阪府大阪市平野区瓜破西3丁目,,,,88.08,93.58,4LDK,,,47990000,47990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025054139/
+house,new_house,平野区,大阪府大阪市平野区長吉長原2丁目,,,,79.35,114.6,4SLDK,,,47990000,47990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025276964/
+house,new_house,平野区,大阪府大阪市平野区西脇1丁目,,,,77.5,97.09,3LDK＋S,,,48800000,48800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025520294/
+house,new_house,平野区,大阪府大阪市平野区長吉川辺2丁目,,,,116.36,106.19,3SLDK,,,49990000,49990000,yahoo,3,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025684395/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025680694/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025684452/
+house,new_house,東住吉区,大阪府大阪市東住吉区公園南矢田2丁目,,,,105.89,93.96,2SLDK,,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025449055/
+house,new_house,東住吉区,大阪府大阪市東住吉区公園南矢田3丁目,,,,65.62,124.95,3SLDK,,,44990000,44990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025091147/
+house,new_house,東住吉区,大阪府大阪市東住吉区公園南矢田3丁目,,,,90.59,126.1,3SLDK,,,48990000,48990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025091151/
+house,new_house,東住吉区,大阪府大阪市東住吉区今川3丁目,,,,73.07,152.19,4LDK,,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025680713/
+house,new_house,東住吉区,大阪府大阪市東住吉区公園南矢田3丁目,,,,111.69,111.56,3SLDK,,,49990000,49990000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025091152/
+house,new_house,東成区,大阪府大阪市東成区大今里南６丁目,,,,74.75,86.10,3LDK,2026,大阪メトロ千日前線「小路」駅 徒歩4分 / 大阪メトロ千日前線「新深江」駅 徒歩7分 / 近鉄大阪線「布施」駅 徒歩9分,43800000,43800000,livable,1,not_in_suumo,,https://www.livable.co.jp/kodate/C27263D93/
+house,new_house,東成区,大阪府大阪市東成区大今里南６丁目,,,,53.41,107.23,4LDK,2026,大阪メトロ千日前線「小路」駅 徒歩4分 / 大阪メトロ千日前線「新深江」駅 徒歩7分 / 近鉄大阪線「布施」駅 徒歩9分,44800000,44800000,livable,1,not_in_suumo,,https://www.livable.co.jp/kodate/C27263D90/
+house,new_house,東淀川区,大阪府大阪市東淀川区豊里5丁目,,,,48.63,95.97,2LDK＋S,,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609246/
+house,new_house,東淀川区,大阪府大阪市東淀川区豊里5丁目,,,,49.42,95.85,2LDK＋S,,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609244/
+house,new_house,東淀川区,大阪府大阪市東淀川区豊里5丁目,,,,48.42,95.85,2LDK＋S,,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609243/
+house,new_house,東淀川区,大阪府大阪市東淀川区豊里5丁目,,,,47.61,93.78,2LDK＋S,,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609245/
+house,new_house,東淀川区,大阪府大阪市東淀川区豊里5丁目,,,,48.59,90.67,2LDK＋S,,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609250/
+house,new_house,東淀川区,大阪府大阪市東淀川区下新庄4丁目,,,,45.42,91.42,2LDK＋S,,,45800000,45800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025763260/
+house,new_house,東淀川区,大阪府大阪市東淀川区豊里5丁目,,,,46.67,92.22,2LDK＋S,,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609249/
+house,new_house,東淀川区,大阪府大阪市東淀川区下新庄4丁目,,,,50.64,97.96,3LDK,,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025763261/
+house,new_house,東淀川区,大阪府大阪市東淀川区大道南2丁目,,,,56.19,100.6,3LDK,,,46900000,46900000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025485592/
+house,new_house,東淀川区,大阪府大阪市東淀川区大道南2丁目,,,,66.98,103.6,3LDK,,,46900000,46900000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025485590/
+house,new_house,東淀川区,大阪府大阪市東淀川区大道南2丁目,,,,66.98,102.36,3LDK,,,46900000,46900000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025515917/
+house,new_house,東淀川区,大阪府大阪市東淀川区大道南2丁目,,,,56.19,98.12,3LDK,,,46900000,46900000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025515918/
+house,new_house,東淀川区,大阪府大阪市東淀川区下新庄4丁目,,,,46.32,95.84,3LDK,,,47800000,47800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025763259/
+house,new_house,此花区,大阪府大阪市此花区春日出北3丁目,,,,60.26,115.2,3LDK＋S,,,41800000,41800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025443294/
+house,new_house,此花区,大阪府大阪市此花区春日出北3丁目,,,,62.87,115.83,2LDK＋2S,,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025443293/
+house,new_house,港区,大阪府大阪市港区築港2丁目,,,,75.54,75.54,3DK,,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025604795/
+house,new_house,西成区,大阪府大阪市西成区長橋3丁目,,,,57.82,114.39,2LDK＋S,,,41800000,41800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025525879/
+house,new_house,西成区,大阪府大阪市西成区北津守3丁目,,,,60.41,110.85,3LDK＋S,,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025416907/
+house,new_house,西成区,大阪府大阪市西成区長橋3丁目,,,,75.03,95.38,3LDK＋S,,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025525876/
+house,new_house,西成区,大阪府大阪市西成区玉出東1丁目,,,,49.16,88.29,3LDK,,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025483141/
+house,new_house,西成区,大阪府大阪市西成区玉出東1丁目,,,,49.07,87.88,2SLDK,,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025483140/
+house,new_house,西淀川区,大阪府大阪市西淀川区姫里3丁目,,,,49.61,93.92,3LDK,,,41000000,41000000,yahoo,2,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0024853391/ https://realestate.yahoo.co.jp/new/house/detail_corp/b0025229403/
+house,new_house,西淀川区,大阪府大阪市西淀川区福町2丁目,,,,61.45,114.3,2LDK＋2S,,,41800000,41800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025609240/
+house,new_house,西淀川区,大阪府大阪市西淀川区大和田5丁目,,,,52.26,100.51,2LDK＋S,,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643360/
+house,new_house,西淀川区,大阪府大阪市西淀川区大和田5丁目,,,,50.96,94.13,2LDK＋S,,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643361/
+house,new_house,西淀川区,大阪府大阪市西淀川区福町2丁目,,,,81.46,93.77,3LDK＋S,,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025690618/
+house,new_house,西淀川区,大阪府大阪市西淀川区福町2丁目,,,,78.51,94.6,2LDK＋S,,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025690616/
+house,new_house,西淀川区,大阪府大阪市西淀川区福町2丁目,,,,76.99,93.15,2LDK＋2S,,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025690617/
+house,new_house,西淀川区,大阪府大阪市西淀川区大和田5丁目,,,,55.44,94.23,3LDK,,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643358/
+house,new_house,西淀川区,大阪府大阪市西淀川区大和田5丁目,,,,60.24,98.25,3LDK,,,45800000,45800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025643362/
+house,new_house,西淀川区,大阪府大阪市西淀川区福町2丁目,,,,80.73,97.7,3LDK,,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025690615/
+house,new_house,阿倍野区,大阪府大阪市阿倍野区共立通1丁目,,,,52.29,91.69,3LDK,,,47800000,47800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025727732/
+house,new_house,鶴見区,大阪府大阪市鶴見区緑3丁目,,,,65.82,117.95,2DK＋S,,,47800000,47800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/new/house/detail_corp/b0025635406/
+condo,used_condo,中央区,大阪府大阪市中央区内平野町２丁目,ニューライフ大手前参番館,1,47.32,,,ワンルーム,1985,大阪メトロ谷町線 天満橋駅 徒歩7分,40900000,40900000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FMUBSA09/
+condo,used_condo,中央区,大阪府大阪市中央区内淡路町1丁目,,9,33.49,,,1LDK,2020,,41500000,41500000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025645864/
+condo,used_condo,中央区,大阪府大阪市中央区瓦屋町1丁目,,12,46.75,,,1LDK,2010,,41800000,41800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025634738/
+condo,used_condo,中央区,大阪府大阪市中央区博労町4丁目,,4,54.02,,,2LDK,2000,,43300000,43300000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025716055/
+condo,used_condo,中央区,大阪府大阪市中央区本町橋,クレアホームズフラン本町橋,5,43.64,,,1LDK,2022,大阪メトロ中央線 堺筋本町駅 徒歩6分,46800000,46800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FZDBUA03/
+condo,used_condo,中央区,大阪市中央区安堂寺町2丁目,,12,48.55,,,1LDK,2011,大阪メトロ長堀鶴見緑地線「松屋町」駅 徒歩1分,48000000,48000000,nomu,1,not_in_suumo,,https://www.nomu.com/mansion/id/N9570111/
+condo,used_condo,中央区,大阪府大阪市中央区糸屋町１丁目,エステムプラザ大手前エヴァース,15,42.83,,,2DK,2012,大阪メトロ谷町線 谷町四丁目駅 徒歩4分,48900000,48900000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FXLBSA04/
+condo,used_condo,中央区,大阪府大阪市中央区高津3丁目,,10,66.37,,,3LDK,2003,,49500000,49500000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025451476/
+condo,used_condo,中央区,大阪府大阪市中央区龍造寺町,リビオアーバネックス上町台龍造寺,3,,,,1LDK,2011,大阪メトロ谷町線「谷町六丁目」駅 徒歩3分 / 大阪メトロ中央線「谷町四丁目」駅 徒歩8分 / 大阪環状線「玉造」駅 徒歩18分,49750000,49750000,livable,1,not_in_suumo,,https://www.livable.co.jp/mansion/C2726X409/
+condo,used_condo,中央区,大阪府大阪市中央区島之内2丁目,,7,37.4,,,1LDK,2020,,50000000,50000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025551876/
+condo,used_condo,中央区,大阪府大阪市中央区島之内2丁目,,12,37.4,,,1LDK,2020,,50000000,50000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025551875/
+condo,used_condo,住之江区,大阪府大阪市住之江区南港北１丁目,大阪ベイレジデンス,8,75.40,,,2LDK,2021,大阪メトロ中央線「コスモスクエア」駅 徒歩3分 / 南港ポートタウン線「トレードセンター前」駅 徒歩4分,44800000,44800000,livable,1,not_in_suumo,,https://www.livable.co.jp/mansion/C2726XC71/
+condo,used_condo,住之江区,大阪府大阪市住之江区南港北１丁目,ローレルスクエア大阪ベイタワー,21,70.27,,,3LDK,2007,大阪メトロ中央線 コスモスクエア駅 徒歩1分,47500000,47500000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FWXBSA11/
+condo,used_condo,北区,大阪市北区大淀中2丁目,,4,58.9,,,2LDK,1999,阪急神戸線「中津」駅 徒歩8分 東海道本線(米原～神戸)「大阪」駅 徒歩17分,43900000,43900000,nomu,1,not_in_suumo,,https://www.nomu.com/mansion/id/R9571534/
+condo,used_condo,北区,大阪府大阪市北区大淀南３丁目,ソレイユ梅田西,3,60.45,,,2LDK,1995,ＪＲ大阪環状線 「 福島 」駅 徒歩10分 阪神本線 「 福島 」駅 徒歩12分 ＪＲ東西線 「 新福島 」駅 徒歩16分,46000000,46000000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/mansion/detail_36253193/
+condo,used_condo,北区,大阪府大阪市北区中之島４丁目,ルネ中之島,7,70.77,,,3LDK,1980,京阪中之島線「中之島」駅 徒歩4分 / 京阪中之島線「渡辺橋」駅 徒歩8分 / 大阪メトロ四つ橋線「肥後橋」駅 徒歩9分,49800000,49800000,livable+yahoo,2,not_in_suumo,,https://www.livable.co.jp/mansion/C2725Y650/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025467690/
+condo,used_condo,城東区,大阪府大阪市城東区鴫野西２丁目,サンヴェール大阪城公園,11,70.86,,,3LDK,2000,ＪＲ大阪環状線 「 京橋 」駅 徒歩7分 ＪＲ大阪環状線 「 大阪城公園 」駅 徒歩8分 京阪本線 「 京橋 」駅 徒歩11分,44500000,44500000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/mansion/detail_C6213014/
+condo,used_condo,城東区,大阪府大阪市城東区今福西2丁目,,7,61.06,,,2LDK,2004,,47980000,47980000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025657648/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区生玉町,シャルマンフジリッツ夕陽丘,6,59.34,,,3LDK,1997,大阪メトロ谷町線 谷町九丁目駅 徒歩5分,42800000,42800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FSLBTA43/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区玉造元町,リーディア玉造駅前,10,46.19,,,1LDK,2012,ＪＲ大阪環状線 「 玉造 」駅 徒歩2分 大阪メトロ長堀鶴見線 「 玉造 」駅 徒歩3分 大阪メトロ中央線 「 森ノ宮 」駅 徒歩12分,43000000,43000000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/mansion/detail_36253212/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区味原本町,,4,68.39,,,3LDK,1985,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025004940/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区味原本町,ノバオリンピアードタワー,9,65.17,,,2SLDK,1985,近鉄難波・奈良線 大阪上本町駅 徒歩7分,46900000,46900000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FSLBQA05/
+condo,used_condo,天王寺区,大阪府大阪市天王寺区寺田町１丁目,アスティミア四天王寺東クレステージ,12,70.76,,,3LDK,2005,ＪＲ大阪環状線 「 寺田町 」駅 徒歩5分 ＪＲ大阪環状線 「 天王寺 」駅 徒歩12分,50000000,50000000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/mansion/detail_C6253006/
+condo,used_condo,平野区,大阪府大阪市平野区平野本町１丁目,ユニハイム平野本町,3,63.52,,,3LDK,2023,大阪メトロ谷町線 平野駅 徒歩5分,42000000,42000000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FMUBUA05/
+condo,used_condo,東成区,大阪府大阪市東成区神路2丁目,,11,828.01,,,3LDK,2009,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025281556/
+condo,used_condo,此花区,大阪府大阪市此花区島屋６丁目,キングマンション大阪ベイ,9,88.04,,,4LDK,2009,桜島線 ユニバーサルシティ駅 徒歩2分,41800000,41800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/F6ABUA06/
+condo,used_condo,此花区,大阪府大阪市此花区島屋６丁目,ルナタワーハリウッドプレイス,11,81.78,,,2LDK,2008,桜島線 ユニバーサルシティ駅 徒歩3分,43800000,43800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/F6ABUA10/
+condo,used_condo,此花区,大阪市此花区春日出南3丁目,,14,60.34,,,3LDK,2025,桜島線「安治川口」駅 徒歩4分,48500000,48500000,nomu,1,not_in_suumo,,https://www.nomu.com/mansion/id/R9570440/
+condo,used_condo,浪速区,大阪府大阪市浪速区幸町1丁目,,8,64.81,,,2LDK,1981,,41800000,41800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025538850/
+condo,used_condo,浪速区,大阪府大阪市浪速区敷津東2丁目,,4,43.02,,,1LDK,2010,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025383146/
+condo,used_condo,浪速区,大阪府大阪市浪速区下寺２丁目,ベルク日本橋,2,65.72,,,3LDK,1996,大阪メトロ谷町線「四天王寺前夕陽ヶ丘」駅 徒歩7分 / 南海本線「難波」駅 徒歩11分 / 大阪メトロ堺筋線「恵美須町」駅 徒歩10分,46800000,46800000,livable+yahoo,2,not_in_suumo,,https://www.livable.co.jp/mansion/C2726Y563/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025753917/
+condo,used_condo,淀川区,大阪府大阪市淀川区木川西４丁目,ユニ・アルス新大阪ウエスト,7,79.49,,,3SLDK,1998,大阪メトロ御堂筋線 西中島南方駅 徒歩10分,43800000,43800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FBGBUA1C/
+condo,used_condo,淀川区,大阪市淀川区田川北2丁目,,7,74.7,,,3LDK,2009,阪急神戸線「十三」駅 徒歩17分 阪急京都線「十三」駅 徒歩17分,43980000,43980000,nomu+yahoo,2,not_in_suumo,,https://www.nomu.com/mansion/id/RA570547/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025716983/
+condo,used_condo,淀川区,大阪府大阪市淀川区新高４丁目,キングスクエア北大阪パークフェリス Ⅰ番館,7,63.68,,,3LDK,2002,阪急宝塚線 三国駅 徒歩5分,44800000,44800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/F1GBGB2F/
+condo,used_condo,淀川区,大阪府大阪市淀川区新北野３丁目,新北野ザ・レジデンス,7,65.09,,,3LDK,2012,東海道本線（米原～神戸） 塚本駅 徒歩7分,46800000,46800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/FBGBUA0B/
+condo,used_condo,淀川区,大阪府大阪市淀川区宮原1丁目,,6,65.11,,,2SLDK,2001,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025697039/
+condo,used_condo,西区,大阪府大阪市西区新町3丁目,,10,38.77,,,1LDK,2013,,41000000,41000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025645852/
+condo,used_condo,西区,大阪府大阪市西区京町堀３丁目,リーガル江戸堀ウエストパーク,13,49.43,,,1LDK,2006,大阪メトロ千日前線 阿波座駅 徒歩2分,43800000,43800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/mansion/bkdetail/F1GBTCA7/
+condo,used_condo,西区,大阪府大阪市西区南堀江2丁目,,5,59.97,,,2LDK,1997,,45800000,45800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025451869/
+condo,used_condo,西区,大阪市西区江戸堀1丁目,,2,58.42,,,1LDK,2005,大阪メトロ四つ橋線「肥後橋」駅 徒歩6分,47000000,47000000,nomu,1,not_in_suumo,,https://www.nomu.com/mansion/id/F95C7022/
+condo,used_condo,西成区,大阪府大阪市西成区岸里１丁目,シティーズマーク天下茶屋,10,73.03,,,3LDK,2006,南海本線「天下茶屋」駅 徒歩2分 / 大阪メトロ堺筋線「天下茶屋」駅 徒歩2分 / 大阪メトロ四つ橋線「岸里」駅 徒歩4分,47800000,47800000,livable,1,not_in_suumo,,https://www.livable.co.jp/mansion/C2726Y027/
+condo,used_condo,西淀川区,大阪府大阪市西淀川区野里３丁目,ライオンズクオーレ御幣島駅前ヴェルデ New 11/16 御幣島駅徒歩2分×南西向き角住戸×3沿線利用可能×3駅利用可能,3,70.26,,,2LDK＋S（納戸）,2011,ＪＲ東西線 「 御幣島 」駅 徒歩2分 東海道本線 「 塚本 」駅 徒歩17分 阪神電鉄本線 「 姫島 」駅 徒歩12分,41800000,41800000,daikyo+yahoo,2,not_in_suumo,,https://www.daikyo-anabuki.co.jp/buy/detail/MHF96907/ https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025755766/
+condo,used_condo,都島区,大阪府大阪市都島区友渕町１丁目,ベル・パークシティ画地ⅡＫ棟,1,85.05,,,3LDK＋S（納戸）,1987,おおさか東線 「 城北公園通 」駅 徒歩14分 大阪メトロ谷町線 「 都島 」駅 徒歩15分 大阪メトロ谷町線 「 野江内代 」駅 徒歩24分,42990000,42990000,daikyo+nomu,2,not_in_suumo,,https://www.daikyo-anabuki.co.jp/buy/detail/OAL15432/ https://www.nomu.com/mansion/id/U9570109/
+condo,used_condo,都島区,大阪府大阪市都島区中野町5丁目,,6,81.76,,,3LDK,1993,,43000000,43000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025454646/
+condo,used_condo,阿倍野区,大阪府大阪市阿倍野区阿倍野筋３丁目,あべのベルタ,16,72.96,,,2SLDK,1987,大阪メトロ谷町線 「 阿倍野 」駅 徒歩2分 ＪＲ大阪環状線 「 天王寺 」駅 徒歩7分 大阪メトロ御堂筋線 「 天王寺 」駅 徒歩7分,44800000,44800000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/mansion/detail_36253319/
+condo,used_condo,阿倍野区,大阪府大阪市阿倍野区阿倍野筋５丁目,パークホームズあべの筋,3,71.41,,,3LDK,2010,阪堺電気軌道上町線 「 松虫 」駅 徒歩3分 大阪メトロ谷町線 「 阿倍野 」駅 徒歩8分 大阪メトロ御堂筋線 「 天王寺 」駅 徒歩16分,47000000,47000000,daikyo+nomu,2,not_in_suumo,,https://www.daikyo-anabuki.co.jp/buy/detail/OAL14098/ https://www.nomu.com/mansion/id/UE070073/
+condo,used_condo,鶴見区,大阪府大阪市鶴見区鶴見1丁目,,12,74.06,,,3LDK,2007,,40800000,40800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/mansion/detail_corp/b0025541531/
+condo,used_condo,鶴見区,大阪府大阪市鶴見区横堤４丁目,鶴見緑地アーバンコンフォート,12,85.66,,,4LD・K,1998,大阪メトロ長堀鶴見緑地線「横堤」駅 徒歩10分 / 大阪メトロ長堀鶴見緑地線「鶴見緑地」駅 徒歩15分 / 大阪メトロ長堀鶴見緑地線「今福鶴見」駅 徒歩16分,44900000,44900000,livable,1,not_in_suumo,,https://www.livable.co.jp/mansion/C27262E57/
+condo,used_condo,鶴見区,大阪府大阪市鶴見区横堤２丁目,ビープレイスＣ棟,11,84.21,,,3LDK,2003,大阪メトロ長堀鶴見線 「 横堤 」駅 徒歩10分 ＪＲ片町線（学研都市線） 「 徳庵 」駅 徒歩18分 大阪メトロ長堀鶴見線 「 今福鶴見 」駅 徒歩20分,44900000,44900000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/mansion/detail_36543067/
+house,used_house,中央区,大阪府大阪市中央区谷町６丁目,,,,40.85,32.22,2LDK,1915,大阪メトロ谷町線 「 谷町六丁目 」駅 徒歩1分 大阪メトロ長堀鶴見線 「 谷町六丁目 」駅 徒歩1分,49800000,49800000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/kodate/detail_36252122/
+house,used_house,住之江区,大阪府大阪市住之江区粉浜3丁目,,,,92.59,168.5,4DK,1986,,40000000,40000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0024272185/
+house,used_house,住之江区,大阪府大阪市住之江区西住之江3丁目,,,,78.04,192.06,5LDK,1990,,45000000,45000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0023714869/
+house,used_house,住吉区,大阪府大阪市住吉区墨江3丁目,,,,115.7,186.06,9LDK,1983,,45000000,45000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0022155439/
+house,used_house,城東区,大阪府大阪市城東区今福南4丁目,,,,60,100.49,3SLDK,2018,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025702860/
+house,used_house,城東区,大阪市城東区関目2丁目,,,,60.53,114.21,4LDK,2003,中古戸建 ■関目2丁目アドレス ■角地で視認性良好 ■城東区でお探しのファミリーにおすすめです 画像：6枚 大阪市城東区関目2丁目 京阪本線「関目」駅 徒歩11分 京阪本線「野江」駅 徒歩10分,48000000,48000000,nomu,1,not_in_suumo,,https://www.nomu.com/house/id/F95CY001/
+house,used_house,城東区,大阪府大阪市城東区鴫野西１丁目,,,,56.3,107.44,3SLDK,1999,大阪環状線 京橋駅 徒歩4分,49800000,49800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/kodate/bkdetail/FWQBTA57/
+house,used_house,大正区,大阪府大阪市大正区泉尾３丁目,,,,68.43,110.06,4LDK,2017,大阪メトロ長堀鶴見線 「 大正 」駅 徒歩18分 ＪＲ大阪環状線 「 大正 」駅 徒歩18分,49800000,49800000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/kodate/detail_36252148/
+house,used_house,天王寺区,大阪府大阪市天王寺区真法院町,,,,51.39,62.42,4K,1962,,46000000,46000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025280280/
+house,used_house,平野区,大阪府大阪市平野区流町４丁目,,,,59.33,108.54,3SLDK,2020,大阪メトロ谷町線 平野駅 徒歩9分,42800000,42800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/kodate/bkdetail/FMUBUA01/
+house,used_house,平野区,大阪府大阪市平野区加美正覚寺1丁目,,,,132.29,269.1,11SDK,1992,,45000000,45000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025750601/
+house,used_house,平野区,大阪府大阪市平野区平野市町3丁目,,,,63.58,89.43,3LDK,2025,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025452345/
+house,used_house,旭区,大阪府大阪市旭区大宮３丁目,,,,78.83,150.70,5LDK,1993,大阪メトロ谷町線「千林大宮」駅 徒歩5分 / 京阪本線「千林」駅 徒歩13分 / 大阪メトロ今里筋線「関目成育」駅 徒歩23分,44800000,44800000,livable+yahoo,2,not_in_suumo,,https://www.livable.co.jp/kodate/C27268357/ https://realestate.yahoo.co.jp/used/house/detail_corp/b0025635508/
+house,used_house,旭区,大阪府大阪市旭区新森５丁目,,,,98.98,125.55,5LDK,1998,大阪メトロ今里筋線 「 清水 」駅 徒歩4分 京阪本線 「 森小路 」駅 徒歩10分 京阪本線 「 千林 」駅 徒歩10分,48800000,48800000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/kodate/detail_36212091/
+house,used_house,東住吉区,大阪府大阪市東住吉区針中野1丁目,,,,89.19,185.14,5LDK,1989,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025090917/
+house,used_house,東成区,大阪府大阪市東成区中本2丁目,,,,56.87,97.94,4LDK,2009,,44800000,44800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0022885991/
+house,used_house,東成区,大阪府大阪市東成区大今里1丁目,,,,101.09,96.04,2LDK＋S,2024,,47800000,47800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025598803/
+house,used_house,東成区,大阪府大阪市東成区大今里西1丁目,,,,50.63,84.24,3LDK,2025,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025317229/
+house,used_house,東淀川区,大阪府大阪市東淀川区上新庄３丁目,,,,54.71,116.53,3LDK,2024,阪急京都線 上新庄駅 徒歩8分,49800000,49800000,rehouse,1,not_in_suumo,,https://www.rehouse.co.jp/buy/kodate/bkdetail/FBG7TA64/
+house,used_house,此花区,大阪府大阪市此花区四貫島2丁目,,,,163.37,274.65,1R,1995,,45000000,45000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0024450971/
+house,used_house,此花区,大阪府大阪市此花区伝法3丁目,,,,102.1,177.01,4LDK,1983,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0022426291/
+house,used_house,浪速区,大阪府大阪市浪速区敷津西1丁目,,,,30.29,70.23,4SDK,1956,,40000000,40000000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0024510504/
+house,used_house,淀川区,大阪府大阪市淀川区木川西２丁目,,,,46.99,76.54,3LDK,2025,阪急京都線 「 十三 」駅 徒歩11分 大阪メトロ御堂筋線 「 西中島南方 」駅 徒歩15分 阪急神戸線 「 十三 」駅 徒歩11分,44980000,44980000,stepon,1,not_in_suumo,,https://www.stepon.co.jp/kodate/detail_36252120/
+house,used_house,生野区,大阪府大阪市生野区生野西1丁目,,,,101.64,112.83,4LDK,2016,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025522910/
+house,used_house,福島区,大阪府大阪市福島区吉野１丁目,,,,59.4,130.59,6LDK,1989,阪神電鉄本線 「 野田 」駅 徒歩7分 大阪環状線 「 野田 」駅 徒歩8分 大阪メトロ千日前線 「 玉川 」駅 徒歩7分,42800000,42800000,daikyo+nomu,2,not_in_suumo,,https://www.daikyo-anabuki.co.jp/buy/detail/OAK54062/ https://www.nomu.com/house/id/H9570065/
+house,used_house,福島区,大阪府大阪市福島区野田2丁目,,,,126.87,89.25,2LDK,1938,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025185301/
+house,used_house,西成区,大阪府大阪市西成区北津守2丁目,,,,70.13,115.92,3LDK,2020,,40800000,40800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025664730/
+house,used_house,西成区,大阪府大阪市西成区玉出東1丁目,,,,72.67,111.78,4LDK,2013,,42800000,42800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0024986016/
+house,used_house,西成区,大阪府大阪市西成区玉出中1丁目,,,,81.56,105.3,3LDK＋S,2018,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0024131900/
+house,used_house,西淀川区,大阪市西淀川区中島1期,,,,102.23,89.63,4LDK,,2号棟 画像：1枚 大阪市西淀川区中島1丁目 阪神なんば線「出来島」駅 バス7分 (バス停 中島一丁目) 徒歩2分,41990000,41990000,nomu,1,not_in_suumo,,https://www.nomu.com/house/id/F95C9014/
+house,used_house,西淀川区,大阪府大阪市西淀川区佃5丁目,,,,76.89,106.87,3SLDK,2025,,43800000,43800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025719760/
+house,used_house,西淀川区,大阪市西淀川区中島1期,,,,85.96,90.79,4LDK,,3号棟 画像：1枚 大阪市西淀川区中島1丁目 阪神なんば線「出来島」駅 バス7分 (バス停 中島一丁目) 徒歩2分,46990000,46990000,nomu,1,not_in_suumo,,https://www.nomu.com/house/id/F95C9015/
+house,used_house,西淀川区,大阪市西淀川区中島1期,,,,86.15,91.29,4LDK,,1号棟 画像：1枚 大阪市西淀川区中島1丁目 阪神なんば線「出来島」駅 バス7分 (バス停 中島一丁目) 徒歩2分,47990000,47990000,nomu,1,not_in_suumo,,https://www.nomu.com/house/id/F95C9013/
+house,used_house,都島区,大阪府大阪市都島区中野町５丁目,,,,43.81,83.79,3LDK,1980,大阪環状線「桜ノ宮」駅 徒歩3分 / 大阪メトロ谷町線「都島」駅 徒歩7分 / 阪急千里線「天神橋筋六丁目」駅 徒歩16分,44800000,44800000,livable,1,not_in_suumo,,https://www.livable.co.jp/kodate/C2726X653/
+house,used_house,阿倍野区,大阪府大阪市阿倍野区相生通2丁目,,,,50.34,77.79,3LDK,2017,,46800000,46800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0025384355/
+house,used_house,阿倍野区,大阪府大阪市阿倍野区天王寺町北2丁目,,,,43.49,117.75,5DK,1991,,49800000,49800000,yahoo,1,not_in_suumo,,https://realestate.yahoo.co.jp/used/house/detail_corp/b0024986018/

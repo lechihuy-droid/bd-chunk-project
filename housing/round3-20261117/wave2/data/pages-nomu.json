@@ -1,0 +1,38 @@
+{
+ "site": "nomu",
+ "requests_this_run": 5,
+ "pages": [
+  {
+   "url": "https://www.nomu.com/mansion/area_osaka/271/?price_from=4000&price_to=5000",
+   "cards": 40,
+   "in_band_rows": 40,
+   "site_total": 117
+  },
+  {
+   "url": "https://www.nomu.com/mansion/area_osaka/271/?price_from=4000&price_to=5000&pager_page=2",
+   "cards": 40,
+   "in_band_rows": 40,
+   "site_total": 117
+  },
+  {
+   "url": "https://www.nomu.com/mansion/area_osaka/271/?price_from=4000&price_to=5000&pager_page=3",
+   "cards": 37,
+   "in_band_rows": 37,
+   "site_total": 117
+  },
+  {
+   "url": "https://www.nomu.com/house/area_osaka/271/?price_from=4000&price_to=5000",
+   "cards": 15,
+   "in_band_rows": 15,
+   "site_total": 15
+  },
+  {
+   "url": "https://www.nomu.com/house_n/area_osaka/271/?price_from=4000&price_to=5000",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": 15
+  }
+ ],
+ "rows": 132,
+ "stopped": ""
+}

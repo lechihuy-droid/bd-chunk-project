@@ -1,0 +1,182 @@
+{
+ "site": "stepon",
+ "requests_this_run": 0,
+ "pages": [
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_102/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_103/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 4,
+   "in_band_rows": 4,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_104/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 3,
+   "in_band_rows": 3,
+   "site_total": 3
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_107/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_109/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 4,
+   "in_band_rows": 4,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_111/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_117/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_118/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 7,
+   "in_band_rows": 7,
+   "site_total": 7
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_119/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 3,
+   "in_band_rows": 3,
+   "site_total": 3
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_120/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_122/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_123/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_124/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_125/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_127/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 6,
+   "in_band_rows": 6,
+   "site_total": 6
+  },
+  {
+   "url": "https://www.stepon.co.jp/mansion/area_27/list_27_128/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 4,
+   "in_band_rows": 4,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_102/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_104/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_108/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_115/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_116/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_117/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_118/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_121/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_122/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_123/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_126/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_127/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  },
+  {
+   "url": "https://www.stepon.co.jp/kodate/area_27/list_27_128/?hanbaiKakakuMin=4000&hanbaiKakakuMax=5000",
+   "cards": 1,
+   "in_band_rows": 1,
+   "site_total": 1
+  }
+ ],
+ "rows": 59,
+ "stopped": ""
+}

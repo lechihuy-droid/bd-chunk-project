@@ -2,7 +2,7 @@
 
 Chạy ngày 17/11/2026 từ máy chủ đám mây. 38 request (5 robots.txt + 33 trang), mỗi nguồn một luồng, cách nhau hơn 3 giây. Nhật ký: [requests.log](requests.log). Số tổng hợp: [source-coverage.json](source-coverage.json). Script: [`newcondo_sources.py`](../tools/newcondo_sources.py).
 
-Bảng từng dự án không nằm trong repo (cùng lý do với đợt 2: điều khoản các trang cấm đăng lại, repo đang công khai). File được gửi riêng cho Huy.
+Bảng từng dự án: [data/projects-by-source.csv](data/projects-by-source.csv). HTML gốc không đưa vào repo.
 
 Phạm vi: dự án chung cư mới ở Osaka-shi, mọi mức giá, chỉ trang danh sách.
 
@@ -76,7 +76,7 @@ Ngày vào ở của 85 dự án: 15 dự án đã xong hoặc vào ở ngay, 3 
 
 # Nhà riêng xây mới — nghiên cứu nguồn và độ phủ
 
-Bổ sung ngày 17/11/2026 theo yêu cầu của Huy. 28 request (SUUMO 15 trang, Yahoo! 11 trang, 住まいサーフィン 2 trang), cùng quy tắc như trên. Nhật ký: [requests-newhouse.log](requests-newhouse.log). Số tổng hợp: [newhouse-source-coverage.json](newhouse-source-coverage.json). Script: [`newhouse_sources.py`](../tools/newhouse_sources.py). Bảng từng tin gửi riêng cho Huy, không nằm trong repo.
+Bổ sung ngày 17/11/2026 theo yêu cầu của Huy. 28 request (SUUMO 15 trang, Yahoo! 11 trang, 住まいサーフィン 2 trang), cùng quy tắc như trên. Nhật ký: [requests-newhouse.log](requests-newhouse.log). Số tổng hợp: [newhouse-source-coverage.json](newhouse-source-coverage.json). Script: [`newhouse_sources.py`](../tools/newhouse_sources.py). Bảng từng tin: [data/newhouse-listings.csv](data/newhouse-listings.csv).
 
 Phạm vi: nhà riêng mới ở Osaka-shi, mọi mức giá, chỉ trang danh sách.
 

@@ -2,7 +2,7 @@
 
 Chạy ngày 17/11/2026 từ máy chủ đám mây. 296 request tới 6 trang, mỗi trang một luồng, cách nhau hơn 3 giây; không trang nào chặn. Nhật ký: [requests.log](requests.log). Số liệu tổng hợp: [summary.json](summary.json).
 
-**Dữ liệu từng tin của 6 trang này không nằm trong repo.** Điều khoản của các trang cấm đăng lại nội dung, và repo đang công khai. File dữ liệu được gửi riêng cho Huy; repo chỉ giữ code, nhật ký URL và số tổng hợp.
+Dữ liệu từng tin nằm ở [data/](data/) (đưa vào repo ngày 17/11/2026 theo yêu cầu của Huy). Lưu ý: điều khoản của 野村, リバブル, 大京 cấm đăng lại nội dung, và repo đang công khai. HTML gốc (khoảng 160 MB) không đưa vào repo.
 
 ## Điều khoản và robots.txt
 

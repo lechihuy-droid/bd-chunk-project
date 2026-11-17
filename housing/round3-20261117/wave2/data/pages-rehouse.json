@@ -1,0 +1,494 @@
+{
+ "site": "rehouse",
+ "requests_this_run": 0,
+ "pages": [
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27102/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 5,
+   "site_total": 60
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27102/?page=2 parsed=30",
+   "cards": 38,
+   "in_band_rows": 10,
+   "site_total": 60
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27103/ parsed=23",
+   "cards": 38,
+   "in_band_rows": 3,
+   "site_total": 86
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27103/?page=2 parsed=22",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 86
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27103/?page=3 parsed=22",
+   "cards": 34,
+   "in_band_rows": 2,
+   "site_total": 86
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27104/ parsed=29",
+   "cards": 38,
+   "in_band_rows": 7,
+   "site_total": 36
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27104/?page=2 parsed=6",
+   "cards": 14,
+   "in_band_rows": 0,
+   "site_total": 36
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27106/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 4,
+   "site_total": 154
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27106/?page=2 parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 154
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27106/?page=3 parsed=30",
+   "cards": 38,
+   "in_band_rows": 3,
+   "site_total": 154
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27106/?page=4 parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 154
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27106/?page=5 parsed=30",
+   "cards": 38,
+   "in_band_rows": 1,
+   "site_total": 154
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27106/?page=6 parsed=4",
+   "cards": 12,
+   "in_band_rows": 0,
+   "site_total": 154
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27107/ parsed=23",
+   "cards": 31,
+   "in_band_rows": 2,
+   "site_total": 23
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27108/ parsed=4",
+   "cards": 12,
+   "in_band_rows": 3,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27109/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 5,
+   "site_total": 72
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27109/?page=2 parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 72
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27109/?page=3 parsed=12",
+   "cards": 20,
+   "in_band_rows": 0,
+   "site_total": 72
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27111/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 36
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27111/?page=2 parsed=6",
+   "cards": 14,
+   "in_band_rows": 0,
+   "site_total": 36
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27113/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 31
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27113/?page=2 parsed=1",
+   "cards": 9,
+   "in_band_rows": 0,
+   "site_total": 31
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27114/ parsed=25",
+   "cards": 33,
+   "in_band_rows": 4,
+   "site_total": 25
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27115/ parsed=16",
+   "cards": 24,
+   "in_band_rows": 3,
+   "site_total": 16
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27116/ parsed=3",
+   "cards": 11,
+   "in_band_rows": 0,
+   "site_total": 3
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27117/ parsed=12",
+   "cards": 21,
+   "in_band_rows": 1,
+   "site_total": 13
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27118/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 4,
+   "site_total": 45
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27118/?page=2 parsed=15",
+   "cards": 23,
+   "in_band_rows": 2,
+   "site_total": 45
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27119/ parsed=29",
+   "cards": 38,
+   "in_band_rows": 1,
+   "site_total": 32
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27119/?page=2 parsed=2",
+   "cards": 10,
+   "in_band_rows": 0,
+   "site_total": 32
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27120/ parsed=23",
+   "cards": 31,
+   "in_band_rows": 5,
+   "site_total": 23
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27121/ parsed=15",
+   "cards": 23,
+   "in_band_rows": 2,
+   "site_total": 15
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27122/ parsed=3",
+   "cards": 11,
+   "in_band_rows": 2,
+   "site_total": 3
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27123/ parsed=29",
+   "cards": 38,
+   "in_band_rows": 9,
+   "site_total": 56
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27123/?page=2 parsed=26",
+   "cards": 34,
+   "in_band_rows": 5,
+   "site_total": 56
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27124/ parsed=20",
+   "cards": 29,
+   "in_band_rows": 6,
+   "site_total": 21
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27125/ parsed=30",
+   "cards": 38,
+   "in_band_rows": 5,
+   "site_total": 34
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27125/?page=2 parsed=4",
+   "cards": 12,
+   "in_band_rows": 0,
+   "site_total": 34
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27126/ parsed=15",
+   "cards": 23,
+   "in_band_rows": 3,
+   "site_total": 15
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/ parsed=28",
+   "cards": 38,
+   "in_band_rows": 1,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=2 parsed=29",
+   "cards": 38,
+   "in_band_rows": 1,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=3 parsed=26",
+   "cards": 38,
+   "in_band_rows": 1,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=4 parsed=27",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=5 parsed=29",
+   "cards": 38,
+   "in_band_rows": 0,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=6 parsed=27",
+   "cards": 38,
+   "in_band_rows": 3,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=7 parsed=28",
+   "cards": 38,
+   "in_band_rows": 0,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=8 parsed=26",
+   "cards": 38,
+   "in_band_rows": 1,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=9 parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=10 parsed=29",
+   "cards": 38,
+   "in_band_rows": 0,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27127/?page=11 parsed=9",
+   "cards": 17,
+   "in_band_rows": 0,
+   "site_total": 309
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/ parsed=29",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/?page=2 parsed=30",
+   "cards": 38,
+   "in_band_rows": 4,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/?page=3 parsed=30",
+   "cards": 38,
+   "in_band_rows": 6,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/?page=4 parsed=30",
+   "cards": 38,
+   "in_band_rows": 3,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/?page=5 parsed=29",
+   "cards": 38,
+   "in_band_rows": 3,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/?page=6 parsed=30",
+   "cards": 38,
+   "in_band_rows": 2,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/mansion/prefecture/27/city/27128/?page=7 parsed=26",
+   "cards": 34,
+   "in_band_rows": 0,
+   "site_total": 206
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27102/ parsed=3",
+   "cards": 10,
+   "in_band_rows": 0,
+   "site_total": 3
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27103/ parsed=4",
+   "cards": 10,
+   "in_band_rows": 0,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27104/ parsed=5",
+   "cards": 11,
+   "in_band_rows": 0,
+   "site_total": 6
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27106/ parsed=3",
+   "cards": 9,
+   "in_band_rows": 1,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27107/ parsed=1",
+   "cards": 8,
+   "in_band_rows": 0,
+   "site_total": 3
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27108/ parsed=4",
+   "cards": 11,
+   "in_band_rows": 1,
+   "site_total": 6
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27109/ parsed=7",
+   "cards": 15,
+   "in_band_rows": 0,
+   "site_total": 8
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27111/ parsed=1",
+   "cards": 8,
+   "in_band_rows": 0,
+   "site_total": 2
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27113/ parsed=10",
+   "cards": 18,
+   "in_band_rows": 2,
+   "site_total": 14
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27114/ parsed=4",
+   "cards": 12,
+   "in_band_rows": 2,
+   "site_total": 19
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27115/ parsed=6",
+   "cards": 16,
+   "in_band_rows": 0,
+   "site_total": 9
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27116/ parsed=6",
+   "cards": 16,
+   "in_band_rows": 0,
+   "site_total": 10
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27117/ parsed=6",
+   "cards": 14,
+   "in_band_rows": 1,
+   "site_total": 8
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27118/ parsed=9",
+   "cards": 18,
+   "in_band_rows": 1,
+   "site_total": 12
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27119/ parsed=15",
+   "cards": 24,
+   "in_band_rows": 1,
+   "site_total": 18
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27120/ parsed=8",
+   "cards": 18,
+   "in_band_rows": 1,
+   "site_total": 12
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27121/ parsed=3",
+   "cards": 10,
+   "in_band_rows": 1,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27122/ parsed=8",
+   "cards": 15,
+   "in_band_rows": 1,
+   "site_total": 10
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27123/ parsed=10",
+   "cards": 16,
+   "in_band_rows": 2,
+   "site_total": 13
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27124/ parsed=5",
+   "cards": 15,
+   "in_band_rows": 0,
+   "site_total": 8
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27125/ parsed=2",
+   "cards": 9,
+   "in_band_rows": 0,
+   "site_total": 4
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27126/ parsed=8",
+   "cards": 20,
+   "in_band_rows": 2,
+   "site_total": 12
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27127/ parsed=3",
+   "cards": 11,
+   "in_band_rows": 0,
+   "site_total": 7
+  },
+  {
+   "url": "https://www.rehouse.co.jp/buy/kodate/prefecture/27/city/27128/ parsed=2",
+   "cards": 15,
+   "in_band_rows": 0,
+   "site_total": 9
+  }
+ ],
+ "rows": 156,
+ "stopped": ""
+}

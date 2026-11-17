@@ -1,0 +1,566 @@
+{
+ "site": "livable",
+ "requests_this_run": 20,
+ "pages": [
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27102/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 7,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27102/?sort=price-asc&page=2",
+   "cards": 10,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27103/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27103/?sort=price-asc&page=2",
+   "cards": 11,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27104/?sort=price-asc",
+   "cards": 18,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27106/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 4,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27106/?sort=price-asc&page=2",
+   "cards": 30,
+   "in_band_rows": 5,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27106/?sort=price-asc&page=3",
+   "cards": 2,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27107/?sort=price-asc",
+   "cards": 12,
+   "in_band_rows": 4,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27108/?sort=price-asc",
+   "cards": 2,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27109/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27109/?sort=price-asc&page=2",
+   "cards": 24,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27111/?sort=price-asc",
+   "cards": 13,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27113/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27113/?sort=price-asc&page=2",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27114/?sort=price-asc",
+   "cards": 20,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27115/?sort=price-asc",
+   "cards": 12,
+   "in_band_rows": 4,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27116/?sort=price-asc",
+   "cards": 4,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27117/?sort=price-asc",
+   "cards": 15,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27118/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27118/?sort=price-asc&page=2",
+   "cards": 20,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27119/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27119/?sort=price-asc&page=2",
+   "cards": 4,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27120/?sort=price-asc",
+   "cards": 19,
+   "in_band_rows": 6,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27121/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27122/?sort=price-asc",
+   "cards": 3,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27123/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27123/?sort=price-asc&page=2",
+   "cards": 19,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27124/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 10,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27124/?sort=price-asc&page=2",
+   "cards": 2,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27125/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27126/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc&page=2",
+   "cards": 30,
+   "in_band_rows": 3,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc&page=3",
+   "cards": 30,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc&page=4",
+   "cards": 30,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc&page=5",
+   "cards": 30,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc&page=6",
+   "cards": 30,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27127/?sort=price-asc&page=7",
+   "cards": 4,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27128/?sort=price-asc",
+   "cards": 30,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27128/?sort=price-asc&page=2",
+   "cards": 30,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27128/?sort=price-asc&page=3",
+   "cards": 30,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27128/?sort=price-asc&page=4",
+   "cards": 30,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27128/?sort=price-asc&page=5",
+   "cards": 30,
+   "in_band_rows": 5,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-mansion/osaka/a27128/?sort=price-asc&page=6",
+   "cards": 8,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27102/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27103/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27104/?sort=price-asc",
+   "cards": 6,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27106/?sort=price-asc",
+   "cards": 3,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27107/?sort=price-asc",
+   "cards": 4,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27108/?sort=price-asc",
+   "cards": 4,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27109/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27111/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27113/?sort=price-asc",
+   "cards": 6,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27114/?sort=price-asc",
+   "cards": 4,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27115/?sort=price-asc",
+   "cards": 5,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27116/?sort=price-asc",
+   "cards": 5,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27117/?sort=price-asc",
+   "cards": 13,
+   "in_band_rows": 6,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27118/?sort=price-asc",
+   "cards": 7,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27119/?sort=price-asc",
+   "cards": 9,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27120/?sort=price-asc",
+   "cards": 11,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27121/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27122/?sort=price-asc",
+   "cards": 6,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27123/?sort=price-asc",
+   "cards": 2,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27124/?sort=price-asc",
+   "cards": 4,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27125/?sort=price-asc",
+   "cards": 1,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27126/?sort=price-asc",
+   "cards": 8,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27127/?sort=price-asc",
+   "cards": 2,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/chuko-kodate/osaka/a27128/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27102/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27103/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27104/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27106/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27107/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27108/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27109/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27111/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27113/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27114/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27115/?sort=price-asc",
+   "cards": 2,
+   "in_band_rows": 2,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27116/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27117/?sort=price-asc",
+   "cards": 1,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27118/?sort=price-asc",
+   "cards": 1,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27119/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27120/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27121/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27122/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27123/?sort=price-asc",
+   "cards": 2,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27124/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27125/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27126/?sort=price-asc",
+   "cards": 2,
+   "in_band_rows": 1,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27127/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  },
+  {
+   "url": "https://www.livable.co.jp/kounyu/shinchiku-kodate/osaka/a27128/?sort=price-asc",
+   "cards": 0,
+   "in_band_rows": 0,
+   "site_total": null
+  }
+ ],
+ "rows": 129,
+ "stopped": ""
+}
