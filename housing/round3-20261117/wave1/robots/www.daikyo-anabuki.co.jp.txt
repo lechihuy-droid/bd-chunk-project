@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /property/articleDetailLog/
+
+User-agent: Googlebot
+Disallow: /*.pdf$
+
+sitemap: https://www.daikyo-anabuki.co.jp/sitemap.xml
+
+User-agent: bingbot
+Crawl-Delay: 5

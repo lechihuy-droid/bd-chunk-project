@@ -1,0 +1,30 @@
+{
+ "listings": 1753,
+ "properties": 1108,
+ "by_category": {
+  "new_house": {
+   "listings": 262,
+   "properties": 219
+  },
+  "used_condo": {
+   "listings": 1162,
+   "properties": 635
+  },
+  "used_house": {
+   "listings": 329,
+   "properties": 254
+  }
+ },
+ "identity": {
+  "ok": 1044,
+  "weak_key_not_merged": 20,
+  "price_conflict": 44
+ },
+ "listing_count_distribution": {
+  "1": 891,
+  "2": 89,
+  "3": 48,
+  "4": 22,
+  "5": 58
+ }
+}

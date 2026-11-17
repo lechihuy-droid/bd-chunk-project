@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /project/search/redirect.php
+Disallow: /mansion/library/index/action/MapSearchList/
+Disallow: /mansion/eki_Search/
+Disallow: /house/eki_Search/
+Disallow: /house_n/eki_Search/
+Disallow: /land/eki_Search/
+Disallow: /plus/pdf/
+Disallow: /*?fpc=
+Disallow: /*&fpc=
+
+Sitemap: https://www.nomu.com/sitemap.xml
+Sitemap: https://www.nomu.com/pro_sitemap.xml
+Sitemap: https://www.nomu.com/pro_column_sitemap.xml
+Sitemap: https://www.nomu.com/pro_legalest-cre_sitemap.xml
