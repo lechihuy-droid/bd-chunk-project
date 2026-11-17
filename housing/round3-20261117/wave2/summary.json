@@ -1,0 +1,97 @@
+{
+ "suumo_in_scope_listings": 1753,
+ "non_suumo_listings": 904,
+ "non_suumo_properties": 594,
+ "properties_by_status": {
+  "in_suumo_band": 422,
+  "in_suumo_band_probable": 4,
+  "in_suumo_other_price": 27,
+  "not_in_suumo": 141
+ },
+ "properties_by_kind": {
+  "new_house": {
+   "in_suumo_band": 37,
+   "in_suumo_other_price": 3,
+   "not_in_suumo": 56
+  },
+  "used_condo": {
+   "in_suumo_band": 297,
+   "in_suumo_band_probable": 3,
+   "in_suumo_other_price": 19,
+   "not_in_suumo": 49
+  },
+  "used_house": {
+   "in_suumo_band": 88,
+   "in_suumo_band_probable": 1,
+   "in_suumo_other_price": 5,
+   "not_in_suumo": 36
+  }
+ },
+ "listings_by_source": {
+  "daikyo": {
+   "in_suumo_band": 22,
+   "in_suumo_other_price": 1,
+   "not_in_suumo": 4
+  },
+  "livable": {
+   "in_suumo_band": 113,
+   "in_suumo_other_price": 6,
+   "not_in_suumo": 10
+  },
+  "nomu": {
+   "in_suumo_band": 115,
+   "in_suumo_band_probable": 1,
+   "in_suumo_other_price": 4,
+   "not_in_suumo": 12
+  },
+  "rehouse": {
+   "in_suumo_band": 132,
+   "in_suumo_other_price": 8,
+   "not_in_suumo": 16
+  },
+  "stepon": {
+   "in_suumo_band": 44,
+   "in_suumo_other_price": 5,
+   "not_in_suumo": 10
+  },
+  "yahoo": {
+   "in_suumo_band": 274,
+   "in_suumo_band_probable": 4,
+   "in_suumo_other_price": 15,
+   "not_in_suumo": 108
+  }
+ },
+ "properties_seen_by_n_sources": {
+  "1": 444,
+  "2": 81,
+  "3": 43,
+  "4": 24,
+  "5": 2
+ },
+ "new_properties_by_ward": {
+  "平野区": 17,
+  "西淀川区": 15,
+  "東淀川区": 14,
+  "中央区": 12,
+  "西成区": 9,
+  "此花区": 7,
+  "東住吉区": 6,
+  "東成区": 6,
+  "天王寺区": 6,
+  "淀川区": 6,
+  "阿倍野区": 5,
+  "城東区": 5,
+  "住吉区": 4,
+  "鶴見区": 4,
+  "住之江区": 4,
+  "浪速区": 4,
+  "西区": 4,
+  "北区": 3,
+  "都島区": 3,
+  "旭区": 2,
+  "福島区": 2,
+  "港区": 1,
+  "大正区": 1,
+  "生野区": 1
+ }
+}
