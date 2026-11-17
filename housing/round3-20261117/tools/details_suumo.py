@@ -86,7 +86,7 @@ COLS = ['target_type','url','page_title','project_name','address','station_raw',
 ALIASES = {
  'address': ['所在地','住所'],
  'station_raw': ['交通'],
- 'price_raw': ['価格','予定価格','販売価格'],
+ 'price_raw': ['価格','予定価格','販売価格','予定価格帯'],
  'most_common_price_band_raw': ['最多価格帯','予定最多価格帯'],
  'units_for_sale': ['販売戸数','今回販売戸数','販売区画数','今回販売区画数'],
  'units_total': ['総戸数','総区画数'],
@@ -99,7 +99,7 @@ ALIASES = {
  'other_fees_raw': ['その他諸経費','諸費用'],
  'completion_raw': ['完成時期','完成時期(築年月)','竣工時期','築年月','完成時期（築年月）'],
  'handover_raw': ['引渡可能時期','入居時期','引渡時期','入居可能時期'],
- 'structure_raw': ['構造・工法','構造・階建て','構造・階建','構造・階数','構造'],
+ 'structure_raw': ['構造・工法','構造・階建て','構造・階建','構造・階数','所在階/構造・階建','構造'],
  'land_rights_raw': ['土地の権利形態','敷地の権利形態'],
  'zoning_raw': ['用途地域'],
  'coverage_far_raw': ['建ぺい率・容積率','建蔽率・容積率'],
@@ -108,7 +108,7 @@ ALIASES = {
  'seller_raw': ['売主'],
  'builder_raw': ['施工','施工会社'],
  'transaction_type_raw': ['取引態様'],
- 'company_raw': ['会社概要','情報提供会社'],
+ 'company_raw': ['会社概要','情報提供会社','会社情報'],
 }
 LABEL2COL = {}
 for c, ls in ALIASES.items():
@@ -202,6 +202,13 @@ def parse_row(tt, url, pages):
                         n = norm(a.get_text())
                         if n and n not in names: names.append(n)
         row['company_raw'] = ' | '.join(names)
+    if not row['seller_raw'] and '売主' in row['transaction_type_raw'] and '〒' in row['company_raw']:
+        seg = row['company_raw'].split('〒')[0]
+        seg = re.sub(r'^\s*<[^>]*>\s*', '', seg)
+        seg = re.sub(r'^.*?第[\d\-]+号\s*', '', seg)
+        toks = [x for x in seg.split(' ') if x and x != '/' and not re.search(r'(会員|加盟)$', x)]
+        row['seller_raw'] = ' '.join(toks)
+    if not row['project_name'] and '物件名' in allp: row['project_name'] = allp['物件名']
     row['price_min_man'], row['price_max_man'] = (lambda a: ('' if a[0] is None else a[0], '' if a[1] is None else a[1]))(parse_price(row['price_raw']))
     return row, allp
 
