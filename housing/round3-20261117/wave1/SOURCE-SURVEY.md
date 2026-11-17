@@ -54,7 +54,7 @@ Lấy các căn trong dải 4.000–5.000万 trên những trang đã tải, kh�
 Kiểm lại 12 trong 13 căn không khớp với toàn bộ 11.463 tin SUUMO (mọi giá):
 
 - **4 căn có trên SUUMO nhưng ở giá cao hơn dải** (5.150–6.380万, cùng khu và cùng diện tích). Có hai khả năng chưa phân biệt được: căn đã giảm giá sau 02/11, hoặc là căn khác tầng trong cùng tòa.
-- **8 căn hoàn toàn không có trên SUUMO**: 4 chung cư (鶴見区, 西区, 北区, 西淀川区, 此花区 — một trong số này từ リハウス) và 3 nhà riêng cũ (福島区, 浪速区, 天王寺区).
+- **8 căn hoàn toàn không có trên SUUMO**: 5 chung cư (鶴見区, 西区, 北区, 西淀川区, 此花区) và 3 nhà riêng cũ (福島区, 浪速区, 天王寺区).
 - Căn thứ 13 (野村, 北区大深町, xây 2025, 4.280万) nghi do biểu thức trích giá của tôi cắt sai; không tính.
 
 Cách đọc con số này:
