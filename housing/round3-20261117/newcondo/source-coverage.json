@@ -1,0 +1,80 @@
+{
+ "source_rows": {
+  "yahoo": 99,
+  "suumo": 196,
+  "major7": 13,
+  "surfin": 61
+ },
+ "clusters_total": 98,
+ "unsold_unit_resale_only_clusters": 13,
+ "projects_total": 85,
+ "projects_per_source": {
+  "yahoo": 72,
+  "suumo": 74,
+  "major7": 13,
+  "surfin": 57
+ },
+ "only_in_one_source": {
+  "yahoo": 3,
+  "suumo": 6,
+  "major7": 1,
+  "surfin": 1
+ },
+ "by_source_count": {
+  "1": 11,
+  "2": 22,
+  "3": 47,
+  "4": 5
+ },
+ "yahoo_or_suumo": 83,
+ "missing_from_yahoo": 13,
+ "missing_from_suumo": 11,
+ "price_status": {
+  "undisclosed": 18,
+  "above_5000": 29,
+  "touches_4000_5000": 37,
+  "below_4000": 1
+ },
+ "price_status_by_presence": {
+  "both": {
+   "above_5000": 25,
+   "undisclosed": 11,
+   "touches_4000_5000": 26,
+   "below_4000": 1
+  },
+  "yahoo_only": {
+   "undisclosed": 2,
+   "touches_4000_5000": 4,
+   "above_5000": 3
+  },
+  "suumo_only": {
+   "undisclosed": 3,
+   "touches_4000_5000": 7,
+   "above_5000": 1
+  },
+  "neither": {
+   "undisclosed": 2
+  }
+ },
+ "wards": {
+  "中央区": 14,
+  "北区": 13,
+  "天王寺区": 8,
+  "旭区": 6,
+  "住吉区": 5,
+  "平野区": 5,
+  "阿倍野区": 5,
+  "住之江区": 4,
+  "此花区": 4,
+  "都島区": 4,
+  "城東区": 3,
+  "福島区": 3,
+  "鶴見区": 3,
+  "東住吉区": 2,
+  "淀川区": 2,
+  "大正区": 1,
+  "東淀川区": 1,
+  "西区": 1,
+  "西淀川区": 1
+ }
+}
