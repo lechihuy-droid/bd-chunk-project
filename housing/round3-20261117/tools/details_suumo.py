@@ -221,6 +221,7 @@ def completion_bucket(txt, today=(2026, 11)):
     t = unicodedata.normalize('NFKC', txt)
     m = re.search(r'(\d{4})年\s*(\d{1,2})月', t)
     if re.search(r'完成済|築済|即入居', t) and not m: return 'completed'
+    if '契約後' in t: return 'relative_to_contract'
     if not m: return 'unknown'
     ym = (int(m.group(1)), int(m.group(2)))
     if ym < today: return 'completed'
@@ -260,7 +261,7 @@ def main():
 
 def build_outputs(targets, stop_reason):
     rows, stats_labels = [], {}
-    buckets = {'completed': 0, 'current_month': 0, 'future': 0, 'unknown': 0}
+    buckets = {}
     for r in targets:
         tt, url = r['target_type'], r['url']
         pages = collect_pages(tt, url, False)
