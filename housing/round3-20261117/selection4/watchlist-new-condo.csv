@@ -1,0 +1,26 @@
+source,watch,ward,project_name,address,units_total,completion_raw,handover_raw,price_raw,area_keep_ratio_20y,url
+suumo,fees_undisclosed,住吉区,グランアッシュ長居パークデイズ,大阪府大阪市住吉区苅田1丁目9番1(地番),106戸,2027年3月中旬予定,2027年4月中旬予定,4900万円台~7800万円台,0.586,https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67733555/
+suumo,fees_undisclosed,中央区,ラシュレ堺筋本町エスト,大阪府大阪市中央区農人橋2丁目33番(地番),83戸,2027年6月下旬予定,2027年7月下旬予定,3600万円台~5900万円台,0.558,https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67736247/
+yahoo,fees_undisclosed,住之江区,エスリード住吉大社駅レジデンス,大阪府大阪市住之江区浜口東二丁目5番12（地番）,,,2025年10月31日,"4,710万円～5,360万円",,https://realestate.yahoo.co.jp/new/mansion/dtl/00156004/
+yahoo,fees_undisclosed,住之江区,大阪ベイレジデンス,大阪府大阪市住之江区南港北一丁目41番5（地番）,,,即入居可,"4,758万円",,https://realestate.yahoo.co.jp/new/mansion/dtl/00148616/
+yahoo,fees_undisclosed,大正区,クレアホームズ フラン大正駅前,大阪府大阪市大正区三軒家東1丁目24番18、24番19、24番20（地番）,,,2027年04月下旬予定,"第2期 3,760万円～5,510万円 / 【登録受付】 3,490万円",,https://realestate.yahoo.co.jp/new/mansion/dtl/00156213/
+suumo,price_undisclosed,旭区,ザ・ライオンズ千林駅前,大阪府大阪市旭区清水1丁目35番1他(地番)、大阪府大阪市旭区清水1丁目18番以下未定(住居表示),50戸,2026年11月,即引渡可(諸手続き完了後),未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashiasahi/nc_67732229/
+suumo,price_undisclosed,住吉区,エステムコート御堂筋あびこIIフェアリー,大阪府大阪市住吉区庭井2丁目201番1(地番),51戸,2026年12月中旬予定,2027年3月上旬予定,未定,0.68,https://suumo.jp/ms/shinchiku/osaka/sc_osakashisumiyoshi/nc_67733403/
+suumo,price_undisclosed,東住吉区,プレサンス ロジェ 田辺ルメール,大阪府大阪市東住吉区北田辺3丁目17-1(地番),25戸,2027年11月中旬予定,2027年12月中旬予定,未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashihigashisumiyoshi/nc_67733093/
+suumo,price_undisclosed,北区,レ・ジェイド大阪梅田,大阪府大阪市北区堂山町91番5(地番),225戸(内自社保有予定住戸80戸含む、その他店舗1戸),2027年1月末予定,2027年2月末予定,未定,0.499,https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67734027/
+suumo,price_undisclosed,中央区,レーベン大阪上本町プレイズ,大阪府大阪市中央区上本町西5丁目2番9(地番),70戸(他、管理事務室1戸),2027年5月中旬予定,2027年6月下旬予定,未定,0.594,https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67734356/
+suumo,price_undisclosed,城東区,カサーレ城東セントラルプレイス,大阪府大阪市城東区中央1丁目40番1(地番),110戸,2027年9月上旬予定,2027年9月下旬予定,未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashijoto/nc_67732666/
+suumo,price_undisclosed,北区,ローレルコート大阪同心,大阪府大阪市北区同心1丁目40番2(地番),52戸(募集対象外住戸6戸含む),2028年12月予定,2029年1月予定,未定,0.492,https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67737625/
+suumo,price_undisclosed,阿倍野区,プレサンス ロジェ 阿倍野西田辺 STATION FRONT,大阪府大阪市阿倍野区昭和町5丁目12番28(地番),39戸,2028年1月下旬予定,2028年2月下旬予定,未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashiabeno/nc_67734373/
+suumo,price_undisclosed,鶴見区,カサーレ鶴見ファーストプレイス,大阪府大阪市鶴見区諸口3丁目713番1(地番),52戸,2028年1月下旬予定,2028年2月中旬予定,未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashitsurumi/nc_67732667/
+suumo,price_undisclosed,中央区,ミラージュグランデ玉造,大阪府大阪市中央区玉造1丁目20-2(地番),33戸,2028年2月下旬予定,2028年3月下旬予定,未定,0.686,https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67736911/
+suumo,price_undisclosed,平野区,プレサンス ロジェ 平野ザ・ガーデン,大阪府大阪市平野区平野西6丁目1番6(地番),44戸,2028年2月下旬予定,2028年3月下旬予定,未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashihirano/nc_67735395/
+suumo,price_undisclosed,阿倍野区,プレサンス ロジェ 阿倍野天王寺,大阪府大阪市阿倍野区天王寺町北3丁目96番4(地番),30戸,2028年2月下旬予定,2028年3月末予定,未定,,https://suumo.jp/ms/shinchiku/osaka/sc_osakashiabeno/nc_67734595/
+suumo,price_undisclosed,北区,プレサンス ロジェ 中崎町アーバニティ,大阪府大阪市北区浪花町128番1(地番),30戸(うち非分譲住戸1戸),2028年2月中旬予定,2028年3月中旬予定,未定,0.492,https://suumo.jp/ms/shinchiku/osaka/sc_osakashikita/nc_67731966/
+suumo,price_undisclosed,天王寺区,(仮称)四天王寺前夕陽ヶ丘・駅直上プロジェクト,大阪府大阪市天王寺区夕陽丘町2番6の一部(地番),43戸(募集対象外住戸2戸含む),2028年5月下旬予定,2028年7月下旬予定,未定,0.857,https://suumo.jp/ms/shinchiku/osaka/sc_osakashitennoji/nc_67736867/
+suumo,price_undisclosed,中央区,ソルティア上町台高津公園,大阪府大阪市中央区中寺2丁目1-9(地番),36戸,2028年6月下旬予定,2028年8月下旬予定,未定,0.686,https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67737691/
+suumo,price_undisclosed,中央区,シエリアタワー森ノ宮中央,大阪府大阪市中央区森ノ宮中央1丁目557-5(地番),151戸,2029年7月予定,2029年8月予定,未定,0.719,https://suumo.jp/ms/shinchiku/osaka/sc_osakashichuo/nc_67734363/
+suumo,price_undisclosed,福島区,ジオタワー大阪福島,大阪府大阪市福島区鷺洲1丁目32番13、32番12、32番19、34番2、50番4、50番5、53番1(地番),612戸,2030年5月下旬予定,2030年7月下旬予定,未定,0.776,https://suumo.jp/ms/shinchiku/osaka/sc_osakashifukushima/nc_67733527/
+yahoo,price_undisclosed,中央区,グランドメゾン大阪上本町STATION TOWER,大阪府大阪市中央区谷町9丁目3-4（地番）,,,2029年03月下旬予定,第二期 未定,,https://realestate.yahoo.co.jp/new/mansion/dtl/00156373/
+yahoo,price_undisclosed,天王寺区,グランドメゾン天王寺上汐六丁目,大阪府大阪市天王寺区上汐6丁目2-11（地番）,,,2028年01月下旬予定,未定,,https://realestate.yahoo.co.jp/new/mansion/dtl/00156718/
+yahoo,priced,此花区,サンメゾン大阪此花,大阪府大阪市此花区四貫島1丁目3番（地番）,39戸,竣工済み（2025年4月）,即入居可（諸手続き完了次第）,"4,840万円～5,900万円",,https://realestate.yahoo.co.jp/new/mansion/dtl/00156081/

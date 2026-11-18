@@ -1,0 +1,122 @@
+{
+ "new_house": {
+  "listing_rows": 344,
+  "houses_after_dedup": 289,
+  "bands": {
+   "A": 50,
+   "B": 46,
+   "C": 48,
+   "D": 48,
+   "S": 2,
+   "U": 95
+  },
+  "unranked_reasons": {
+   "multi_lot_entry": 92,
+   "land_estimate_exceeds_price": 3
+  },
+  "net_cost_jpy_month_quartiles": [
+   108258,
+   128032,
+   143104
+  ],
+  "net_cost_jpy_m2_month_quartiles": [
+   998,
+   1194,
+   1420
+  ],
+  "keep_ratio_quartiles": [
+   0.45,
+   0.5,
+   0.62
+  ],
+  "no_brokerage_fee": {
+   "no": 227,
+   "fee_waived_stated": 16,
+   "direct_or_agent": 46
+  },
+  "no_brokerage_by_band": {
+   "A": 10,
+   "B": 14,
+   "C": 17,
+   "D": 10,
+   "U": 11
+  },
+  "residual_basis_by_band": {
+   "A": {
+    "ward_old_house_land_proxy_coarse": 19,
+    "station_old_house_land_proxy": 31
+   },
+   "B": {
+    "station_old_house_land_proxy": 38,
+    "ward_old_house_land_proxy_coarse": 8
+   },
+   "C": {
+    "ward_old_house_land_proxy_coarse": 12,
+    "station_old_house_land_proxy": 36
+   },
+   "D": {
+    "station_old_house_land_proxy": 37,
+    "ward_old_house_land_proxy_coarse": 11
+   }
+  },
+  "build_status": {
+   "future": 105,
+   "after_contract": 49,
+   "completing_this_month": 35,
+   "completed": 100
+  },
+  "band_by_build_status": {
+   "A": {
+    "future": 19,
+    "after_contract": 10,
+    "completing_this_month": 5,
+    "completed": 16
+   },
+   "B": {
+    "future": 20,
+    "after_contract": 5,
+    "completing_this_month": 5,
+    "completed": 16
+   },
+   "C": {
+    "after_contract": 14,
+    "future": 17,
+    "completed": 15,
+    "completing_this_month": 2
+   },
+   "D": {
+    "completing_this_month": 9,
+    "after_contract": 8,
+    "completed": 14,
+    "future": 17
+   }
+  }
+ },
+ "new_condo": {
+  "rows": 64,
+  "kinds": {
+   "project": 49,
+   "unsold_unit_via_broker": 15
+  },
+  "watch": {
+   "project:touches_band": 29,
+   "project:price_undisclosed": 17,
+   "unsold_unit_via_broker:outside_band": 14,
+   "project:fees_undisclosed": 2,
+   "project:outside_band": 1,
+   "unsold_unit_via_broker:touches_band": 1
+  },
+  "keep_ratio_known_projects": 26,
+  "project_keep_ratio_quartiles": [
+   0.58,
+   0.66,
+   0.75
+  ],
+  "project_fee_per_m2_quartiles": [
+   260,
+   326,
+   395
+  ],
+  "units_costed": 14
+ }
+}

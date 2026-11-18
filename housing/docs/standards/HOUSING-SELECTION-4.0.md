@@ -116,3 +116,18 @@ So với bản 3.0:
 - Không căn nào vào nhóm D hoặc bị loại chỉ vì thiếu dữ liệu.
 - Mỗi căn A có đủ ba thông tin ở mục 6.
 - Kiểm tay 10 căn mỗi loại, gồm căn đứng đầu, căn sát ranh A/B và một căn U.
+
+## 10. Bổ sung 18/11/2026 — nhà mới và chung cư mới
+
+Áp dụng cho dữ liệu trang chi tiết đợt 3 ([báo cáo](../../round3-20261117/wave3/REPORT.md)). Script: [`net_cost_new.py`](../../round3-20261117/tools/net_cost_new.py).
+
+**Phí mua theo loại người bán.** Phí mua 7% đã gồm phí môi giới. Khi người bán bán trực tiếp (売主), qua đại lý (販売提携/代理), hoặc trang ghi rõ miễn phí môi giới (仲介手数料:無料), trừ phí môi giới (3% giá + 6万円, cộng 10% thuế) khỏi phí mua. Công thức này là giả định chờ Huy xác nhận.
+
+**Nhà riêng mới:** cùng công thức như nhà cũ (mục 3–4). Nhiều môi giới cùng đăng một căn thì gom về một dòng, lấy giá thấp nhất. Tin gộp nhiều lô (giá hoặc diện tích ghi theo khoảng) chưa xếp hạng, vì không biết giá nào đi với lô nào. Nhóm A–D chia riêng trong nhà mới.
+
+**Chung cư mới:** chưa xếp hạng. Bảng giá dự án chỉ cho khoảng giá và khoảng diện tích, không gắn giá với từng căn. Thay vào đó mỗi dự án có:
+- tỷ lệ giữ giá 20 năm của khu: giá/m² chung cư già hơn 20 năm so với chung cư gần mới (xây trong vòng 5 năm), cùng khu;
+- phí quản lý + quỹ sửa chữa trên m² (lấy mức thấp nhất chia diện tích nhỏ nhất);
+- tình trạng: chạm dải giá / chưa công bố giá / chưa công bố phí / ngoài dải.
+
+Căn lẻ chưa bán do môi giới bán lại (giá một mức, một căn) được tính như chung cư cũ.
