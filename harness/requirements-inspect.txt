@@ -1,3 +1,0 @@
-inspect-ai
-inspect-swe
-inspect-viz
