@@ -1,0 +1,1 @@
+The design copy replaces the name of an internal reference field with "private reference". Source modules and policy are otherwise unmodified. These files describe the evaluation; source inputs are not bundled.
