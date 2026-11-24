@@ -1,1 +1,0 @@
-CREATE DATABASE vgov_test;
