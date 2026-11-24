@@ -1,3 +1,9 @@
+# Housing selection housing-selection-v4-20261124
+
+Chuẩn mới HOUSING-SELECTION-4.0: xếp hạng theo **chi phí ở thực** (giá mua + phí − giá trị còn lại sau 20 năm, chia theo tháng, cộng phí định kỳ). Thêm nhà riêng mới, dự án chung cư mới và căn chỉ có ở trang khác SUUMO (Yahoo!不動産, 三井のリハウス, 野村の仲介+, 東急リバブル, 住友不動産ステップ, 大京穴吹不動産).
+
+[Bản hiện hành](https://lechihuy-droid.github.io/bd-chunk-project/housing/) | [Bản housing-selection-v4-20261124](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-selection-v4-20261124/index.html) | [Tải dữ liệu](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-selection-v4-20261124/downloads.html) | [Chuẩn 4.0](docs/standards/HOUSING-SELECTION-4.0.md)
+
 # Housing research priorities housing-selection-v3-20261115-walk-filter
 
 [Current research priorities app](https://lechihuy-droid.github.io/bd-chunk-project/housing/) | [Versioned research priorities app](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-selection-v3-20261115-walk-filter/index.html) | [Data downloads](https://lechihuy-droid.github.io/bd-chunk-project/housing/housing-selection-v3-20261115-walk-filter/downloads.html)

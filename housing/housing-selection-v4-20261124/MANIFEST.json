@@ -1,0 +1,74 @@
+{
+ "version": "housing-selection-v4-20261124",
+ "summary": {
+  "rows": 1418,
+  "by_category_band": {
+   "new_condo_project": {
+    "P": 55
+   },
+   "new_condo_unit": {
+    "U": 15
+   },
+   "new_house": {
+    "A": 50,
+    "B": 46,
+    "C": 48,
+    "D": 48,
+    "N": 61,
+    "S": 2,
+    "U": 95
+   },
+   "used_condo": {
+    "A": 103,
+    "B": 106,
+    "C": 102,
+    "D": 103,
+    "N": 68,
+    "S": 45,
+    "U": 176
+   },
+   "used_house": {
+    "A": 52,
+    "B": 53,
+    "C": 52,
+    "D": 52,
+    "N": 41,
+    "S": 16,
+    "U": 29
+   }
+  },
+  "by_source": {
+   "suumo": 1242,
+   "yahoo": 107,
+   "livable": 10,
+   "rehouse+stepon": 1,
+   "rehouse": 23,
+   "stepon": 14,
+   "daikyo+nomu": 4,
+   "nomu+yahoo": 2,
+   "livable+yahoo": 4,
+   "livable+nomu+yahoo": 1,
+   "livable+nomu": 1,
+   "nomu": 8,
+   "daikyo+yahoo": 1
+  }
+ },
+ "files": {
+  "downloads.html": {
+   "bytes": 2171,
+   "sha256": "5323e17fb446f75866f79bda25b3d473297f274156411294c60392cf9f673b38"
+  },
+  "index.html": {
+   "bytes": 7665,
+   "sha256": "c84fc3347ba6673e8e33d1d125524fa70ec4030347855291f9960805ebb3c180"
+  },
+  "listing-data.json": {
+   "bytes": 908381,
+   "sha256": "85dc8cb06024c99f4fdfe3c5a9c0a3774913c282dabea90d8a66729cb8586a08"
+  },
+  "view.js": {
+   "bytes": 9127,
+   "sha256": "87d5d66fe8c90ebb36310a27e3e49ae9d1214caba8ce7b2a4be9beb9f9e2f246"
+  }
+ }
+}
